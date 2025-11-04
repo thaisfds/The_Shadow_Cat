@@ -32,8 +32,6 @@ jogador morre, recomeçando da primeira fase, com a oportunidade de
 conseguir itens e habilidades diferentes na próxima (nenhuma run é igual
 à outra).
 
-![](media/image1.png){width="6.5in" height="2.2916666666666665in"}
-
 As fases do jogo são um conjunto de salas, e acaba quando o jogador mata
 o chefe. A estrutura das salas é feita à mão, mas os inimigos,
 obstáculos e outros elementos são colocados aleatoriamente.
@@ -98,11 +96,6 @@ Of The Lamb*[^1], na pixel art viva e colorida de *Stardew Valley*[^2],
 e na ambientação marcada pelo uso expressivo de luz e sombra de *Hollow
 Knight*[^3].
 
-![](media/image3.jpg){width="2.09375in"
-height="2.7333333333333334in"}![](media/image5.png){width="2.0in"
-height="2.7333333333333334in"}![](media/image4.png){width="2.0619477252843397in"
-height="2.7290485564304463in"}
-
 A ambientação das fases representa a segregação entre os povos felinos e
 como isso afetou o equilíbrio do reino. As regiões são:
 
@@ -114,9 +107,6 @@ com orgulho e rigidez
 
 **Arredores:** território dos gatos livres, uma zona de transição
 habitada por gatos brancos, tricolores e frajolas.
-
-![](media/image2.jpg){width="1.1166272965879265in"
-height="1.0290485564304461in"}
 
 O protagonista será um jovem e pequeno gato preto, ágil e curioso, que
 parte em uma jornada para desafiar a tirania e restaurar o equilíbrio
