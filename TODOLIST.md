@@ -2,7 +2,7 @@
 
 ## High Priority
 
-- [ ][_____][_____] Player movement
+- [ ][Thaís] Player movement
     - [ ][_____] keyboard WASD
     - [ ][_____] gamepad 
 - [ ][_____] Create enemy
