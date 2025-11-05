@@ -28,53 +28,49 @@ void ShadowCat::OnProcessInput(const uint8_t *state)
 {
     if (mIsDead)
         return;
-
-    Vector2 force = Vector2::Zero;
-    Vector2 vel = mRigidBodyComponent->GetVelocity();
+    // Build input direction
+    Vector2 dir = Vector2::Zero;
     mIsRunning = false;
 
-    // Right (D key)
     if (state[SDL_SCANCODE_D])
     {
-        mIsRunning = true;
-        force.x += mForwardSpeed;
-        SetScale(Vector2(1.0f, GetScale().y));
+        dir.x += 1.0f;
     }
-    // Left (A key)
-    else if (state[SDL_SCANCODE_A])
+    if (state[SDL_SCANCODE_A])
     {
-        mIsRunning = true;
-        force.x -= mForwardSpeed;
-        SetScale(Vector2(-1.0f, GetScale().y));
+        dir.x -= 1.0f;
     }
-    else
-    {
-        vel.x = 0.0f;
-    }
-
-    // Down (S key)
     if (state[SDL_SCANCODE_S])
     {
-        mIsRunning = true;
-        force.y += mForwardSpeed;
+        dir.y += 1.0f;
     }
-    // Up (W key)
-    else if (state[SDL_SCANCODE_W])
+    if (state[SDL_SCANCODE_W])
     {
-        mIsRunning = true;
-        force.y -= mForwardSpeed;
-    }
-    else
-    {
-        vel.y = 0.0f;
+        dir.y -= 1.0f;
     }
 
-    if (mIsRunning)
+    // If any input, set constant velocity in that direction
+    Vector2 desiredVel = Vector2::Zero;
+    if (dir.LengthSq() > 0.0f)
     {
-        mRigidBodyComponent->ApplyForce(force);
+        mIsRunning = true;
+        // Normalize to keep constant speed in diagonals
+        dir.Normalize();
+        desiredVel = dir * mForwardSpeed;
+
+        // Flip sprite horizontally based on x input
+        if (dir.x > 0.0f)
+        {
+            SetScale(Vector2(1.0f, GetScale().y));
+        }
+        else if (dir.x < 0.0f)
+        {
+            SetScale(Vector2(-1.0f, GetScale().y));
+        }
     }
 
-    mRigidBodyComponent->SetVelocity(vel);
+    // Directly set velocity to avoid acceleration
+    mRigidBodyComponent->SetVelocity(desiredVel);
 }
 
 void ShadowCat::OnUpdate(float deltaTime)
