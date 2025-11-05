@@ -28,7 +28,7 @@ void ShadowCat::OnProcessInput(const uint8_t *state)
 {
     if (mIsDead)
         return;
-    // Build input direction
+
     Vector2 dir = Vector2::Zero;
     mIsRunning = false;
 
@@ -54,7 +54,6 @@ void ShadowCat::OnProcessInput(const uint8_t *state)
     if (dir.LengthSq() > 0.0f)
     {
         mIsRunning = true;
-        // Normalize to keep constant speed in diagonals
         dir.Normalize();
         desiredVel = dir * mForwardSpeed;
 

@@ -130,7 +130,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
             {
             case 0:
             {
-                // ShadowCat spawn point
                 mShadowCat = new ShadowCat(this);
                 mShadowCat->SetPosition(position);
                 break;
@@ -138,7 +137,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 
             case 1:
             {
-                // Bush1
                 auto block = new Block(this, "../Assets/Sprites/Blocks/Bush1.png");
                 block->SetPosition(position);
                 break;
@@ -146,7 +144,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 
             case 2:
             {
-                // Bush2
                 auto block = new Block(this, "../Assets/Sprites/Blocks/Bush2.png");
                 block->SetPosition(position);
                 break;
@@ -154,7 +151,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 
             case 3:
             {
-                // Bush3
                 auto block = new Block(this, "../Assets/Sprites/Blocks/Bush3.png");
                 block->SetPosition(position);
                 break;
@@ -162,7 +158,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 
             case 4:
             {
-                // Bush4
                 auto block = new Block(this, "../Assets/Sprites/Blocks/Bush4.png");
                 block->SetPosition(position);
                 break;
@@ -170,7 +165,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 
             case 5:
             {
-                // Stone1
                 auto block = new Block(this, "../Assets/Sprites/Blocks/Stone1.png");
                 block->SetPosition(position);
                 break;
@@ -178,7 +172,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 
             case 6:
             {
-                // Stone3
                 auto block = new Block(this, "../Assets/Sprites/Blocks/Stone3.png");
                 block->SetPosition(position);
                 break;
@@ -186,15 +179,8 @@ void Game::BuildLevel(int **levelData, int width, int height)
 
             case 7:
             {
-                // Stone2
                 auto block = new Block(this, "../Assets/Sprites/Blocks/Stone2.png");
                 block->SetPosition(position);
-                break;
-            }
-
-            case -1:
-            {
-                // Empty tile, do nothing
                 break;
             }
 
@@ -365,23 +351,18 @@ void Game::GenerateOutput()
     // Clear back buffer
     mRenderer->Clear();
 
-    // Draw background scaled to level size (preserve aspect ratio)
     Texture *backgroundTexture = mRenderer->GetTexture("../Assets/Levels/Lobby/LobbyBackground.png");
     if (backgroundTexture)
     {
-        // Level size in pixels
         float levelPixelWidth = static_cast<float>(LEVEL_WIDTH) * static_cast<float>(TILE_SIZE);
         float levelPixelHeight = static_cast<float>(LEVEL_HEIGHT) * static_cast<float>(TILE_SIZE);
 
-        // Desired size = level size only (do not depend on window size)
         float desiredWidth = levelPixelWidth;
         float desiredHeight = levelPixelHeight;
 
-        // Original texture size
         float texW = static_cast<float>(backgroundTexture->GetWidth());
         float texH = static_cast<float>(backgroundTexture->GetHeight());
 
-        // Compute uniform scale to cover desired area while preserving aspect ratio
         float scale = 1.0f;
         if (texW > 0.0f && texH > 0.0f)
         {
@@ -391,7 +372,6 @@ void Game::GenerateOutput()
         float backgroundWidth = texW * scale;
         float backgroundHeight = texH * scale;
 
-        // Center on the level (not the window) so camera panning works naturally
         Vector2 position(levelPixelWidth / 2.0f, levelPixelHeight / 2.0f);
         Vector2 size(backgroundWidth, backgroundHeight);
 
