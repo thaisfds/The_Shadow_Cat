@@ -49,7 +49,7 @@ bool Game::Initialize()
 void Game::InitializeActors()
 {
 
-    mLevelData = LoadLevel("../Assets/Levels/Level1-1/level1-1.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
+    mLevelData = LoadLevel("../Assets/Levels/Lobby/Lobby.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
 
     if (mLevelData)
     {
@@ -115,8 +115,6 @@ int **Game::LoadLevel(const std::string &fileName, int width, int height)
 
 void Game::BuildLevel(int **levelData, int width, int height)
 {
-    const std::string BLOCK_TEXTURE = "../Assets/Sprites/Blocks/BlockA.png";
-
     for (int i = 0; i < height; ++i)
     {
         for (int j = 0; j < width; ++j)
@@ -132,71 +130,71 @@ void Game::BuildLevel(int **levelData, int width, int height)
             {
             case 0:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockA.png");
-                block->SetPosition(position);
+                // ShadowCat spawn point
+                mShadowCat = new ShadowCat(this);
+                mShadowCat->SetPosition(position);
                 break;
             }
 
             case 1:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockC.png");
+                // Bush1
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Bush1.png");
                 block->SetPosition(position);
                 break;
             }
 
             case 2:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockF.png");
+                // Bush2
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Bush2.png");
+                block->SetPosition(position);
+                break;
+            }
+
+            case 3:
+            {
+                // Bush3
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Bush3.png");
                 block->SetPosition(position);
                 break;
             }
 
             case 4:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockB.png");
+                // Bush4
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Bush4.png");
                 block->SetPosition(position);
                 break;
             }
 
             case 5:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockE.png");
+                // Stone1
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Stone1.png");
                 block->SetPosition(position);
                 break;
             }
 
             case 6:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockI.png");
+                // Stone3
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Stone3.png");
                 block->SetPosition(position);
                 break;
             }
 
-            case 8:
+            case 7:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockD.png");
+                // Stone2
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Stone2.png");
                 block->SetPosition(position);
                 break;
             }
 
-            case 9:
+            case -1:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockH.png");
-                block->SetPosition(position);
-                break;
-            }
-
-            case 12:
-            {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockG.png");
-                block->SetPosition(position);
-                break;
-            }
-
-            case 16:
-            {
-                mShadowCat = new ShadowCat(this);
-                mShadowCat->SetPosition(position);
+                // Empty tile, do nothing
                 break;
             }
 
@@ -366,6 +364,40 @@ void Game::GenerateOutput()
 {
     // Clear back buffer
     mRenderer->Clear();
+
+    // Draw background scaled to level size (preserve aspect ratio)
+    Texture *backgroundTexture = mRenderer->GetTexture("../Assets/Levels/Lobby/LobbyBackground.png");
+    if (backgroundTexture)
+    {
+        // Level size in pixels
+        float levelPixelWidth = static_cast<float>(LEVEL_WIDTH) * static_cast<float>(TILE_SIZE);
+        float levelPixelHeight = static_cast<float>(LEVEL_HEIGHT) * static_cast<float>(TILE_SIZE);
+
+        // Desired size = level size only (do not depend on window size)
+        float desiredWidth = levelPixelWidth;
+        float desiredHeight = levelPixelHeight;
+
+        // Original texture size
+        float texW = static_cast<float>(backgroundTexture->GetWidth());
+        float texH = static_cast<float>(backgroundTexture->GetHeight());
+
+        // Compute uniform scale to cover desired area while preserving aspect ratio
+        float scale = 1.0f;
+        if (texW > 0.0f && texH > 0.0f)
+        {
+            scale = std::max(desiredWidth / texW, desiredHeight / texH);
+        }
+
+        float backgroundWidth = texW * scale;
+        float backgroundHeight = texH * scale;
+
+        // Center on the level (not the window) so camera panning works naturally
+        Vector2 position(levelPixelWidth / 2.0f, levelPixelHeight / 2.0f);
+        Vector2 size(backgroundWidth, backgroundHeight);
+
+        mRenderer->DrawTexture(position, size, 0.0f, Vector3(1.0f, 1.0f, 1.0f),
+                               backgroundTexture, Vector4::UnitRect, mCameraPos);
+    }
 
     for (auto drawable : mDrawables)
     {
