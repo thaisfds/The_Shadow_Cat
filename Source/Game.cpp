@@ -11,10 +11,10 @@
 #include "Actors/Block.h"
 #include "Actors/Goomba.h"
 #include "Actors/Spawner.h"
-#include "Actors/Mario.h"
+#include "Actors/ShadowCat.h"
 
 Game::Game()
-    : mWindow(nullptr), mRenderer(nullptr), mTicksCount(0), mIsRunning(true), mIsDebugging(false), mUpdatingActors(false), mCameraPos(Vector2::Zero), mMario(nullptr), mLevelData(nullptr)
+    : mWindow(nullptr), mRenderer(nullptr), mTicksCount(0), mIsRunning(true), mIsDebugging(false), mUpdatingActors(false), mCameraPos(Vector2::Zero), mShadowCat(nullptr), mLevelData(nullptr)
 {
 }
 
@@ -195,8 +195,8 @@ void Game::BuildLevel(int **levelData, int width, int height)
 
             case 16:
             {
-                mMario = new Mario(this);
-                mMario->SetPosition(position);
+                mShadowCat = new ShadowCat(this);
+                mShadowCat->SetPosition(position);
                 break;
             }
 
@@ -295,6 +295,15 @@ void Game::UpdateActors(float deltaTime)
 
 void Game::UpdateCamera()
 {
+    if (mShadowCat)
+    {
+        float targetX = mShadowCat->GetPosition().x;
+        float targetY = mShadowCat->GetPosition().y;
+
+        // Center camera on ShadowCat by subtracting half of window dimensions
+        mCameraPos.x = targetX - (WINDOW_WIDTH / 2.0f);
+        mCameraPos.y = targetY - (WINDOW_HEIGHT / 2.0f);
+    }
 }
 
 void Game::AddActor(Actor *actor)
