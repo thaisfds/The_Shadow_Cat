@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="11" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="1">
+ <editorsettings>
+  <export target="Lobby.csv" format="csv"/>
+ </editorsettings>
+ <tileset firstgid="1" source="Lobby.tsx"/>
+ <imagelayer id="2" name="Background">
+  <image source="LobbyBackground.png" width="352" height="352"/>
+ </imagelayer>
+ <layer id="1" name="Tile Layer 1" width="11" height="11">
+  <data encoding="csv">
+4,5,3,5,3,5,3,5,3,5,4,
+2,0,0,0,0,0,0,0,0,0,2,
+4,0,0,0,8,7,8,0,0,0,4,
+2,0,0,0,6,1,6,0,0,0,2,
+4,0,0,0,0,0,0,0,0,0,4,
+2,0,0,0,0,0,0,0,0,0,2,
+4,0,0,0,0,0,0,0,0,0,4,
+2,0,0,0,0,0,0,0,0,0,2,
+4,0,0,0,0,0,0,0,0,0,4,
+2,0,0,0,0,0,0,0,0,0,2,
+4,3,5,8,0,0,0,8,5,3,4
+</data>
+ </layer>
+</map>
