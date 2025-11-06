@@ -22,8 +22,8 @@ public:
     // Renderer
     class Renderer *GetRenderer() { return mRenderer; }
 
-    static const int WINDOW_WIDTH = 640;
-    static const int WINDOW_HEIGHT = 448;
+    static const int WINDOW_WIDTH = 854;
+    static const int WINDOW_HEIGHT = 480;
     static const int LEVEL_WIDTH = 11;
     static const int LEVEL_HEIGHT = 11;
     static const int TILE_SIZE = 32;
@@ -83,6 +83,7 @@ private:
     bool mIsRunning;
     bool mIsDebugging;
     bool mUpdatingActors;
+    bool mIsFullscreen;
 
     // Game-specific
     class ShadowCat *mShadowCat;
