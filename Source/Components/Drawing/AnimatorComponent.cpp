@@ -10,6 +10,14 @@ AnimatorComponent::AnimatorComponent(class Actor *owner, const std::string &texP
     : DrawComponent(owner, drawOrder), mAnimTimer(0.0f), mIsPaused(false), mWidth(width), mHeight(height), mTextureFactor(1.0f)
 {
     mSpriteTexture = mOwner->GetGame()->GetRenderer()->GetTexture(texPath);
+
+    if (!dataPath.empty())
+    {
+        if (!LoadSpriteSheetData(dataPath))
+        {
+            SDL_Log("Failed to load sprite sheet data for %s", texPath.c_str());
+        }
+    }
 }
 
 AnimatorComponent::~AnimatorComponent()
@@ -63,8 +71,30 @@ void AnimatorComponent::Draw(Renderer *renderer)
 
         if (!mSpriteSheetData.empty())
         {
-            texRect = mSpriteSheetData[0];
+            auto animIter = mAnimations.find(mAnimName);
+
+            if (animIter != mAnimations.end() && !animIter->second.empty())
+            {
+                const std::vector<int> &frames = animIter->second;
+                int currentFrameIndex = static_cast<int>(mAnimTimer);
+
+                if (currentFrameIndex >= 0 && currentFrameIndex < frames.size())
+                {
+                    int spriteNum = frames[currentFrameIndex];
+
+                    if (spriteNum >= 0 && spriteNum < mSpriteSheetData.size())
+                    {
+                        texRect = mSpriteSheetData[spriteNum];
+                    }
+                }
+            }
+            else
+            {
+                texRect = mSpriteSheetData[0];
+            }
         }
+
+        bool flipH = (mOwner->GetScale().x < 0.0f);
 
         renderer->DrawTexture(
             mOwner->GetPosition(),
@@ -74,19 +104,39 @@ void AnimatorComponent::Draw(Renderer *renderer)
             mSpriteTexture,
             texRect,
             mOwner->GetGame()->GetCameraPos(),
-            false,
+            flipH,
             mTextureFactor);
     }
 }
 
 void AnimatorComponent::Update(float deltaTime)
 {
+    if (mIsPaused || mAnimations.empty())
+        return;
+
+    auto animIter = mAnimations.find(mAnimName);
+    if (animIter == mAnimations.end())
+        return;
+
+    const std::vector<int> &frames = animIter->second;
+    if (frames.empty())
+        return;
+
+    mAnimTimer += deltaTime * mAnimFPS;
+
+    while (mAnimTimer >= frames.size())
+    {
+        mAnimTimer -= static_cast<float>(frames.size());
+    }
 }
 
 void AnimatorComponent::SetAnimation(const std::string &name)
 {
+    mAnimName = name;
+    Update(0.0f);
 }
 
 void AnimatorComponent::AddAnimation(const std::string &name, const std::vector<int> &spriteNums)
 {
+    mAnimations.emplace(name, spriteNums);
 }

@@ -5,12 +5,8 @@
 #include "Texture.h"
 
 Renderer::Renderer(SDL_Window *window)
-: mBaseShader(nullptr)
-, mWindow(window)
-, mContext(nullptr)
-, mOrthoProjection(Matrix4::Identity)
+    : mBaseShader(nullptr), mWindow(window), mContext(nullptr), mOrthoProjection(Matrix4::Identity)
 {
-
 }
 
 Renderer::~Renderer()
@@ -22,8 +18,8 @@ Renderer::~Renderer()
 bool Renderer::Initialize(float width, float height)
 {
     // Specify version 3.3 (core profile)
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     // Enable double buffering
@@ -40,22 +36,24 @@ bool Renderer::Initialize(float width, float height)
 
     // Initialize GLEW
     glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
+    if (glewInit() != GLEW_OK)
+    {
         SDL_Log("Failed to initialize GLEW.");
         return false;
     }
 
-	// Make sure we can create/compile shaders
-	if (!LoadShaders()) {
-		SDL_Log("Failed to load shaders.");
-		return false;
-	}
+    // Make sure we can create/compile shaders
+    if (!LoadShaders())
+    {
+        SDL_Log("Failed to load shaders.");
+        return false;
+    }
 
     // Create quad for drawing sprites
     CreateSpriteVerts();
 
     // Set the clear color to light grey
-    glClearColor(0.419f, 0.549f, 1.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     // Enable alpha blending on textures
     glEnable(GL_BLEND);
@@ -64,7 +62,6 @@ bool Renderer::Initialize(float width, float height)
     // Create orthografic projection matrix
     mOrthoProjection = Matrix4::CreateOrtho(0.0f, width, height, 0.0f, -1.0f, 1.0f);
     mBaseShader->SetMatrixUniform("uOrthoProj", mOrthoProjection);
-
 
     mBaseShader->SetIntegerUniform("uTexture", 0);
     // Activate shader
@@ -87,7 +84,7 @@ void Renderer::Shutdown()
     delete mBaseShader;
 
     SDL_GL_DeleteContext(mContext);
-	SDL_DestroyWindow(mWindow);
+    SDL_DestroyWindow(mWindow);
 }
 
 void Renderer::Clear()
@@ -104,27 +101,28 @@ void Renderer::Draw(RendererMode mode, const Matrix4 &modelMatrix, const Vector2
     mBaseShader->SetVectorUniform("uTexRect", textureRect);
     mBaseShader->SetVectorUniform("uCameraPos", cameraPos);
 
-    if(vertices)
+    if (vertices)
     {
         vertices->SetActive();
     }
 
-    if(texture)
+    if (texture)
     {
         texture->SetActive();
         mBaseShader->SetFloatUniform("uTextureFactor", textureFactor);
     }
-    else {
+    else
+    {
         mBaseShader->SetFloatUniform("uTextureFactor", 0.0f);
     }
 
     if (mode == RendererMode::LINES)
     {
-        glDrawElements(GL_LINE_LOOP, vertices->GetNumIndices(), GL_UNSIGNED_INT,nullptr);
+        glDrawElements(GL_LINE_LOOP, vertices->GetNumIndices(), GL_UNSIGNED_INT, nullptr);
     }
-    else if(mode == RendererMode::TRIANGLES)
+    else if (mode == RendererMode::TRIANGLES)
     {
-        glDrawElements(GL_TRIANGLES, vertices->GetNumIndices(), GL_UNSIGNED_INT,nullptr);
+        glDrawElements(GL_TRIANGLES, vertices->GetNumIndices(), GL_UNSIGNED_INT, nullptr);
     }
 }
 
@@ -163,19 +161,20 @@ void Renderer::DrawGeometry(const Vector2 &position, const Vector2 &size, float 
 
 void Renderer::Present()
 {
-	// Swap the buffers
-	SDL_GL_SwapWindow(mWindow);
+    // Swap the buffers
+    SDL_GL_SwapWindow(mWindow);
 }
 
 bool Renderer::LoadShaders()
 {
-	// Create sprite shader
-	mBaseShader = new Shader();
-	if (!mBaseShader->Load("../Shaders/Base")) {
-		return false;
-	}
+    // Create sprite shader
+    mBaseShader = new Shader();
+    if (!mBaseShader->Load("../Shaders/Base"))
+    {
+        return false;
+    }
 
-	mBaseShader->SetActive();
+    mBaseShader->SetActive();
 
     return true;
 }
@@ -183,24 +182,21 @@ bool Renderer::LoadShaders()
 void Renderer::CreateSpriteVerts()
 {
     float verts[] = {
-        -0.5f,  0.5f,      0.0f, 1.0f,
-         0.5f,  0.5f,      1.0f, 1.0f,
-         0.5f, -0.5f,      1.0f, 0.0f,
-        -0.5f, -0.5f,      0.0f, 0.0f
-    };
+        -0.5f, 0.5f, 0.0f, 1.0f,
+        0.5f, 0.5f, 1.0f, 1.0f,
+        0.5f, -0.5f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f, 0.0f};
 
     unsigned int indices[] = {
         0, 1, 2,
-        2, 3, 0
-    };
+        2, 3, 0};
 
     mSpriteVerts = new VertexArray(verts, 4, indices, 6);
 }
 
-
-Texture* Renderer::GetTexture(const std::string& fileName)
+Texture *Renderer::GetTexture(const std::string &fileName)
 {
-    Texture* tex = nullptr;
+    Texture *tex = nullptr;
     auto iter = mTextures.find(fileName);
     if (iter != mTextures.end())
     {

@@ -1,0 +1,174 @@
+//
+// Created by thais on 11/5/2025.
+//
+
+#include "ShadowCat.h"
+#include "../Game.h"
+#include "../Components/Drawing/AnimatorComponent.h"
+#include "../Components/Physics/RigidBodyComponent.h"
+#include "../Components/Physics/AABBColliderComponent.h"
+#include "../Components/ParticleSystemComponent.h"
+#include <cmath>
+
+const int JOYSTICK_DEAD_ZONE = 8000;
+
+ShadowCat::ShadowCat(Game *game, const float forwardSpeed, const float jumpSpeed)
+    : Actor(game), mIsRunning(false), mIsDead(false), mForwardSpeed(forwardSpeed), mJumpSpeed(jumpSpeed)
+{
+    mDrawComponent = new AnimatorComponent(this, "../Assets/Sprites/ShadowCat/ShadowCat.png", "../Assets/Sprites/ShadowCat/ShadowCat.json", Game::TILE_SIZE, Game::TILE_SIZE);
+    mRigidBodyComponent = new RigidBodyComponent(this);
+    mColliderComponent = new AABBColliderComponent(this, 0, 0, Game::TILE_SIZE, Game::TILE_SIZE, ColliderLayer::Player);
+    mRigidBodyComponent->SetApplyGravity(false);
+
+    mDrawComponent->AddAnimation("Idle", {0});
+    mDrawComponent->AddAnimation("Run", {0, 1, 0, 2});
+
+    mDrawComponent->SetAnimation("Idle");
+    mDrawComponent->SetAnimFPS(10.0f);
+}
+
+void ShadowCat::OnProcessInput(const uint8_t *state)
+{
+    if (mIsDead)
+        return;
+
+    Vector2 dir = Vector2::Zero;
+    mIsRunning = false;
+
+    // Keyboard input
+    if (state[SDL_SCANCODE_D])
+    {
+        dir.x += 1.0f;
+    }
+    if (state[SDL_SCANCODE_A])
+    {
+        dir.x -= 1.0f;
+    }
+    if (state[SDL_SCANCODE_S])
+    {
+        dir.y += 1.0f;
+    }
+    if (state[SDL_SCANCODE_W])
+    {
+        dir.y -= 1.0f;
+    }
+
+    // Gamepad input
+    SDL_GameController *controller = GetGame()->mController;
+    if (controller)
+    {
+        // Left Stick (analog)
+        int x_axis = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
+        int y_axis = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+
+        float x_dir = 0.0f;
+        if (std::abs(x_axis) > JOYSTICK_DEAD_ZONE)
+        {
+            x_dir = (float)x_axis / 32767.0f;
+        }
+
+        float y_dir = 0.0f;
+        if (std::abs(y_axis) > JOYSTICK_DEAD_ZONE)
+        {
+            y_dir = (float)y_axis / 32767.0f;
+        }
+
+        dir.x += x_dir;
+        dir.y += y_dir;
+
+        // D-Pad (arrows)
+        if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP))
+        {
+            dir.y -= 1.0f;
+        }
+        if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN))
+        {
+            dir.y += 1.0f;
+        }
+        if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT))
+        {
+            dir.x -= 1.0f;
+        }
+        if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT))
+        {
+            dir.x += 1.0f;
+        }
+    }
+
+    Vector2 desiredVel = Vector2::Zero;
+    if (dir.LengthSq() > 0.0f)
+    {
+        mIsRunning = true;
+        dir.Normalize();
+        desiredVel = dir * mForwardSpeed;
+
+        if (dir.x > 0.0f)
+        {
+            SetScale(Vector2(1.0f, GetScale().y));
+        }
+        else if (dir.x < 0.0f)
+        {
+            SetScale(Vector2(-1.0f, GetScale().y));
+        }
+    }
+
+    mRigidBodyComponent->SetVelocity(desiredVel);
+}
+
+void ShadowCat::OnUpdate(float deltaTime)
+{
+    Vector2 pos = GetPosition();
+    const float margin = 15.0f;
+    const float maxX = Game::LEVEL_WIDTH * Game::TILE_SIZE - margin;
+    const float maxY = Game::LEVEL_HEIGHT * Game::TILE_SIZE - margin;
+
+    if (pos.x < margin)
+    {
+        pos.x = margin;
+        SetPosition(pos);
+    }
+    if (pos.x > maxX)
+    {
+        pos.x = maxX;
+        SetPosition(pos);
+    }
+    if (pos.y < margin)
+    {
+        pos.y = margin;
+        SetPosition(pos);
+    }
+    if (pos.y > maxY)
+    {
+        pos.y = maxY;
+        SetPosition(pos);
+    }
+
+    ManageAnimations();
+}
+
+void ShadowCat::ManageAnimations()
+{
+    if (!mIsDead)
+    {
+        if (mIsRunning)
+        {
+            mDrawComponent->SetAnimation("Run");
+        }
+        else
+        {
+            mDrawComponent->SetAnimation("Idle");
+        }
+    }
+}
+
+void ShadowCat::Kill()
+{
+}
+
+void ShadowCat::OnHorizontalCollision(const float minOverlap, AABBColliderComponent *other)
+{
+}
+
+void ShadowCat::OnVerticalCollision(const float minOverlap, AABBColliderComponent *other)
+{
+}

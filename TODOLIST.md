@@ -2,7 +2,7 @@
 
 ## High Priority
 
-- [ ][Thaís] Player movement
+- [x][Thaís] Player movement
     - [ ][_____] keyboard WASD
     - [ ][_____] gamepad 
 - [ ][_____] Create enemy
@@ -24,7 +24,7 @@
 - [ ][_____] Implement boss
 - [ ][_____] Implement spawn system and wave balancing
 - [ ][_____] Implement health and roguelike run system
-- [ ][Thaís] Player basic sprit and animations
+- [x][Thaís] Player basic sprit and animations
 
 ## Mid Priority
 

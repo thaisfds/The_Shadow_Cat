@@ -24,8 +24,8 @@ public:
 
     static const int WINDOW_WIDTH = 640;
     static const int WINDOW_HEIGHT = 448;
-    static const int LEVEL_WIDTH = 215;
-    static const int LEVEL_HEIGHT = 15;
+    static const int LEVEL_WIDTH = 11;
+    static const int LEVEL_HEIGHT = 11;
     static const int TILE_SIZE = 32;
     static const int SPAWN_DISTANCE = 700;
     static const int FPS = 60;
@@ -45,7 +45,9 @@ public:
     void SetCameraPos(const Vector2 &position) { mCameraPos = position; };
 
     // Game specific
-    const class Mario *GetPlayer() { return mMario; }
+    const class ShadowCat *GetPlayer() { return mShadowCat; }
+
+    SDL_GameController *mController;
 
 private:
     void ProcessInput();
@@ -83,6 +85,6 @@ private:
     bool mUpdatingActors;
 
     // Game-specific
-    class Mario *mMario;
+    class ShadowCat *mShadowCat;
     int **mLevelData;
 };

@@ -11,10 +11,10 @@
 #include "Actors/Block.h"
 #include "Actors/Goomba.h"
 #include "Actors/Spawner.h"
-#include "Actors/Mario.h"
+#include "Actors/ShadowCat.h"
 
 Game::Game()
-    : mWindow(nullptr), mRenderer(nullptr), mTicksCount(0), mIsRunning(true), mIsDebugging(false), mUpdatingActors(false), mCameraPos(Vector2::Zero), mMario(nullptr), mLevelData(nullptr)
+    : mWindow(nullptr), mRenderer(nullptr), mTicksCount(0), mIsRunning(true), mIsDebugging(false), mUpdatingActors(false), mCameraPos(Vector2::Zero), mShadowCat(nullptr), mLevelData(nullptr)
 {
 }
 
@@ -22,7 +22,7 @@ bool Game::Initialize()
 {
     Random::Init();
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0)
     {
         SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         return false;
@@ -38,6 +38,23 @@ bool Game::Initialize()
     mRenderer = new Renderer(mWindow);
     mRenderer->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
+    for (int i = 0; i < SDL_NumJoysticks(); ++i)
+    {
+        if (SDL_IsGameController(i))
+        {
+            mController = SDL_GameControllerOpen(i);
+            if (mController)
+            {
+                SDL_Log("Found game controller: %s", SDL_GameControllerName(mController));
+                break;
+            }
+            else
+            {
+                SDL_Log("Could not open game controller %i: %s", i, SDL_GetError());
+            }
+        }
+    }
+
     // Init all game actors
     InitializeActors();
 
@@ -49,7 +66,7 @@ bool Game::Initialize()
 void Game::InitializeActors()
 {
 
-    mLevelData = LoadLevel("../Assets/Levels/Level1-1/level1-1.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
+    mLevelData = LoadLevel("../Assets/Levels/Lobby/Lobby.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
 
     if (mLevelData)
     {
@@ -98,7 +115,7 @@ int **Game::LoadLevel(const std::string &fileName, int width, int height)
         }
     }
 
-    SDL_Log("--- Conteúdo do Nível CSV ---");
+    SDL_Log("--- Level CSV Content ---");
     for (int i = 0; i < height; ++i)
     {
         std::string rowStr = "";
@@ -115,8 +132,6 @@ int **Game::LoadLevel(const std::string &fileName, int width, int height)
 
 void Game::BuildLevel(int **levelData, int width, int height)
 {
-    const std::string BLOCK_TEXTURE = "../Assets/Sprites/Blocks/BlockA.png";
-
     for (int i = 0; i < height; ++i)
     {
         for (int j = 0; j < width; ++j)
@@ -132,71 +147,57 @@ void Game::BuildLevel(int **levelData, int width, int height)
             {
             case 0:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockA.png");
-                block->SetPosition(position);
+                mShadowCat = new ShadowCat(this);
+                mShadowCat->SetPosition(position);
                 break;
             }
 
             case 1:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockC.png");
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Bush1.png");
                 block->SetPosition(position);
                 break;
             }
 
             case 2:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockF.png");
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Bush2.png");
+                block->SetPosition(position);
+                break;
+            }
+
+            case 3:
+            {
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Bush3.png");
                 block->SetPosition(position);
                 break;
             }
 
             case 4:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockB.png");
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Bush4.png");
                 block->SetPosition(position);
                 break;
             }
 
             case 5:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockE.png");
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Stone1.png");
                 block->SetPosition(position);
                 break;
             }
 
             case 6:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockI.png");
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Stone3.png");
                 block->SetPosition(position);
                 break;
             }
 
-            case 8:
+            case 7:
             {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockD.png");
+                auto block = new Block(this, "../Assets/Sprites/Blocks/Stone2.png");
                 block->SetPosition(position);
-                break;
-            }
-
-            case 9:
-            {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockH.png");
-                block->SetPosition(position);
-                break;
-            }
-
-            case 12:
-            {
-                auto block = new Block(this, "../Assets/Sprites/Blocks/BlockG.png");
-                block->SetPosition(position);
-                break;
-            }
-
-            case 16:
-            {
-                mMario = new Mario(this);
-                mMario->SetPosition(position);
                 break;
             }
 
@@ -242,6 +243,30 @@ void Game::ProcessInput()
         {
         case SDL_QUIT:
             Quit();
+            break;
+        case SDL_CONTROLLERDEVICEADDED:
+            // Try to open the added controller if there isn't one already open
+            if (!mController)
+            {
+                mController = SDL_GameControllerOpen(event.cdevice.which);
+                if (mController)
+                {
+                    SDL_Log("Game controller added: %s", SDL_GameControllerName(mController));
+                }
+                else
+                {
+                    SDL_Log("Could not open new game controller: %s", SDL_GetError());
+                }
+            }
+            break;
+        case SDL_CONTROLLERDEVICEREMOVED:
+            // Close the controller if it's the one that was removed
+            if (mController && SDL_GameControllerGetJoystick(mController) == SDL_JoystickFromInstanceID(event.cdevice.which))
+            {
+                SDL_Log("Game controller removed");
+                SDL_GameControllerClose(mController);
+                mController = nullptr;
+            }
             break;
         }
     }
@@ -295,6 +320,15 @@ void Game::UpdateActors(float deltaTime)
 
 void Game::UpdateCamera()
 {
+    if (mShadowCat)
+    {
+        float targetX = mShadowCat->GetPosition().x;
+        float targetY = mShadowCat->GetPosition().y;
+
+        // Center camera on ShadowCat by subtracting half of window dimensions
+        mCameraPos.x = targetX - (WINDOW_WIDTH / 2.0f);
+        mCameraPos.y = targetY - (WINDOW_HEIGHT / 2.0f);
+    }
 }
 
 void Game::AddActor(Actor *actor)
@@ -358,6 +392,34 @@ void Game::GenerateOutput()
     // Clear back buffer
     mRenderer->Clear();
 
+    Texture *backgroundTexture = mRenderer->GetTexture("../Assets/Levels/Lobby/LobbyBackground.png");
+    if (backgroundTexture)
+    {
+        float levelPixelWidth = static_cast<float>(LEVEL_WIDTH) * static_cast<float>(TILE_SIZE);
+        float levelPixelHeight = static_cast<float>(LEVEL_HEIGHT) * static_cast<float>(TILE_SIZE);
+
+        float desiredWidth = levelPixelWidth;
+        float desiredHeight = levelPixelHeight;
+
+        float texW = static_cast<float>(backgroundTexture->GetWidth());
+        float texH = static_cast<float>(backgroundTexture->GetHeight());
+
+        float scale = 1.0f;
+        if (texW > 0.0f && texH > 0.0f)
+        {
+            scale = std::max(desiredWidth / texW, desiredHeight / texH);
+        }
+
+        float backgroundWidth = texW * scale;
+        float backgroundHeight = texH * scale;
+
+        Vector2 position(levelPixelWidth / 2.0f, levelPixelHeight / 2.0f);
+        Vector2 size(backgroundWidth, backgroundHeight);
+
+        mRenderer->DrawTexture(position, size, 0.0f, Vector3(1.0f, 1.0f, 1.0f),
+                               backgroundTexture, Vector4::UnitRect, mCameraPos);
+    }
+
     for (auto drawable : mDrawables)
     {
         drawable->Draw(mRenderer);
@@ -381,6 +443,12 @@ void Game::Shutdown()
     while (!mActors.empty())
     {
         delete mActors.back();
+    }
+
+    if (mController)
+    {
+        SDL_GameControllerClose(mController);
+        mController = nullptr;
     }
 
     // Delete level data

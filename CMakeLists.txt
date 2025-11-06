@@ -51,6 +51,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/Drawing/AnimatorComponent.h
         Source/Components/Drawing/RectComponent.cpp
         Source/Components/Drawing/RectComponent.h
+        Source/Actors/ShadowCat.cpp
+        Source/Actors/ShadowCat.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE GLEW::GLEW SDL2::SDL2 SDL2_image::SDL2_image)
