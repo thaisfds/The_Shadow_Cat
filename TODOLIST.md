@@ -59,9 +59,9 @@
     - [ ] Restart Run (confirm)
     - [ ] Exit to Main Menu (confirm)
     - [ ] View Run Stats (time, enemies defeated, items picked)
-- [ ] [_____] Resize the game
+- [ ] [Filipe] Resize the game
     - [ ] Increase all
-    - [ ] Implement full screen mode
+    - [x] Implement full screen mode
 
 ## Low Priority
 

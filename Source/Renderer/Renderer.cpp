@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "VertexArray.h"
 #include "Texture.h"
+#include "../Game.h"
 
 Renderer::Renderer(SDL_Window *window)
     : mBaseShader(nullptr), mWindow(window), mContext(nullptr), mOrthoProjection(Matrix4::Identity)
@@ -217,4 +218,30 @@ Texture *Renderer::GetTexture(const std::string &fileName)
         }
     }
     return tex;
+}
+
+void Renderer::UpdateViewport(int windowWidth, int windowHeight)
+{
+    float targetAspect = Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT;
+    float windowAspect = (float)windowWidth / (float)windowHeight;
+    
+    int viewportX = 0;
+    int viewportY = 0;
+    int viewportWidth = windowWidth;
+    int viewportHeight = windowHeight;
+    
+    if (windowAspect > targetAspect)
+    {
+        // Window is wider - add black bars on sides
+        viewportWidth = (int)(windowHeight * targetAspect);
+        viewportX = (windowWidth - viewportWidth) / 2;
+    }
+    else
+    {
+        // Window is taller - add black bars on top/bottom
+        viewportHeight = (int)(windowWidth / targetAspect);
+        viewportY = (windowHeight - viewportHeight) / 2;
+    }
+    
+    glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
 }

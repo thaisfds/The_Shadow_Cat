@@ -268,6 +268,26 @@ void Game::ProcessInput()
                 mController = nullptr;
             }
             break;
+        case SDL_KEYDOWN:
+            if (event.key.keysym.sym == SDLK_F11 && event.key.repeat == 0)
+            {
+                mIsFullscreen = !mIsFullscreen;
+                if (mIsFullscreen)
+                {
+                    SDL_SetWindowFullscreen(mWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+                    // Update viewport for fullscreen
+                    int w, h;
+                    SDL_GetWindowSize(mWindow, &w, &h);
+                    mRenderer->UpdateViewport(w, h);
+                }
+                else
+                {
+                    SDL_SetWindowFullscreen(mWindow, 0);
+                    mRenderer->UpdateViewport(WINDOW_WIDTH, WINDOW_HEIGHT);
+                }
+            }
+            break;
         }
     }
 

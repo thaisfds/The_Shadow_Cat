@@ -34,6 +34,8 @@ public:
     void DrawGeometry(const Vector2 &position, const Vector2 &size,  float rotation,
                       const Vector3 &color, const Vector2 &cameraPos, VertexArray *vertexArray, RendererMode mode);
 
+    void UpdateViewport(int windowWidth, int windowHeight);
+
     void Clear();
     void Present();
 
