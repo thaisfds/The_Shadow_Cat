@@ -8,7 +8,7 @@
 class ShadowCat : public Actor
 {
 public:
-    explicit ShadowCat(Game *game, float forwardSpeed = 300.0f, float jumpSpeed = -750.0f);
+    explicit ShadowCat(Game *game, float forwardSpeed = 200.0f, float jumpSpeed = -750.0f);
 
     void OnProcessInput(const Uint8 *keyState) override;
     void OnUpdate(float deltaTime) override;

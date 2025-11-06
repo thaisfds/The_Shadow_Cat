@@ -47,6 +47,8 @@ public:
     // Game specific
     const class ShadowCat *GetPlayer() { return mShadowCat; }
 
+    SDL_GameController *mController;
+
 private:
     void ProcessInput();
     void UpdateGame(float deltaTime);

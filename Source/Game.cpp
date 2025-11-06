@@ -22,7 +22,7 @@ bool Game::Initialize()
 {
     Random::Init();
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0)
     {
         SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         return false;
@@ -37,6 +37,23 @@ bool Game::Initialize()
 
     mRenderer = new Renderer(mWindow);
     mRenderer->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    for (int i = 0; i < SDL_NumJoysticks(); ++i)
+    {
+        if (SDL_IsGameController(i))
+        {
+            mController = SDL_GameControllerOpen(i);
+            if (mController)
+            {
+                SDL_Log("Found game controller: %s", SDL_GameControllerName(mController));
+                break;
+            }
+            else
+            {
+                SDL_Log("Could not open game controller %i: %s", i, SDL_GetError());
+            }
+        }
+    }
 
     // Init all game actors
     InitializeActors();
@@ -98,7 +115,7 @@ int **Game::LoadLevel(const std::string &fileName, int width, int height)
         }
     }
 
-    SDL_Log("--- Conteúdo do Nível CSV ---");
+    SDL_Log("--- Level CSV Content ---");
     for (int i = 0; i < height; ++i)
     {
         std::string rowStr = "";
@@ -226,6 +243,30 @@ void Game::ProcessInput()
         {
         case SDL_QUIT:
             Quit();
+            break;
+        case SDL_CONTROLLERDEVICEADDED:
+            // Try to open the added controller if there isn't one already open
+            if (!mController)
+            {
+                mController = SDL_GameControllerOpen(event.cdevice.which);
+                if (mController)
+                {
+                    SDL_Log("Game controller added: %s", SDL_GameControllerName(mController));
+                }
+                else
+                {
+                    SDL_Log("Could not open new game controller: %s", SDL_GetError());
+                }
+            }
+            break;
+        case SDL_CONTROLLERDEVICEREMOVED:
+            // Close the controller if it's the one that was removed
+            if (mController && SDL_GameControllerGetJoystick(mController) == SDL_JoystickFromInstanceID(event.cdevice.which))
+            {
+                SDL_Log("Game controller removed");
+                SDL_GameControllerClose(mController);
+                mController = nullptr;
+            }
             break;
         }
     }
@@ -402,6 +443,12 @@ void Game::Shutdown()
     while (!mActors.empty())
     {
         delete mActors.back();
+    }
+
+    if (mController)
+    {
+        SDL_GameControllerClose(mController);
+        mController = nullptr;
     }
 
     // Delete level data
