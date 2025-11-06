@@ -80,4 +80,7 @@ fabric.properties
 .DS_Store
 build
 
-CMakeLists.txt
+# Local CMake configuration (computer-specific library paths)
+local_config.cmake
+
+.idea/editor.xml

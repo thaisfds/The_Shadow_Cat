@@ -3,13 +3,15 @@ cmake_minimum_required(VERSION 3.26)
 set(CMAKE_CXX_STANDARD 17)
 
 # Configurando o nome e executável do projeto
-set(PROJECT_NAME "tp3-smb")
+set(PROJECT_NAME "the_shadow_cat")
 project(${PROJECT_NAME})
 
-find_package(SDL2 2.32.2 EXACT REQUIRED)
-find_package(SDL2_image REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(OpenGL REQUIRED)
+# Include local configuration (each person creates their own)
+if(EXISTS "${CMAKE_SOURCE_DIR}/local_config.cmake")
+    include(local_config.cmake)
+else()
+    message(FATAL_ERROR "Please copy local_config.cmake.example to local_config.cmake and configure your library paths")    
+endif()
 
 add_executable(${PROJECT_NAME}
         Source/Renderer/Shader.cpp
@@ -55,4 +57,4 @@ add_executable(${PROJECT_NAME}
         Source/Actors/ShadowCat.h
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE GLEW::GLEW SDL2::SDL2 SDL2_image::SDL2_image)
+configure_local_linking(${PROJECT_NAME})
