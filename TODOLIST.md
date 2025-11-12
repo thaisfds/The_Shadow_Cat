@@ -5,15 +5,15 @@
 - [x] [Thaís] Player movement
     - [x] keyboard WASD
     - [x] gamepad 
-- [ ] [_____] Create enemy
+- [ ] [Juan] Create enemy
     - [ ] Basic static
     - [ ] smart
-- [ ] [_____] Player basic combat 
+- [ ] [Juan] Player basic combat 
     - [ ] basic
     - [ ] charged
     - [ ] special
     - [ ] dodge and invulnerability frame
-- [ ] [_____] Implement camera follow and room bounds
+- [ ] [Juan] Implement camera follow and room bounds
 - [ ] [_____] Load levels from CSV/TMX
     - [ ] Forest
     - [ ] Surroundings
@@ -28,7 +28,7 @@
 
 ## Mid Priority
 
-- [ ] [_____] Implement HUD
+- [ ] [Pains] Implement HUD
     - [ ] Lives / HP display (hearts or bar)
     - [ ] Item slots (icons + count)
     - [ ] Active item indicator + usage key
@@ -41,18 +41,18 @@
     - [ ] Active
     - [ ] Passive
 - [ ] [_____] Implement item selection UI / loot choices
-- [ ] [_____] Implement menus
-- [ ] [_____] Integrate audio
+- [ ] [Pains] Implement menus
+- [ ] [Pains] Integrate audio
 - [ ] [_____] Implement particle systems and visual feedback
 - [ ] [_____] Integrate shaders and lighting effects
-- [ ] [_____] Finalize sprites, tilesets and animations
-- [ ] [_____] Main Menu (detailed)
+- [ ] [Thais] Finalize sprites, tilesets and animations
+- [ ] [Pains] Main Menu (detailed)
     - [ ] Start Run
     - [ ] Tutorial (first-run trigger)
-    - [ ] Options (Audio, Controls, Accessibility)
+    - [ ] Options (Audio, FullScreen, Controls?, Accessibility?)
     - [ ] Credits
     - [ ] Exit
-- [ ] [_____] In-Game Pause Menu (detailed)
+- [ ] [Pains] In-Game Pause Menu (detailed)
     - [ ] Resume
     - [ ] Options (Audio, Controls, Accessibility)
     - [ ] Keybind remap
