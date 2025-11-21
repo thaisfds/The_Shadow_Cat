@@ -5,5 +5,9 @@
 class Block : public Actor
 {
 public:
-    explicit Block(Game *game, const std::string &texturePath);
+	// Constructor for individual texture files (deprecated)
+	explicit Block(Game *game, const std::string &texturePath);
+
+	// Constructor for sprite sheet with frame index
+	explicit Block(Game *game, int frameIndex);
 };
