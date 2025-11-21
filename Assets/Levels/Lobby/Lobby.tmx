@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="11" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="2" nextobjectid="1">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="11" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="1">
  <tileset firstgid="1" source="../MapTaleset.tsx"/>
+ <imagelayer id="2" name="Image Layer 1">
+  <image source="LobbyBackground.png" width="352" height="352"/>
+ </imagelayer>
  <layer id="1" name="Tile Layer 1" width="11" height="11">
   <data encoding="csv">
 8,7,8,7,8,7,8,7,8,7,8,
