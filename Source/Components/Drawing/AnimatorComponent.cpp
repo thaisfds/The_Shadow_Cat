@@ -4,6 +4,7 @@
 #include "../../Json.h"
 #include "../../Renderer/Texture.h"
 #include <fstream>
+#include <map>
 
 AnimatorComponent::AnimatorComponent(class Actor *owner, const std::string &texPath, const std::string &dataPath,
                                      int width, int height, int drawOrder)
@@ -48,9 +49,33 @@ bool AnimatorComponent::LoadSpriteSheetData(const std::string &dataPath)
     auto textureWidth = static_cast<float>(spriteSheetData["meta"]["size"]["w"].get<int>());
     auto textureHeight = static_cast<float>(spriteSheetData["meta"]["size"]["h"].get<int>());
 
-    for (const auto &frame : spriteSheetData["frames"])
+    // Create a map to store frames with their indices for proper ordering
+    std::map<int, nlohmann::json> orderedFrames;
+    
+    for (const auto &[key, value] : spriteSheetData["frames"].items())
     {
-
+        // Extract the frame number from the key (e.g., "MapTaleset4.aseprite" -> 4)
+        std::string frameName = key;
+        size_t dotPos = frameName.find('.');
+        if (dotPos != std::string::npos)
+        {
+            frameName = frameName.substr(0, dotPos);
+        }
+        
+        // Find the last sequence of digits in the name
+        int frameIndex = 0;
+        size_t numStart = frameName.find_last_not_of("0123456789");
+        if (numStart != std::string::npos && numStart + 1 < frameName.length())
+        {
+            frameIndex = std::stoi(frameName.substr(numStart + 1));
+        }
+        
+        orderedFrames[frameIndex] = value;
+    }
+    
+    // Now add frames in order
+    for (const auto &[index, frame] : orderedFrames)
+    {
         int x = frame["frame"]["x"].get<int>();
         int y = frame["frame"]["y"].get<int>();
         int w = frame["frame"]["w"].get<int>();

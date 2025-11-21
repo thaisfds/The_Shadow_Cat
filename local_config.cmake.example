@@ -1,8 +1,0 @@
-find_package(SDL2 2.32.2 EXACT REQUIRED)
-find_package(SDL2_image REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(OpenGL REQUIRED)
-
-function(configure_local_linking PROJECT_NAME)
-	target_link_libraries(${PROJECT_NAME} PRIVATE GLEW::GLEW SDL2::SDL2 SDL2_image::SDL2_image)
-endfunction()
