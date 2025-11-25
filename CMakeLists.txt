@@ -53,6 +53,26 @@ add_executable(${PROJECT_NAME}
         Source/Components/Drawing/AnimatorComponent.h
         Source/Components/Drawing/RectComponent.cpp
         Source/Components/Drawing/RectComponent.h
+        Source/AudioSystem.cpp
+        Source/AudioSystem.h
+        Source/Renderer/Font.h
+        Source/Renderer/Font.cpp
+        Source/UI/UIButton.cpp
+        Source/UI/UIButton.h
+        Source/UI/UIElement.cpp
+        Source/UI/UIElement.h
+        Source/UI/UIImage.cpp
+        Source/UI/UIImage.h
+        Source/UI/Screens/UIScreen.cpp
+        Source/UI/Screens/UIScreen.h
+        Source/UI/UIText.cpp
+        Source/UI/UIText.h
+        Source/UI/Screens/HUD.cpp
+        Source/UI/Screens/HUD.h
+        Source/UI/UIRect.cpp
+        Source/UI/UIRect.h
+        Source/UI/Screens/MainMenu.cpp
+        Source/UI/Screens/MainMenu.h
         Source/Actors/ShadowCat.cpp
         Source/Actors/ShadowCat.h
 )
