@@ -128,12 +128,12 @@ void Game::SetScene(GameScene nextScene)
             mCurrentScene = GameScene::MainMenu;
 
 			// Main menu back music
-			mAudio->PlaySound("Music.ogg", true);
+			// mAudio->PlaySound("Music.ogg", true);
 
 			InitializeActors();
 
 			// Still debugging this
-			new MainMenu(this, "../Assets/Fonts/arial.ttf");
+			// new MainMenu(this, "../Assets/Fonts/arial.ttf");
             break;
 
         case GameScene::Level1:
