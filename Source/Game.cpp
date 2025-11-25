@@ -7,6 +7,8 @@
 #include "Components/Drawing/DrawComponent.h"
 #include "Components/Physics/RigidBodyComponent.h"
 #include "Random.h"
+#include "UI/Screens/HUD.h"
+#include "UI/Screens/MainMenu.h"
 #include "Actors/Actor.h"
 #include "Actors/Block.h"
 #include "Actors/Goomba.h"
@@ -14,7 +16,17 @@
 #include "Actors/ShadowCat.h"
 
 Game::Game()
-	: mWindow(nullptr), mRenderer(nullptr), mTicksCount(0), mIsRunning(true), mIsDebugging(false), mUpdatingActors(false), mCameraPos(Vector2::Zero), mShadowCat(nullptr), mLevelData(nullptr)
+	: mWindow(nullptr),
+	mRenderer(nullptr),
+	mTicksCount(0),
+	mIsRunning(true),
+	mIsDebugging(false),
+	mUpdatingActors(false),
+	mCameraPos(Vector2::Zero),
+	mLevelData(nullptr),
+	mAudio(nullptr),
+    mHUD(nullptr),
+	mShadowCat(nullptr)
 {
 }
 
@@ -27,6 +39,28 @@ bool Game::Initialize()
 		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
 		return false;
 	}
+
+	// Init SDL Image
+    int imgFlags = IMG_INIT_PNG;
+    if (!(IMG_Init(imgFlags) & imgFlags))
+    {
+        SDL_Log("Unable to initialize SDL_image: %s", IMG_GetError());
+        return false;
+    }
+
+    // Initialize SDL_ttf
+    if (TTF_Init() != 0)
+    {
+        SDL_Log("Failed to initialize SDL_ttf");
+        return false;
+    }
+
+    // Initialize SDL_mixer
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
+    {
+        SDL_Log("Failed to initialize SDL_mixer");
+        return false;
+    }
 
 	mWindow = SDL_CreateWindow("The Shadow Cat", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
 	if (!mWindow)
@@ -55,12 +89,58 @@ bool Game::Initialize()
 		}
 	}
 
-	// Init all game actors
-	InitializeActors();
+	// Init audio system
+	mAudio = new AudioSystem();
+    mAudio->CacheAllSounds();
+
+	// First scene
+    SetScene(GameScene::MainMenu);
 
 	mTicksCount = SDL_GetTicks();
 
 	return true;
+}
+
+void Game::UnloadScene()
+{
+    // Use state so we can call this from within an actor update
+    for(auto *actor : mActors) {
+        actor->SetState(ActorState::Destroy);
+    }
+
+    // Delete UI screens
+    for (auto ui : mUIStack) {
+        delete ui;
+    }
+    mUIStack.clear();
+
+    // Reset states
+    mHUD = nullptr;
+	mShadowCat = nullptr;
+}
+
+void Game::SetScene(GameScene nextScene)
+{
+    UnloadScene();
+
+    switch (nextScene) {
+        case GameScene::MainMenu:
+            mCurrentScene = GameScene::MainMenu;
+
+			// Main menu back music
+			mAudio->PlaySound("Music.ogg", true);
+
+			InitializeActors();
+
+			// Still debugging this
+			//new MainMenu(this, "../Assets/Fonts/arial.ttf");
+            break;
+
+        case GameScene::Level1:
+            mCurrentScene = GameScene::Level1;
+
+            break;
+    }
 }
 
 void Game::InitializeActors()
@@ -269,8 +349,13 @@ void Game::ProcessInput()
 			}
 			break;
 		case SDL_KEYDOWN:
-			if (event.key.keysym.sym == SDLK_F11 && event.key.repeat == 0)
-			{
+			// Handle key press for UI screens
+			if (!mUIStack.empty()) {
+				mUIStack.back()->HandleKeyPress(event.key.keysym.sym);
+			}
+
+			// Fullscreen toggle
+			if (event.key.keysym.sym == SDLK_F11 && event.key.repeat == 0) {
 				mIsFullscreen = !mIsFullscreen;
 				if (mIsFullscreen)
 				{
@@ -306,6 +391,28 @@ void Game::UpdateGame(float deltaTime)
 
 	// Update camera position
 	UpdateCamera();
+
+	// Audio and UI
+	if (mAudio)
+        mAudio->Update(deltaTime);
+
+    // Update UI screens
+    for (auto ui : mUIStack) {
+        if (ui->GetState() == UIScreen::UIState::Active) {
+            ui->Update(deltaTime);
+        }
+    }
+
+    // Delete any UI that are closed
+    auto iter = mUIStack.begin();
+    while (iter != mUIStack.end()) {
+        if ((*iter)->GetState() == UIScreen::UIState::Closing) {
+            delete *iter;
+            iter = mUIStack.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
 }
 
 void Game::UpdateActors(float deltaTime)
@@ -454,6 +561,9 @@ void Game::GenerateOutput()
 		}
 	}
 
+	// Draw UI (TODO: unify in a single draw function and remove mDrawables, add to renderer)
+	mRenderer->DrawAllUI();
+
 	// Swap front buffer and back buffer
 	mRenderer->Present();
 }
@@ -482,9 +592,18 @@ void Game::Shutdown()
 		mLevelData = nullptr;
 	}
 
+	// Delete UI screens
+    for (auto ui : mUIStack) {
+        delete ui;
+    }
+    mUIStack.clear();
+
 	mRenderer->Shutdown();
 	delete mRenderer;
 	mRenderer = nullptr;
+
+	delete mAudio;
+    mAudio = nullptr;
 
 	SDL_DestroyWindow(mWindow);
 	SDL_Quit();

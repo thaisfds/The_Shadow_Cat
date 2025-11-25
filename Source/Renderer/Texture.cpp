@@ -45,6 +45,23 @@ bool Texture::Load(const std::string &filePath) {
     return true;
 }
 
+void Texture::CreateFromSurface(SDL_Surface* surface)
+{
+    mWidth = surface->w;
+    mHeight = surface->h;
+
+    // Generate a GL texture
+    glGenTextures(1, &mTextureID);
+    glBindTexture(GL_TEXTURE_2D, mTextureID);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, surface->pitch / 4);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 surface->pixels);
+
+    // Use linear filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
 void Texture::Unload() {
     glDeleteTextures(1, &mTextureID);
     mTextureID = 0;

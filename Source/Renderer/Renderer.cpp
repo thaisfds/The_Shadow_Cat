@@ -4,9 +4,15 @@
 #include "VertexArray.h"
 #include "Texture.h"
 #include "../Game.h"
+#include "../UI/UIElement.h"
 
 Renderer::Renderer(SDL_Window *window)
-    : mBaseShader(nullptr), mWindow(window), mContext(nullptr), mOrthoProjection(Matrix4::Identity)
+    : mBaseShader(nullptr),
+    mWindow(window),
+    mContext(nullptr),
+    mOrthoProjection(Matrix4::Identity),
+    mScreenWidth(854.0f),
+    mScreenHeight(480.0f)
 {
 }
 
@@ -18,6 +24,9 @@ Renderer::~Renderer()
 
 bool Renderer::Initialize(float width, float height)
 {
+    mScreenWidth = width;
+    mScreenHeight = height;
+
     // Specify version 3.3 (core profile)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -71,6 +80,21 @@ bool Renderer::Initialize(float width, float height)
     return true;
 }
 
+void Renderer::AddUIElement(UIElement *comp)
+{
+    mUIComps.emplace_back(comp);
+
+    std::sort(mUIComps.begin(), mUIComps.end(),[](UIElement* a, UIElement* b) {
+        return a->GetDrawOrder() < b->GetDrawOrder();
+    });
+}
+
+void Renderer::RemoveUIElement(UIElement *comp)
+{
+    auto iter = std::find(mUIComps.begin(), mUIComps.end(), comp);
+    mUIComps.erase(iter);
+}
+
 void Renderer::Shutdown()
 {
     // Destroy textures
@@ -80,6 +104,14 @@ void Renderer::Shutdown()
         delete i.second;
     }
     mTextures.clear();
+
+    // Destroy fonts
+    for (auto i : mFonts)
+    {
+        i.second->Unload();
+        delete i.second;
+    }
+    mFonts.clear();
 
     mBaseShader->Unload();
     delete mBaseShader;
@@ -160,6 +192,14 @@ void Renderer::DrawGeometry(const Vector2 &position, const Vector2 &size, float 
     Draw(mode, model, cameraPos, vertexArray, color);
 }
 
+void Renderer::DrawAllUI() {
+    mSpriteVerts->SetActive();
+
+    for (auto ui : mUIComps) {
+        ui->Draw(mBaseShader);
+    }
+}
+
 void Renderer::Present()
 {
     // Swap the buffers
@@ -167,8 +207,8 @@ void Renderer::Present()
 }
 
 bool Renderer::LoadShaders()
-{
-    // Create sprite shader
+{   
+    // Create base shader
     mBaseShader = new Shader();
     if (!mBaseShader->Load("../Shaders/Base"))
     {
@@ -218,6 +258,30 @@ Texture *Renderer::GetTexture(const std::string &fileName)
         }
     }
     return tex;
+}
+
+Font* Renderer::GetFont(const std::string& fileName)
+{
+    auto iter = mFonts.find(fileName);
+    if (iter != mFonts.end())
+    {
+        return iter->second;
+    }
+    else
+    {
+        Font* font = new Font();
+        if (font->Load(fileName))
+        {
+            mFonts.emplace(fileName, font);
+        }
+        else
+        {
+            font->Unload();
+            delete font;
+            font = nullptr;
+        }
+        return font;
+    }
 }
 
 void Renderer::UpdateViewport(int windowWidth, int windowHeight)

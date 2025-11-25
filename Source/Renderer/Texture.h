@@ -13,6 +13,8 @@ public:
 	bool Load(const std::string& fileName);
 	void Unload();
 
+	void CreateFromSurface(struct SDL_Surface* surface);
+
 	void SetActive(int index = 0) const;
 
     static GLenum SDLFormatToGL(SDL_PixelFormat* fmt);

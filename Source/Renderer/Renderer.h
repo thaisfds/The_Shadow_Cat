@@ -1,11 +1,13 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <unordered_map>
 #include <SDL.h>
 #include "../Math.h"
 #include "VertexArray.h"
 #include "Texture.h"
+#include "Font.h"
 
 enum class RendererMode
 {
@@ -22,6 +24,9 @@ public:
 	bool Initialize(float width, float height);
 	void Shutdown();
 
+    void AddUIElement(class UIElement *comp);
+    void RemoveUIElement(class UIElement *comp);
+
     void DrawRect(const Vector2 &position, const Vector2 &size,  float rotation,
                   const Vector3 &color, const Vector2 &cameraPos, RendererMode mode);
 
@@ -34,6 +39,8 @@ public:
     void DrawGeometry(const Vector2 &position, const Vector2 &size,  float rotation,
                       const Vector3 &color, const Vector2 &cameraPos, VertexArray *vertexArray, RendererMode mode);
 
+    void DrawAllUI();
+
     void UpdateViewport(int windowWidth, int windowHeight);
 
     void Clear();
@@ -42,6 +49,7 @@ public:
     // Getters
     class Texture* GetTexture(const std::string& fileName);
 	class Shader* GetBaseShader() const { return mBaseShader; }
+    class Font* GetFont(const std::string& fileName);
 
 private:
     void Draw(RendererMode mode, const Matrix4 &modelMatrix, const Vector2 &cameraPos, VertexArray *vertices,
@@ -70,4 +78,12 @@ private:
 
     // Map of textures loaded
     std::unordered_map<std::string, class Texture*> mTextures;
+    // Map of fonts loaded
+    std::unordered_map<std::string, class Font*> mFonts;
+    // UI screens to draw
+    std::vector<class UIElement*> mUIComps;
+
+    // Width/height of screem
+    float mScreenWidth;
+    float mScreenHeight;
 };
