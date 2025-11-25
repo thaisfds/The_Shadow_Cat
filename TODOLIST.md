@@ -19,11 +19,11 @@
     - [ ] Surroundings
     - [ ] City
     - [ ] Castle
-- [ ] [_____] Implement collision and physics system
-- [ ] [_____] Implement player abilities and upgrades
+- [ ] [Filipe] Implement collision and physics system
+- [ ] [Filipe] Implement player abilities and upgrades
 - [ ] [_____] Implement boss
 - [ ] [_____] Implement spawn system and wave balancing
-- [ ] [_____] Implement health and roguelike run system
+- [ ] [Filipe] Implement health and roguelike run system
 - [x] [Thaís] Player basic sprit and animations
 
 ## Mid Priority
@@ -37,10 +37,10 @@
     - [ ] Boss HP bar (show during boss fight)
     - [ ] Status effect icons (poison, slow, buffs)
     - [ ] Responsive layout (different resolutions)
-- [ ] [_____] Implement item pickups
+- [ ] [Filipe] Implement item pickups
     - [ ] Active
     - [ ] Passive
-- [ ] [_____] Implement item selection UI / loot choices
+- [ ] [Filipe] Implement item selection UI / loot choices
 - [ ] [Pains] Implement menus
 - [ ] [Pains] Integrate audio
 - [ ] [_____] Implement particle systems and visual feedback
