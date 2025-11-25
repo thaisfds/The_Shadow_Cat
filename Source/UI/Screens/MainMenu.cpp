@@ -11,12 +11,12 @@ MainMenu::MainMenu(class Game* game, const std::string& fontName)
     // Using lambda as on click functions
     AddButton("NEW GAME", [game]() {
         game->SetScene(GameScene::Level1);
-    }, Vector2(0.0f, 0.0f), SCALE);
+    }, Vector2(0.0f, -50.0f), SCALE);
 
     AddButton("QUIT", [this, game]() {
         this->Close();
         game->Quit();
-    }, Vector2(0.0f, -50.0f), SCALE);
+    }, Vector2(0.0f, +50.0f), SCALE);
 
     // Setup UI Screen initial state
     mSelectedButtonIndex = 0;

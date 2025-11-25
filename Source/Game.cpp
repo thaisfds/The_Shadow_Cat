@@ -133,7 +133,7 @@ void Game::SetScene(GameScene nextScene)
 			InitializeActors();
 
 			// Still debugging this
-			//new MainMenu(this, "../Assets/Fonts/arial.ttf");
+			new MainMenu(this, "../Assets/Fonts/arial.ttf");
             break;
 
         case GameScene::Level1:

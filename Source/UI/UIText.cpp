@@ -60,15 +60,17 @@ void UIText::Draw(class Shader* shader)
                                             (static_cast<float>(mTexture->GetHeight()) + mMargin.y) * mScale, 1.0f);
 
     // Translate to position on screen
-    Matrix4 transMat = Matrix4::CreateTranslation(Vector3(mOffset.x, mOffset.y, 0.0f));
+    Matrix4 transMat = Matrix4::CreateTranslation(Vector3(mOffset.x + Game::WINDOW_WIDTH / 2, mOffset.y + Game::WINDOW_HEIGHT / 2, 0.0f));
 
     // Set world transform
     Matrix4 world = scaleMat * transMat;
     shader->SetMatrixUniform("uWorldTransform", world);
+    shader->SetVectorUniform("uTexRect", Vector4::UnitRect);
+    shader->SetVectorUniform("uCameraPos", Vector2::Zero);
 
     // Set uTextureFactor and color
-    shader->SetFloatUniform("uTextureFactor", 0.0f);
-    shader->SetVectorUniform("uBaseColor", mBackgroundColor);
+    shader->SetFloatUniform("uTextureFactor", 0.0f); // add alpha later
+    shader->SetVectorUniform("uColor", Vector3(mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z   ));
 
     // Draw quad
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);

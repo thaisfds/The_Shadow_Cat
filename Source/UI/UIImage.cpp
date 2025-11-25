@@ -36,11 +36,15 @@ void UIImage::Draw(class Shader* shader)
     Matrix4 rotMat = Matrix4::CreateRotationZ(mAngle);
 
     // Translate to position on screen
-    Matrix4 transMat = Matrix4::CreateTranslation(Vector3(mOffset.x, mOffset.y, 0.0f));
+    Matrix4 transMat = Matrix4::CreateTranslation(Vector3(mOffset.x + Game::WINDOW_WIDTH / 2, mOffset.y + Game::WINDOW_HEIGHT / 2, 0.0f));
 
     // Set world transform
     Matrix4 world = scaleMat * rotMat * transMat;
     shader->SetMatrixUniform("uWorldTransform", world);
+
+    shader->SetVectorUniform("uColor", Color::White);
+    shader->SetVectorUniform("uTexRect", Vector4::UnitRect);
+    shader->SetVectorUniform("uCameraPos", Vector2::Zero);
 
     // Set uTextureFactor
     shader->SetFloatUniform("uTextureFactor", 1.0f);
