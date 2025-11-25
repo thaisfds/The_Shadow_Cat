@@ -1,0 +1,28 @@
+# Use these to manually set include locations if needed.
+# If the libs are already in your PATH, this step is likely not needed
+# and you can delete everything between the #### lines
+
+####
+set(SDL2_DIR "${CMAKE_CURRENT_SOURCE_DIR}/SDL2/cmake")
+
+set(SDL2_image_DIR "${CMAKE_CURRENT_SOURCE_DIR}/SDL2_image/cmake")
+set(SDL2_mixer_DIR "${CMAKE_CURRENT_SOURCE_DIR}/SDL2_mixer/cmake")
+set(SDL2_ttf_DIR "${CMAKE_CURRENT_SOURCE_DIR}/SDL2_ttf/cmake")
+
+set(GLEW_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/GLEW/include")
+set(GLEW_SHARED_LIBRARY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/GLEW/bin/Release/x64/glew32.dll")
+set(GLEW_STATIC_LIBRARY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/GLEW/lib/Release/x64/glew32.lib")
+####
+
+# These are required
+find_package(SDL2 2.32.2 EXACT REQUIRED)
+find_package(SDL2_image REQUIRED)
+find_package(SDL2_mixer REQUIRED)
+find_package(SDL2_ttf REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(OpenGL REQUIRED)
+
+function(configure_local_linking PROJECT_NAME)
+# You may not need SDL::SDL2main and opengl32 depending on your setup
+	target_link_libraries(${PROJECT_NAME} PRIVATE GLEW::GLEW SDL2::SDL2main SDL2::SDL2 SDL2_image::SDL2_image SDL2_mixer::SDL2_mixer SDL2_ttf::SDL2_ttf opengl32)
+endfunction()
