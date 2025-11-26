@@ -157,7 +157,10 @@ void AnimatorComponent::Update(float deltaTime)
 
 void AnimatorComponent::SetAnimation(const std::string &name)
 {
+	if (mAnimName == name) return;
+	
 	mAnimName = name;
+	mAnimTimer = 0.0f;
 	Update(0.0f);
 }
 
