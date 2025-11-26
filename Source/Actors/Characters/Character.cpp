@@ -3,6 +3,7 @@
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../../Components/Drawing/AnimatorComponent.h"
 #include "../../Game.h"
+#include "../../GameConstants.h"
 
 Character::Character(class Game *game, float forwardSpeed)
     : Actor(game)
@@ -21,8 +22,8 @@ void Character::OnUpdate(float deltaTime)
 {
     Vector2 pos = GetPosition();
     const float margin = 15.0f;
-    const float maxX = Game::LEVEL_WIDTH * Game::TILE_SIZE - margin;
-    const float maxY = Game::LEVEL_HEIGHT * Game::TILE_SIZE - margin;
+    const float maxX = GameConstants::LEVEL_WIDTH * GameConstants::TILE_SIZE - margin;
+    const float maxY = GameConstants::LEVEL_HEIGHT * GameConstants::TILE_SIZE - margin;
 
     mPosition.x = Math::Clamp(mPosition.x, margin, maxX);
     mPosition.y = Math::Clamp(mPosition.y, margin, maxY);

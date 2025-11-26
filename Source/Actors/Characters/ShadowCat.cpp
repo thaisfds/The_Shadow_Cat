@@ -4,6 +4,7 @@
 
 #include "ShadowCat.h"
 #include "../../Game.h"
+#include "../../GameConstants.h"
 #include "../../Components/Drawing/AnimatorComponent.h"
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../../Components/Physics/AABBColliderComponent.h"
@@ -12,14 +13,12 @@
 #include "Character.h"
 #include <cmath>
 
-const int JOYSTICK_DEAD_ZONE = 8000;
-
 ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     : Character(game, forwardSpeed)
 {
-    mDrawComponent = new AnimatorComponent(this, "../Assets/Sprites/ShadowCat/ShadowCat.png", "../Assets/Sprites/ShadowCat/ShadowCat.json", Game::TILE_SIZE, Game::TILE_SIZE);
+    mDrawComponent = new AnimatorComponent(this, "../Assets/Sprites/ShadowCat/ShadowCat.png", "../Assets/Sprites/ShadowCat/ShadowCat.json", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
-    mColliderComponent = new AABBColliderComponent(this, 0, 0, Game::TILE_SIZE, Game::TILE_SIZE, ColliderLayer::Player);
+    mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, ColliderLayer::Player);
     mSkillInputHandler = new SkillInputHandler(this);
     mRigidBodyComponent->SetApplyGravity(false);
 
@@ -65,13 +64,13 @@ void ShadowCat::OnProcessInput(const uint8_t *state)
         int y_axis = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
 
         float x_dir = 0.0f;
-        if (std::abs(x_axis) > JOYSTICK_DEAD_ZONE)
+        if (std::abs(x_axis) > GameConstants::JOYSTICK_DEAD_ZONE)
         {
             x_dir = (float)x_axis / 32767.0f;
         }
 
         float y_dir = 0.0f;
-        if (std::abs(y_axis) > JOYSTICK_DEAD_ZONE)
+        if (std::abs(y_axis) > GameConstants::JOYSTICK_DEAD_ZONE)
         {
             y_dir = (float)y_axis / 32767.0f;
         }

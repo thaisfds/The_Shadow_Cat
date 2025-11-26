@@ -2,6 +2,7 @@
 #include "../Renderer/Font.h"
 #include "../Renderer/Texture.h"
 #include "../Renderer/Shader.h"
+#include "../GameConstants.h"
 
 UIText::UIText(class Game* game, const std::string& text, class Font* font, const Vector2 &offset, float scale, float angle,
                int pointSize, const unsigned wrapLength, int drawOrder)
@@ -60,7 +61,7 @@ void UIText::Draw(class Shader* shader)
                                             (static_cast<float>(mTexture->GetHeight()) + mMargin.y) * mScale, 1.0f);
 
     // Translate to position on screen
-    Matrix4 transMat = Matrix4::CreateTranslation(Vector3(mOffset.x + Game::WINDOW_WIDTH / 2, mOffset.y + Game::WINDOW_HEIGHT / 2, 0.0f));
+    Matrix4 transMat = Matrix4::CreateTranslation(Vector3(mOffset.x + GameConstants::WINDOW_WIDTH / 2, mOffset.y + GameConstants::WINDOW_HEIGHT / 2, 0.0f));
 
     // Set world transform
     Matrix4 world = scaleMat * transMat;

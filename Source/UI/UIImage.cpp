@@ -4,6 +4,7 @@
 #include "../Renderer/Renderer.h"
 #include "../Actors/Actor.h"
 #include "../Game.h"
+#include "../GameConstants.h"
 
 
 UIImage::UIImage(class Game* game, const Vector2 &offset, const float scale, const float angle, int drawOrder)
@@ -36,7 +37,7 @@ void UIImage::Draw(class Shader* shader)
     Matrix4 rotMat = Matrix4::CreateRotationZ(mAngle);
 
     // Translate to position on screen
-    Matrix4 transMat = Matrix4::CreateTranslation(Vector3(mOffset.x + Game::WINDOW_WIDTH / 2, mOffset.y + Game::WINDOW_HEIGHT / 2, 0.0f));
+    Matrix4 transMat = Matrix4::CreateTranslation(Vector3(mOffset.x + GameConstants::WINDOW_WIDTH / 2, mOffset.y + GameConstants::WINDOW_HEIGHT / 2, 0.0f));
 
     // Set world transform
     Matrix4 world = scaleMat * rotMat * transMat;

@@ -5,12 +5,9 @@
 #include <SDL.h>
 #include "../../Actors/Actor.h"
 #include "../../Game.h"
+#include "../../GameConstants.h"
 #include "RigidBodyComponent.h"
 #include "AABBColliderComponent.h"
-
-const float MAX_SPEED_X = 750.0f;
-const float MAX_SPEED_Y = 750.0f;
-const float GRAVITY = 2000.0f;
 
 RigidBodyComponent::RigidBodyComponent(class Actor* owner, float mass, float friction, bool applyGravity, int updateOrder)
         :Component(owner, updateOrder)
@@ -33,7 +30,7 @@ void RigidBodyComponent::Update(float deltaTime)
     // Apply gravity acceleration
     if(mApplyGravity)
     {
-        ApplyForce(Vector2::UnitY * GRAVITY);
+        ApplyForce(Vector2::UnitY * GameConstants::GRAVITY);
     }
 
     // Apply friction
@@ -45,8 +42,8 @@ void RigidBodyComponent::Update(float deltaTime)
     // Euler Integration
     mVelocity += mAcceleration * deltaTime;
 
-    mVelocity.x = Math::Clamp<float>(mVelocity.x, -MAX_SPEED_X, MAX_SPEED_X);
-    mVelocity.y = Math::Clamp<float>(mVelocity.y, -MAX_SPEED_Y, MAX_SPEED_Y);
+    mVelocity.x = Math::Clamp<float>(mVelocity.x, -GameConstants::MAX_SPEED_X, GameConstants::MAX_SPEED_X);
+    mVelocity.y = Math::Clamp<float>(mVelocity.y, -GameConstants::MAX_SPEED_Y, GameConstants::MAX_SPEED_Y);
 
     if(Math::NearlyZero(mVelocity.x, 1.0f))
     {

@@ -44,14 +44,6 @@ public:
     // Renderer
     class Renderer *GetRenderer() { return mRenderer; }
 
-    static const int WINDOW_WIDTH = 854;
-    static const int WINDOW_HEIGHT = 480;
-    static const int LEVEL_WIDTH = 11;
-    static const int LEVEL_HEIGHT = 11;
-    static const int TILE_SIZE = 32;
-    static const int SPAWN_DISTANCE = 700;
-    static const int FPS = 60;
-
     // Draw functions
     void AddDrawable(class DrawComponent *drawable);
     void RemoveDrawable(class DrawComponent *drawable);

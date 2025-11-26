@@ -4,6 +4,7 @@
 #include "VertexArray.h"
 #include "Texture.h"
 #include "../Game.h"
+#include "../GameConstants.h"
 #include "../UI/UIElement.h"
 
 Renderer::Renderer(SDL_Window *window)
@@ -286,7 +287,7 @@ Font* Renderer::GetFont(const std::string& fileName)
 
 void Renderer::UpdateViewport(int windowWidth, int windowHeight)
 {
-    float targetAspect = Game::WINDOW_WIDTH / (float)Game::WINDOW_HEIGHT;
+    float targetAspect = GameConstants::WINDOW_WIDTH / (float)GameConstants::WINDOW_HEIGHT;
     float windowAspect = (float)windowWidth / (float)windowHeight;
     
     int viewportX = 0;

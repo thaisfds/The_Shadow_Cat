@@ -85,6 +85,7 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Characters/Character.h
         Source/Actors/Characters/Dummy.cpp
         Source/Actors/Characters/Dummy.h
+        Source/GameConstants.h
 )
 
 configure_local_linking(${PROJECT_NAME})

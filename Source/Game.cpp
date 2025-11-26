@@ -5,6 +5,7 @@
 #include "Actors/Characters/Dummy.h"
 #include "CSV.h"
 #include "Game.h"
+#include "GameConstants.h"
 #include "Components/Drawing/DrawComponent.h"
 #include "Components/Physics/RigidBodyComponent.h"
 #include "Random.h"
@@ -63,7 +64,7 @@ bool Game::Initialize()
         return false;
     }
 
-	mWindow = SDL_CreateWindow("The Shadow Cat", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
+	mWindow = SDL_CreateWindow("The Shadow Cat", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
 	if (!mWindow)
 	{
 		SDL_Log("Failed to create window: %s", SDL_GetError());
@@ -71,7 +72,7 @@ bool Game::Initialize()
 	}
 
 	mRenderer = new Renderer(mWindow);
-	mRenderer->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
+	mRenderer->Initialize(GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT);
 
 	for (int i = 0; i < SDL_NumJoysticks(); ++i)
 	{
@@ -147,11 +148,11 @@ void Game::SetScene(GameScene nextScene)
 void Game::InitializeActors()
 {
 
-	mLevelData = LoadLevel("../Assets/Levels/Lobby/Lobby.csv", LEVEL_WIDTH, LEVEL_HEIGHT);
+	mLevelData = LoadLevel("../Assets/Levels/Lobby/Lobby.csv", GameConstants::LEVEL_WIDTH, GameConstants::LEVEL_HEIGHT);
 
 	if (mLevelData)
 	{
-		BuildLevel(mLevelData, LEVEL_WIDTH, LEVEL_HEIGHT);
+		BuildLevel(mLevelData, GameConstants::LEVEL_WIDTH, GameConstants::LEVEL_HEIGHT);
 	}
 }
 
@@ -219,8 +220,8 @@ void Game::BuildLevel(int **levelData, int width, int height)
 		{
 			int tileID = levelData[i][j];
 
-			float x = (j * TILE_SIZE) + (TILE_SIZE / 2.0f);
-			float y = (i * TILE_SIZE) + (TILE_SIZE / 2.0f);
+			float x = (j * GameConstants::TILE_SIZE) + (GameConstants::TILE_SIZE / 2.0f);
+			float y = (i * GameConstants::TILE_SIZE) + (GameConstants::TILE_SIZE / 2.0f);
 
 			Vector2 position(x, y);
 
@@ -264,7 +265,7 @@ void Game::RunLoop()
 		GenerateOutput();
 
 		// Sleep to maintain frame rate
-		int sleepTime = (1000 / FPS) - (SDL_GetTicks() - mTicksCount);
+		int sleepTime = (1000 / GameConstants::FPS) - (SDL_GetTicks() - mTicksCount);
 		if (sleepTime > 0)
 		{
 			SDL_Delay(sleepTime);
@@ -327,7 +328,7 @@ void Game::ProcessInput()
 				else
 				{
 					SDL_SetWindowFullscreen(mWindow, 0);
-					mRenderer->UpdateViewport(WINDOW_WIDTH, WINDOW_HEIGHT);
+					mRenderer->UpdateViewport(GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT);
 				}
 			}
 
@@ -418,8 +419,8 @@ void Game::UpdateCamera()
 		float targetY = mShadowCat->GetPosition().y;
 
 		// Center camera on ShadowCat by subtracting half of window dimensions
-		mCameraPos.x = targetX - (WINDOW_WIDTH / 2.0f);
-		mCameraPos.y = targetY - (WINDOW_HEIGHT / 2.0f);
+		mCameraPos.x = targetX - (GameConstants::WINDOW_WIDTH / 2.0f);
+		mCameraPos.y = targetY - (GameConstants::WINDOW_HEIGHT / 2.0f);
 	}
 }
 
@@ -487,8 +488,8 @@ void Game::GenerateOutput()
 	Texture *backgroundTexture = mRenderer->GetTexture("../Assets/Levels/Lobby/LobbyBackground.png");
 	if (backgroundTexture)
 	{
-		float levelPixelWidth = static_cast<float>(LEVEL_WIDTH) * static_cast<float>(TILE_SIZE);
-		float levelPixelHeight = static_cast<float>(LEVEL_HEIGHT) * static_cast<float>(TILE_SIZE);
+		float levelPixelWidth = static_cast<float>(GameConstants::LEVEL_WIDTH) * static_cast<float>(GameConstants::TILE_SIZE);
+		float levelPixelHeight = static_cast<float>(GameConstants::LEVEL_HEIGHT) * static_cast<float>(GameConstants::TILE_SIZE);
 
 		float desiredWidth = levelPixelWidth;
 		float desiredHeight = levelPixelHeight;
@@ -549,7 +550,7 @@ void Game::Shutdown()
 	// Delete level data
 	if (mLevelData)
 	{
-		for (int i = 0; i < LEVEL_HEIGHT; ++i)
+		for (int i = 0; i < GameConstants::LEVEL_HEIGHT; ++i)
 		{
 			delete[] mLevelData[i];
 		}
