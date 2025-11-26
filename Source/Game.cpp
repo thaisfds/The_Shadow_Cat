@@ -13,7 +13,6 @@
 #include "UI/Screens/MainMenu.h"
 #include "Actors/Actor.h"
 #include "Actors/Block.h"
-#include "Actors/Goomba.h"
 #include "Actors/Spawner.h"
 #include "Actors/Characters/ShadowCat.h"
 
