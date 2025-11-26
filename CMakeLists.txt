@@ -77,6 +77,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/ShadowCat.h
         Source/Components/Skills/SkillBase.cpp
         Source/Components/Skills/SkillBase.h
+        Source/Components/Skills/BasicAttack.cpp
+        Source/Components/Skills/BasicAttack.h
         Source/Components/Skills/SkillInputHandler.cpp
         Source/Components/Skills/SkillInputHandler.h
         Source/Actors/Character.cpp

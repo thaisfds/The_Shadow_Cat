@@ -24,8 +24,9 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     mRigidBodyComponent->SetApplyGravity(false);
 
     mDrawComponent->AddAnimation("Idle", {0});
-    mDrawComponent->AddAnimation("Run", {0, 1, 0, 2});
-
+    mDrawComponent->AddAnimation("Run", {0, 1, 2, 3});
+    mDrawComponent->AddAnimation("BasicAttack", {4, 5, 6, 7, 8, 0});
+    
     mDrawComponent->SetAnimation("Idle");
     mDrawComponent->SetAnimFPS(10.0f);
 }
