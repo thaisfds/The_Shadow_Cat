@@ -3,14 +3,14 @@
 namespace GameConstants
 {
     // Window settings
-    constexpr int WINDOW_WIDTH = 854;
-    constexpr int WINDOW_HEIGHT = 480;
+    constexpr int WINDOW_WIDTH = 1280;
+    constexpr int WINDOW_HEIGHT = 720;
     constexpr int FPS = 60;
 
     // Level settings
     constexpr int LEVEL_WIDTH = 11;
     constexpr int LEVEL_HEIGHT = 11;
-    constexpr int TILE_SIZE = 32;
+    constexpr int TILE_SIZE = 64;
     constexpr int SPAWN_DISTANCE = 700;
 
     // Physics constants
