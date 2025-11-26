@@ -331,6 +331,10 @@ void Game::ProcessInput()
 				}
 			}
 
+			// Debug toggle
+			if (event.key.keysym.sym == SDLK_F1 && event.key.repeat == 0)
+				mIsDebugging = !mIsDebugging;
+
 			// Pass event to actors
 			for (auto actor : mActors) actor->OnHandleEvent(event);
 			break;
