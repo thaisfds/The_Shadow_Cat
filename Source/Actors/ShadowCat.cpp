@@ -8,16 +8,19 @@
 #include "../Components/Physics/RigidBodyComponent.h"
 #include "../Components/Physics/AABBColliderComponent.h"
 #include "../Components/ParticleSystemComponent.h"
+#include "../Components/Skills/SkillInputHandler.h"
+#include "Character.h"
 #include <cmath>
 
 const int JOYSTICK_DEAD_ZONE = 8000;
 
-ShadowCat::ShadowCat(Game *game, const float forwardSpeed, const float jumpSpeed)
-    : Actor(game), mIsRunning(false), mIsDead(false), mForwardSpeed(forwardSpeed), mJumpSpeed(jumpSpeed)
+ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
+    : Character(game, forwardSpeed)
 {
     mDrawComponent = new AnimatorComponent(this, "../Assets/Sprites/ShadowCat/ShadowCat.png", "../Assets/Sprites/ShadowCat/ShadowCat.json", Game::TILE_SIZE, Game::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
     mColliderComponent = new AABBColliderComponent(this, 0, 0, Game::TILE_SIZE, Game::TILE_SIZE, ColliderLayer::Player);
+    mSkillInputHandler = new SkillInputHandler(this);
     mRigidBodyComponent->SetApplyGravity(false);
 
     mDrawComponent->AddAnimation("Idle", {0});
@@ -29,8 +32,7 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed, const float jumpSpeed
 
 void ShadowCat::OnProcessInput(const uint8_t *state)
 {
-    if (mIsDead)
-        return;
+    if (mIsDead || mIsMovementLocked) return;
 
     Vector2 dir = Vector2::Zero;
     mIsRunning = false;
@@ -115,50 +117,14 @@ void ShadowCat::OnProcessInput(const uint8_t *state)
     mRigidBodyComponent->SetVelocity(desiredVel);
 }
 
-void ShadowCat::OnUpdate(float deltaTime)
+void ShadowCat::OnHandleEvent(const SDL_Event& event)
 {
-    Vector2 pos = GetPosition();
-    const float margin = 15.0f;
-    const float maxX = Game::LEVEL_WIDTH * Game::TILE_SIZE - margin;
-    const float maxY = Game::LEVEL_HEIGHT * Game::TILE_SIZE - margin;
-
-    if (pos.x < margin)
-    {
-        pos.x = margin;
-        SetPosition(pos);
-    }
-    if (pos.x > maxX)
-    {
-        pos.x = maxX;
-        SetPosition(pos);
-    }
-    if (pos.y < margin)
-    {
-        pos.y = margin;
-        SetPosition(pos);
-    }
-    if (pos.y > maxY)
-    {
-        pos.y = maxY;
-        SetPosition(pos);
-    }
-
-    ManageAnimations();
+    if (mSkillInputHandler) mSkillInputHandler->HandleEvent(event);
 }
 
-void ShadowCat::ManageAnimations()
+void ShadowCat::OnUpdate(float deltaTime)
 {
-    if (!mIsDead)
-    {
-        if (mIsRunning)
-        {
-            mDrawComponent->SetAnimation("Run");
-        }
-        else
-        {
-            mDrawComponent->SetAnimation("Idle");
-        }
-    }
+    Character::OnUpdate(deltaTime);
 }
 
 void ShadowCat::Kill()

@@ -3,14 +3,15 @@
 //
 
 #pragma once
-#include "Actor.h"
+#include "Character.h"
 
-class ShadowCat : public Actor
+class ShadowCat : public Character
 {
 public:
-    explicit ShadowCat(Game *game, float forwardSpeed = 200.0f, float jumpSpeed = -750.0f);
+    explicit ShadowCat(Game *game, float forwardSpeed = 200.0f);
 
     void OnProcessInput(const Uint8 *keyState) override;
+    void OnHandleEvent(const SDL_Event& event) override;
     void OnUpdate(float deltaTime) override;
 
     void OnHorizontalCollision(const float minOverlap, AABBColliderComponent *other) override;
@@ -19,17 +20,8 @@ public:
     void Kill() override;
 
 private:
-    void ManageAnimations();
-
-    float mForwardSpeed;
-    float mJumpSpeed;
-    bool mIsRunning;
-    bool mIsDead;
-
-    class RigidBodyComponent *mRigidBodyComponent;
-    class AnimatorComponent *mDrawComponent;
-    class AABBColliderComponent *mColliderComponent;
     class ParticleSystemComponent *mFireBalls;
+    class SkillInputHandler *mSkillInputHandler;
 
     float mFireBallCooldown = 1.0f;
 };

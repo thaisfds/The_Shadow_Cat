@@ -372,6 +372,9 @@ void Game::ProcessInput()
 					mRenderer->UpdateViewport(WINDOW_WIDTH, WINDOW_HEIGHT);
 				}
 			}
+
+			// Pass event to actors
+			for (auto actor : mActors) actor->OnHandleEvent(event);
 			break;
 		}
 	}

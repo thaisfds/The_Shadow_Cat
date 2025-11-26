@@ -22,6 +22,9 @@ public:
     // ProcessInput function called from Game (not overridable)
     void ProcessInput(const Uint8 *keyState);
 
+    // Event handling
+    virtual void OnHandleEvent(const SDL_Event& event) {}
+
     // Position getter/setter
     const Vector2 &GetPosition() const { return mPosition; }
     void SetPosition(const Vector2 &pos) { mPosition = pos; }

@@ -75,6 +75,12 @@ add_executable(${PROJECT_NAME}
         Source/UI/Screens/MainMenu.h
         Source/Actors/ShadowCat.cpp
         Source/Actors/ShadowCat.h
+        Source/Components/Skills/SkillBase.cpp
+        Source/Components/Skills/SkillBase.h
+        Source/Components/Skills/SkillInputHandler.cpp
+        Source/Components/Skills/SkillInputHandler.h
+        Source/Actors/Character.cpp
+        Source/Actors/Character.h
 )
 
 configure_local_linking(${PROJECT_NAME})
