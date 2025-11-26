@@ -8,16 +8,16 @@
 Dummy::Dummy(class Game* game, float forwardSpeed)
     : Character(game, forwardSpeed)
 {
-    mDrawComponent = new AnimatorComponent(this, "../Assets/Sprites/Dummy/Dummy.png", "../Assets/Sprites/Dummy/Dummy.json", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+    mAnimatorComponent = new AnimatorComponent(this, "../Assets/Sprites/Dummy/Dummy.png", "../Assets/Sprites/Dummy/Dummy.json", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
     mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, ColliderLayer::Enemy);
     mRigidBodyComponent->SetApplyGravity(false);
 
-    mDrawComponent->AddAnimation("Idle", {0});
-    mDrawComponent->AddAnimation("Hit", {1, 2, 2, 0});
+    mAnimatorComponent->AddAnimation("Idle", {0});
+    mAnimatorComponent->AddAnimation("Hit", {1, 2, 2, 0});
 
-    mDrawComponent->SetAnimation("Idle");
-    mDrawComponent->SetAnimFPS(10.0f);
+    mAnimatorComponent->SetAnimation("Idle");
+    mAnimatorComponent->SetAnimFPS(10.0f);
 }
 
 Dummy::~Dummy()

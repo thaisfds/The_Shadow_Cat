@@ -16,18 +16,18 @@
 ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     : Character(game, forwardSpeed)
 {
-    mDrawComponent = new AnimatorComponent(this, "../Assets/Sprites/ShadowCat/ShadowCat.png", "../Assets/Sprites/ShadowCat/ShadowCat.json", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+    mAnimatorComponent = new AnimatorComponent(this, "../Assets/Sprites/ShadowCat/ShadowCat.png", "../Assets/Sprites/ShadowCat/ShadowCat.json", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
     mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, ColliderLayer::Player);
     mSkillInputHandler = new SkillInputHandler(this);
     mRigidBodyComponent->SetApplyGravity(false);
 
-    mDrawComponent->AddAnimation("Idle", {0});
-    mDrawComponent->AddAnimation("Run", {0, 1, 2, 3});
-    mDrawComponent->AddAnimation("BasicAttack", {4, 5, 6, 7, 8, 0});
+    mAnimatorComponent->AddAnimation("Idle", {0});
+    mAnimatorComponent->AddAnimation("Run", {0, 1, 2, 3});
+    mAnimatorComponent->AddAnimation("BasicAttack", {4, 5, 6, 7, 8, 0});
     
-    mDrawComponent->SetAnimation("Idle");
-    mDrawComponent->SetAnimFPS(10.0f);
+    mAnimatorComponent->SetAnimation("Idle");
+    mAnimatorComponent->SetAnimFPS(10.0f);
 }
 
 void ShadowCat::OnProcessInput(const uint8_t *state)

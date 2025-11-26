@@ -36,8 +36,8 @@ void Character::ManageAnimations()
     if (mIsDead) return;
     if (mIsAnimationLocked) return;
 
-    if (mIsRunning) mDrawComponent->SetAnimation("Run");
-    else mDrawComponent->SetAnimation("Idle");
+    if (mIsRunning) mAnimatorComponent->SetAnimation("Run");
+    else mAnimatorComponent->SetAnimation("Idle");
 }
 
 void Character::SetAnimationLock(bool isLocked)

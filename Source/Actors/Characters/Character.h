@@ -23,7 +23,7 @@ protected:
     void ManageAnimations();
 
     class RigidBodyComponent *mRigidBodyComponent;
-    class AnimatorComponent *mDrawComponent;
+    class AnimatorComponent *mAnimatorComponent;
     class AABBColliderComponent *mColliderComponent;
 
     float mForwardSpeed;
