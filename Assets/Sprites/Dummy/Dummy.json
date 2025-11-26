@@ -1,0 +1,44 @@
+{ "frames": {
+   "Dummy_0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 1000
+   },
+   "Dummy_1.aseprite": {
+    "frame": { "x": 32, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "Dummy_2.aseprite": {
+    "frame": { "x": 64, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 200
+   }
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.x-dev",
+  "image": "Dummy.png",
+  "format": "RGBA8888",
+  "size": { "w": 96, "h": 32 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "Hit", "from": 0, "to": 2, "direction": "pingpong", "color": "#000000ff" }
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" },
+   { "name": "Layer 2", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

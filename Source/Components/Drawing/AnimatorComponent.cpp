@@ -54,7 +54,7 @@ bool AnimatorComponent::LoadSpriteSheetData(const std::string &dataPath)
 
 	for (const auto &[key, value] : spriteSheetData["frames"].items())
 	{
-		// Extract the frame number from the key (e.g., "MapTaleset4.aseprite" -> 4)
+		// Extract the frame number from the key (e.g., "MapTileset4.aseprite" -> 4)
 		std::string frameName = key;
 		size_t dotPos = frameName.find('.');
 		if (dotPos != std::string::npos)

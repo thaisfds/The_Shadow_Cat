@@ -5,7 +5,7 @@
 SkillInputHandler::SkillInputHandler(Actor* owner, int updateOrder)
     : Component(owner, updateOrder)
 {
-    mKeyToSkill[SDL_SCANCODE_Q] = nullptr;
+    mKeyToSkill[SDL_SCANCODE_Q] = new BasicAttack(owner);
     mKeyToSkill[SDL_SCANCODE_E] = nullptr;
     mKeyToSkill[SDL_SCANCODE_R] = nullptr;
     mKeyToSkill[SDL_SCANCODE_F] = nullptr;

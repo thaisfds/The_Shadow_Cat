@@ -1,8 +1,8 @@
-#include "Actor.h"
+#include "../Actor.h"
 #include "Character.h"
-#include "../Components/Physics/RigidBodyComponent.h"
-#include "../Components/Drawing/AnimatorComponent.h"
-#include "../Game.h"
+#include "../../Components/Physics/RigidBodyComponent.h"
+#include "../../Components/Drawing/AnimatorComponent.h"
+#include "../../Game.h"
 
 Character::Character(class Game *game, float forwardSpeed)
     : Actor(game)

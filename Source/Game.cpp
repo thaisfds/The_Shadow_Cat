@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <fstream>
+#include "Actors/Characters/Dummy.h"
 #include "CSV.h"
 #include "Game.h"
 #include "Components/Drawing/DrawComponent.h"
@@ -13,7 +14,7 @@
 #include "Actors/Block.h"
 #include "Actors/Goomba.h"
 #include "Actors/Spawner.h"
-#include "Actors/ShadowCat.h"
+#include "Actors/Characters/ShadowCat.h"
 
 Game::Game()
 	: mWindow(nullptr),
@@ -223,66 +224,23 @@ void Game::BuildLevel(int **levelData, int width, int height)
 
 			Vector2 position(x, y);
 
-			switch (tileID)
-			{
-			case 0:
+			// Player spawn
+			if (tileID == 0)
 			{
 				mShadowCat = new ShadowCat(this);
 				mShadowCat->SetPosition(position);
-				break;
 			}
-
-			case 4:
+			// Blocks
+			else if (tileID >= 4 && tileID <= 10)
 			{
-				auto block = new Block(this, 4);
+				auto block = new Block(this, tileID);
 				block->SetPosition(position);
-				break;
 			}
-
-			case 5:
+			// Dummy
+			else if (tileID == 11)
 			{
-				auto block = new Block(this, 5);
-				block->SetPosition(position);
-				break;
-			}
-
-			case 6:
-			{
-				auto block = new Block(this, 6);
-				block->SetPosition(position);
-				break;
-			}
-
-			case 7:
-			{
-				auto block = new Block(this, 7);
-				block->SetPosition(position);
-				break;
-			}
-
-			case 8:
-			{
-				auto block = new Block(this, 8);
-				block->SetPosition(position);
-				break;
-			}
-
-			case 9:
-			{
-				auto block = new Block(this, 9);
-				block->SetPosition(position);
-				break;
-			}
-
-			case 10:
-			{
-				auto block = new Block(this, 10);
-				block->SetPosition(position);
-				break;
-			}
-
-			default:
-				break;
+				auto dummy = new Dummy(this);
+				dummy->SetPosition(position);
 			}
 		}
 	}
@@ -346,7 +304,7 @@ void Game::ProcessInput()
 				SDL_Log("Game controller removed");
 				SDL_GameControllerClose(mController);
 				mController = nullptr;
-			}
+		}
 			break;
 		case SDL_KEYDOWN:
 			// Handle key press for UI screens

@@ -73,16 +73,18 @@ add_executable(${PROJECT_NAME}
         Source/UI/UIRect.h
         Source/UI/Screens/MainMenu.cpp
         Source/UI/Screens/MainMenu.h
-        Source/Actors/ShadowCat.cpp
-        Source/Actors/ShadowCat.h
+        Source/Actors/Characters/ShadowCat.cpp
+        Source/Actors/Characters/ShadowCat.h
         Source/Components/Skills/SkillBase.cpp
         Source/Components/Skills/SkillBase.h
         Source/Components/Skills/BasicAttack.cpp
         Source/Components/Skills/BasicAttack.h
         Source/Components/Skills/SkillInputHandler.cpp
         Source/Components/Skills/SkillInputHandler.h
-        Source/Actors/Character.cpp
-        Source/Actors/Character.h
+        Source/Actors/Characters/Character.cpp
+        Source/Actors/Characters/Character.h
+        Source/Actors/Characters/Dummy.cpp
+        Source/Actors/Characters/Dummy.h
 )
 
 configure_local_linking(${PROJECT_NAME})

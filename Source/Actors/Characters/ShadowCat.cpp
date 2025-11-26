@@ -3,12 +3,12 @@
 //
 
 #include "ShadowCat.h"
-#include "../Game.h"
-#include "../Components/Drawing/AnimatorComponent.h"
-#include "../Components/Physics/RigidBodyComponent.h"
-#include "../Components/Physics/AABBColliderComponent.h"
-#include "../Components/ParticleSystemComponent.h"
-#include "../Components/Skills/SkillInputHandler.h"
+#include "../../Game.h"
+#include "../../Components/Drawing/AnimatorComponent.h"
+#include "../../Components/Physics/RigidBodyComponent.h"
+#include "../../Components/Physics/AABBColliderComponent.h"
+#include "../../Components/ParticleSystemComponent.h"
+#include "../../Components/Skills/SkillInputHandler.h"
 #include "Character.h"
 #include <cmath>
 

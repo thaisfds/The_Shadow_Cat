@@ -6,15 +6,15 @@ class BasicAttack : public SkillBase
 {
 public:
     BasicAttack(Actor* owner, int updateOrder = 100);
-	
-	void Update(float deltaTime) override;
-	
+    
+    void Update(float deltaTime) override;
+    
     void Execute() override;
-	void EndAttack();
+    void EndAttack();
 
 private:
-	bool mIsAttacking;
-	float mAttackTimer;
-	float mDamageDelay;
-	bool mDamageApplied;
+    bool mIsAttacking;
+    float mAttackTimer;
+    float mDamageDelay;
+    bool mDamageApplied;
 };

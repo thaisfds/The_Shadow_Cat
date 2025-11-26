@@ -1,5 +1,5 @@
 #include "SkillBase.h"
-#include "../../Actors/Character.h"
+#include "../../Actors/Characters/Character.h"
 
 SkillBase::SkillBase(Actor* owner, int updateOrder)
 	: Component(owner, updateOrder)

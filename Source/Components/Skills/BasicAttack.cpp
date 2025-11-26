@@ -1,7 +1,7 @@
 #include "BasicAttack.h"
 
 #include "../../Actors/Actor.h"
-#include "../../Actors/Character.h"
+#include "../../Actors/Characters/Character.h"
 #include "../Drawing/AnimatorComponent.h"
 #include "../Drawing/DrawComponent.h"
 

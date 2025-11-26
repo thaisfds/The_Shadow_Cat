@@ -3,7 +3,7 @@
  <editorsettings>
   <export target="Level3.csv" format="csv"/>
  </editorsettings>
- <tileset firstgid="1" source="../MapTaleset.tsx"/>
+ <tileset firstgid="1" source="../MapTileset.tsx"/>
  <imagelayer id="2" name="Image Layer 1">
   <image source="Level3Background.png" width="928" height="928"/>
  </imagelayer>
