@@ -3,6 +3,8 @@
 #include <SDL_image.h>
 #include <SDL_mixer.h>
 #include <vector>
+#include "Actors/Actor.h"
+#include "Actors/DebugActor.h"
 #include "Renderer/Renderer.h"
 #include "AudioSystem.h"
 
@@ -64,6 +66,9 @@ public:
 
     SDL_GameController *mController;
 
+    // Debug
+    DebugActor* GetDebugActor() { return mDebugActor; }
+
 private:
     void ProcessInput();
     void UpdateGame(float deltaTime);
@@ -102,7 +107,6 @@ private:
 
     // Track if we're updating actors right now
     bool mIsRunning;
-    bool mIsDebugging;
     bool mUpdatingActors;
     bool mIsFullscreen;
     GameScene mCurrentScene;
@@ -111,4 +115,8 @@ private:
     class ShadowCat *mShadowCat;
     class HUD *mHUD;
     int **mLevelData;
+
+    // Debug
+    bool mIsDebugging;
+    DebugActor *mDebugActor;
 };

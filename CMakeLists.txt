@@ -84,6 +84,8 @@ add_executable(${PROJECT_NAME}
         Source/GameConstants.h
         Source/Components/Physics/PhysicsUtils.cpp
         Source/Components/Physics/PhysicsUtils.h
+        Source/Actors/DebugActor.cpp
+        Source/Actors/DebugActor.h
 )
 
 configure_local_linking(${PROJECT_NAME})

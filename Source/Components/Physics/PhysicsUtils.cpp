@@ -7,52 +7,55 @@ AABBColliderComponent* PhysicsUtils::ConeCast(Game *game, Vector2 origin, Vector
 {
 	float radiusSq = radius * radius;
 	auto colliders = game->GetColliders();
+	std::vector<Vector2> coneTriangle = PhysicsUtils::CreateConeTriangle(origin, direction, angle, radius);
+	ParticleSystemComponent* debugParticles = game->GetDebugActor()->GetParticleSystemComponent();
 	for (auto collider : colliders)
 	{
 		if (collider->GetLayer() != layer) continue;
 		if (PhysicsUtils::GetPointAABBDistanceSquared(origin, collider) > radiusSq) continue;
 
-		if (OverlapTriangleAABB(origin, direction, angle, radius, collider)) return collider;
+		if (OverlapTriangleAABB(coneTriangle, collider))
+		{
+			DebugDrawPolygon(game, coneTriangle, 0.5f, 15); // Red/green color not supported in particles
+			return collider;
+		}
 	}
 
+	DebugDrawPolygon(game, coneTriangle, 0.5f, 15);
 	return nullptr;
 }
 
-bool PhysicsUtils::OverlapTriangleAABB(Vector2 origin, Vector2 direction, float angle, float length, AABBColliderComponent *aabb)
+bool PhysicsUtils::OverlapTriangleAABB(const std::vector<Vector2>& triangle, AABBColliderComponent *aabb)
 {
-	// Create triangle vertices (cone shape)
-	direction.Normalize();
-	float halfAngle = angle / 2.0f;
-	
-	// Rotate direction by +halfAngle and -halfAngle to get cone edges
-	Matrix2 rotationRight = Matrix2::CreateRotation(halfAngle);
-	Matrix2 rotationLeft = Matrix2::CreateRotation(-halfAngle);
-	
-	// Right edge of triangle (rotated by +halfAngle)
-	Vector2 rightDir = rotationRight * direction;
-	
-	// Left edge of triangle (rotated by -halfAngle)
-	Vector2 leftDir = rotationLeft * direction;
-	
-	// Triangle vertices
-	Vector2 v0 = origin; // Apex
-	Vector2 v1 = origin + rightDir * length; // Right point
-	Vector2 v2 = origin + leftDir * length;  // Left point
-	
-	// AABB vertices
 	Vector2 aabbMin = aabb->GetMin();
 	Vector2 aabbMax = aabb->GetMax();
-	
-	// Create polygon representations
-	std::vector<Vector2> triangle = {v0, v1, v2};
 	std::vector<Vector2> box = {
 		aabbMin,
 		Vector2(aabbMax.x, aabbMin.y),
 		aabbMax,
 		Vector2(aabbMin.x, aabbMax.y)
 	};
+	bool overlap = OverlapPolygons(triangle, box);
+
+	return overlap;
+}
+
+std::vector<Vector2> PhysicsUtils::CreateConeTriangle(Vector2 origin, Vector2 direction, float angle, float length)
+{
+	direction.Normalize();
+	float halfAngle = angle / 2.0f;
+
+	Matrix2 rotationRight = Matrix2::CreateRotation(halfAngle);
+	Matrix2 rotationLeft = Matrix2::CreateRotation(-halfAngle);
+
+	Vector2 rightDir = rotationRight * direction;
+	Vector2 leftDir = rotationLeft * direction;
+
+	Vector2 v0 = origin;
+	Vector2 v1 = origin + rightDir * length;
+	Vector2 v2 = origin + leftDir * length;
 	
-	return OverlapPolygons(triangle, box);
+	return {v0, v1, v2};
 }
 
 bool PhysicsUtils::OverlapPolygons(const std::vector<Vector2> &polyA, const std::vector<Vector2> &polyB)
@@ -80,7 +83,7 @@ bool PhysicsUtils::OverlapPolygons(const std::vector<Vector2> &polyA, const std:
 
 float PhysicsUtils::GetPointAABBDistanceSquared(Vector2 point, AABBColliderComponent* aabb)
 {
-	// The closest point is where the straight line from the point to the center of the AABB intersects the AABB
+	// The closest point is it hits going straight to the AABB's center
 	Vector2 aabbMin = aabb->GetMin();
 	Vector2 aabbMax = aabb->GetMax();
 	
@@ -124,4 +127,23 @@ bool PhysicsUtils::PolygonsOverlapOnAxis(const std::vector<Vector2> &polyA, cons
 	ProjectPolygonOntoAxis(polyA, axis, minA, maxA);
 	ProjectPolygonOntoAxis(polyB, axis, minB, maxB);
 	return !(maxA < minB || maxB < minA);
+}
+
+
+void PhysicsUtils::DebugDrawPolygon(Game* game, const std::vector<Vector2>& polygon, float lifetime, int particlesPerEdge)
+{
+	auto particleSystem = game->GetDebugActor()->GetParticleSystemComponent();
+    if (!particleSystem || polygon.size() < 2) return;
+    for (size_t i = 0; i < polygon.size(); ++i)
+    {
+        const Vector2& start = polygon[i];
+        const Vector2& end = polygon[(i + 1) % polygon.size()];
+        Vector2 edge = end - start;
+        for (int j = 0; j <= particlesPerEdge; ++j)
+        {
+            float t = static_cast<float>(j) / static_cast<float>(particlesPerEdge);
+            Vector2 pos = start + edge * t;
+            particleSystem->EmitParticle(lifetime, 0.0f, pos - particleSystem->GetOwner()->GetPosition());
+        }
+    }
 }

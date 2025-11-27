@@ -147,6 +147,8 @@ void Game::SetScene(GameScene nextScene)
 
 void Game::InitializeActors()
 {
+	// Initialize debug actor
+	mDebugActor = new DebugActor(this);
 
 	mLevelData = LoadLevel("../Assets/Levels/Lobby/Lobby.csv", GameConstants::LEVEL_WIDTH, GameConstants::LEVEL_HEIGHT);
 

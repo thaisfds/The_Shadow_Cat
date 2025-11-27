@@ -7,7 +7,7 @@
 class Particle : public Actor
 {
 public:
-    Particle(class Game *game, int width, int height);
+    Particle(class Game *game, int width, int height, bool hasCollider);
 
     void OnUpdate(float deltaTime) override;
 
@@ -28,7 +28,7 @@ class ParticleSystemComponent : public Component
 {
 
 public:
-    ParticleSystemComponent(class Actor *owner, int partibleW, int particleH, int poolSize = 100, int updateOrder = 10);
+    ParticleSystemComponent(class Actor *owner, int partibleW, int particleH, int poolSize = 100, int updateOrder = 10, bool hasCollider = true);
     void EmitParticle(float lifetime, float speed, const Vector2 &offsetPosition = Vector2::Zero);
 
 private:
