@@ -40,6 +40,8 @@ public:
     // Add an animation of the corresponding name to the animation map
     void AddAnimation(const std::string &name, const std::vector<int> &images);
 
+    float GetAnimationDuration(const std::string &name);
+
 private:
     void SetAnimation(const std::string &name);
 

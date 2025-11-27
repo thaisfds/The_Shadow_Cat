@@ -13,6 +13,9 @@ public:
 
     void OnUpdate(float deltaTime) override;
 
+    virtual void TakeDamage(int damage);
+    void Kill() override;
+
     bool GetAnimationLock() const { return mIsAnimationLocked; }
     void SetAnimationLock(bool isLocked);
 
@@ -22,13 +25,15 @@ public:
 protected:
     void ManageAnimations();
 
+    int hp;
+
     class RigidBodyComponent *mRigidBodyComponent;
     class AnimatorComponent *mAnimatorComponent;
     class AABBColliderComponent *mColliderComponent;
 
     float mForwardSpeed;
 
-    bool mIsRunning;
+    bool mIsMoving;
 
     bool mIsAnimationLocked;
     bool mIsMovementLocked;

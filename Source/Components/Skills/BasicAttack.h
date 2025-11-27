@@ -18,9 +18,11 @@ public:
 private:
     float mConeRadius;
     float mConeAngle;
+    int mDamage;
 
     bool mIsAttacking;
     float mAttackTimer;
+    float mAttackDuration;
     float mDamageDelay;
     bool mDamageApplied;
     Vector2 mAttackDirection;

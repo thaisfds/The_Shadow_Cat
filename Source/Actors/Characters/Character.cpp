@@ -11,6 +11,8 @@ Character::Character(class Game *game, float forwardSpeed)
     , mIsMovementLocked(false)
     , mForwardSpeed(forwardSpeed)
     , mIsDead(false)
+    , mIsMoving(false)
+    , hp(10)
 {
 }
 
@@ -31,12 +33,26 @@ void Character::OnUpdate(float deltaTime)
     ManageAnimations();
 }
 
+void Character::TakeDamage(int damage)
+{
+    hp -= damage;
+    if (hp <= 0) Kill();
+}
+
+void Character::Kill()
+{
+    mIsDead = true;
+    mRigidBodyComponent->SetVelocity(Vector2(0, 0));
+    SetAnimationLock(true);
+    SetMovementLock(true);
+}
+
 void Character::ManageAnimations()
 {
     if (mIsDead) return;
     if (mIsAnimationLocked) return;
 
-    if (mIsRunning) mAnimatorComponent->LoopAnimation("Run");
+    if (mIsMoving) mAnimatorComponent->LoopAnimation("Run");
     else mAnimatorComponent->LoopAnimation("Idle");
 }
 

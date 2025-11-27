@@ -19,8 +19,12 @@ BasicAttack::BasicAttack(Actor* owner, int updateOrder)
     mIsAttacking = false;
     mDamageDelay = 0.3f; // Hardcoded for now, want to change later
 
+    mAttackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("BasicAttack");
+    if (mAttackDuration == 0.0f) mAttackDuration = 1.0f;
+
     mConeRadius = 100.0f;
     mConeAngle = Math::ToRadians(30.0f);
+    mDamage = 10;
 }
 
 void BasicAttack::Update(float deltaTime)
@@ -32,19 +36,22 @@ void BasicAttack::Update(float deltaTime)
     mAttackTimer += deltaTime;
     if (mAttackTimer >= mDamageDelay && !mDamageApplied)
     {
-        if (PhysicsUtils::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mAttackDirection, mConeAngle, mConeRadius, ColliderLayer::Enemy))
-            SDL_Log("Basic Attack hit an enemy!");
-
-        // Apply damage to target here
         mDamageApplied = true;
+        auto hitColliders = PhysicsUtils::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mAttackDirection, mConeAngle, mConeRadius, ColliderLayer::Enemy);
+        for (auto collider : hitColliders)
+        {
+            auto enemyActor = collider->GetOwner();
+            auto enemyCharacter = dynamic_cast<Character*>(enemyActor);
+            enemyCharacter->TakeDamage(mDamage);
+        }
     }
 
-    if (mAttackTimer >= 0.6f) EndAttack();
+    if (mAttackTimer >= mAttackDuration) EndAttack();
 }
 
 void BasicAttack::Execute()
 {
-    mCharacter->GetComponent<AnimatorComponent>()->LoopAnimation("BasicAttack");
+    mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("BasicAttack");
     
     mIsAttacking = true;
     mAttackTimer = 0.0f;
@@ -54,14 +61,12 @@ void BasicAttack::Execute()
     mAttackDirection = mouseWorldPos - mCharacter->GetPosition();
     mAttackDirection.Normalize();
     
-    mCharacter->SetAnimationLock(true);
     mCharacter->SetMovementLock(true);
 }
 
 void BasicAttack::EndAttack()
 {
     mIsAttacking = false;
-    mCharacter->SetAnimationLock(false);
     mCharacter->SetMovementLock(false);
     StartCooldown();
 }

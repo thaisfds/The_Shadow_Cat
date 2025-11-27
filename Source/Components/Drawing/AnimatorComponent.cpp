@@ -161,7 +161,6 @@ void AnimatorComponent::SetAnimation(const std::string &name)
     mFrameTimer = 0.0f;
 }
 
-
 void AnimatorComponent::AddAnimation(const std::string &name, const std::vector<int> &spriteNums)
 {
 	Animation animation;
@@ -176,4 +175,11 @@ void AnimatorComponent::AddAnimation(const std::string &name, const std::vector<
 	}
 	
 	mAnimations.emplace(name, animation);
+}
+
+float AnimatorComponent::GetAnimationDuration(const std::string &name)
+{
+    auto iter = mAnimations.find(name);
+    if (iter == mAnimations.end()) return 0.0f;
+    return iter->second.totalDuration;
 }

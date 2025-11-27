@@ -34,7 +34,7 @@ void ShadowCat::OnProcessInput(const uint8_t *state)
     if (mIsDead || mIsMovementLocked) return;
 
     Vector2 dir = Vector2::Zero;
-    mIsRunning = false;
+    mIsMoving = false;
 
     // Keyboard input
     if (state[SDL_SCANCODE_D])
@@ -99,7 +99,7 @@ void ShadowCat::OnProcessInput(const uint8_t *state)
     Vector2 desiredVel = Vector2::Zero;
     if (dir.LengthSq() > 0.0f)
     {
-        mIsRunning = true;
+        mIsMoving = true;
         dir.Normalize();
         desiredVel = dir * mForwardSpeed;
 

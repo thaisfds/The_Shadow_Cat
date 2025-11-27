@@ -22,3 +22,9 @@ Dummy::Dummy(class Game* game, float forwardSpeed)
 Dummy::~Dummy()
 {
 }
+
+void Dummy::TakeDamage(int damage)
+{
+	hp = Math::Max(hp - damage, 1);
+	mAnimatorComponent->PlayAnimationOnce("Hit");
+}
