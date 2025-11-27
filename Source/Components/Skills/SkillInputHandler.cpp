@@ -21,9 +21,12 @@ void SkillInputHandler::HandleEvent(const SDL_Event& event)
     auto it = mKeyToSkill.find(pressedKey);
     if (it == mKeyToSkill.end()) return;
 
-    SDL_Log("Skill used: %s", SDL_GetScancodeName(pressedKey));
     SkillBase* skill = it->second;
-    if (skill && skill->CanUse()) skill->Execute();
+    if (skill && skill->CanUse())
+    {
+        SDL_Log("Skill used: %s", SDL_GetScancodeName(pressedKey));
+        skill->Execute();
+    }
 }
 
 void SkillInputHandler::AssignSkillToSlot(int slot, SkillBase* skill)

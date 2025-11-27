@@ -4,6 +4,9 @@
 #include "../../Actors/Characters/Character.h"
 #include "../Drawing/AnimatorComponent.h"
 #include "../Drawing/DrawComponent.h"
+#include "../Physics/AABBColliderComponent.h"
+#include "../Physics/PhysicsUtils.h"
+#include "../../Game.h"
 
 
 BasicAttack::BasicAttack(Actor* owner, int updateOrder)
@@ -15,6 +18,9 @@ BasicAttack::BasicAttack(Actor* owner, int updateOrder)
     mCurrentCooldown = 0.0f;
     mIsAttacking = false;
     mDamageDelay = 0.3f; // Hardcoded for now, want to change later
+
+    mConeRadius = 100.0f;
+    mConeAngle = Math::ToRadians(30.0f);
 }
 
 void BasicAttack::Update(float deltaTime)
@@ -26,6 +32,9 @@ void BasicAttack::Update(float deltaTime)
     mAttackTimer += deltaTime;
     if (mAttackTimer >= mDamageDelay && !mDamageApplied)
     {
+        if (PhysicsUtils::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mAttackDirection, mConeAngle, mConeRadius, ColliderLayer::Enemy))
+            SDL_Log("Basic Attack hit an enemy!");
+
         // Apply damage to target here
         mDamageApplied = true;
     }
@@ -40,6 +49,14 @@ void BasicAttack::Execute()
     mIsAttacking = true;
     mAttackTimer = 0.0f;
     mDamageApplied = false;
+    
+    int mouseX, mouseY;
+    SDL_GetMouseState(&mouseX, &mouseY);
+    Vector2 mousePos(static_cast<float>(mouseX), static_cast<float>(mouseY));
+    Vector2 cameraPos = mCharacter->GetGame()->GetCameraPos();
+    Vector2 worldMousePos = mousePos + cameraPos;
+    mAttackDirection = worldMousePos - mCharacter->GetPosition();
+    mAttackDirection.Normalize();
     
     mCharacter->SetAnimationLock(true);
     mCharacter->SetMovementLock(true);
