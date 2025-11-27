@@ -44,7 +44,7 @@ void BasicAttack::Update(float deltaTime)
 
 void BasicAttack::Execute()
 {
-    mCharacter->GetComponent<AnimatorComponent>()->SetAnimation("BasicAttack");
+    mCharacter->GetComponent<AnimatorComponent>()->LoopAnimation("BasicAttack");
     
     mIsAttacking = true;
     mAttackTimer = 0.0f;

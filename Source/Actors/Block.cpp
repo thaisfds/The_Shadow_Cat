@@ -20,5 +20,5 @@ Block::Block(Game *game, int tileID)
 	// The tileID corresponds directly to the frame index in the sprite sheet
 	// MapTileset0 = index 0, MapTileset4 = index 4, etc.
 	animator->AddAnimation("static", {tileID});
-	animator->SetAnimation("static");
+	animator->LoopAnimation("static");
 }

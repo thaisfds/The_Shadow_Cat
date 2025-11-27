@@ -3,6 +3,18 @@
 #include <unordered_map>
 #include "DrawComponent.h"
 
+struct Sprite
+{
+    Vector4 uv;
+    float duration;
+};
+
+struct Animation
+{
+    std::vector<Sprite*> frames;
+    float totalDuration;
+};
+
 class AnimatorComponent : public DrawComponent
 {
 public:
@@ -14,11 +26,13 @@ public:
     void Draw(Renderer *renderer) override;
     void Update(float deltaTime) override;
 
-    // Use to change the FPS of the animation
-    void SetAnimFPS(float fps) { mAnimFPS = fps; }
+    // Use to change the speed of the animation
+    void SetAnimSpeed(float speed) { mAnimSpeed = speed; }
 
     // Set the current active animation
-    void SetAnimation(const std::string &name);
+    void LoopAnimation(const std::string &name);
+    void PlayAnimation(const std::string &name, int loops);
+    void PlayAnimationOnce(const std::string &name) { PlayAnimation(name, 1); }
 
     // Use to pause/unpause the animation
     void SetIsPaused(bool pause) { mIsPaused = pause; }
@@ -27,25 +41,30 @@ public:
     void AddAnimation(const std::string &name, const std::vector<int> &images);
 
 private:
+    void SetAnimation(const std::string &name);
+
     bool LoadSpriteSheetData(const std::string &dataPath);
 
     // Sprite sheet texture
     class Texture *mSpriteTexture;
 
     // Vector of sprites
-    std::vector<Vector4> mSpriteSheetData;
+    std::vector<Sprite> mSpriteSheetData;
 
     // Map of animation name to vector of textures corresponding to the animation
-    std::unordered_map<std::string, std::vector<int>> mAnimations;
+    std::unordered_map<std::string, Animation> mAnimations;
 
     // Name of current animation
-    std::string mAnimName;
+    std::string mLoopAnimName;
 
-    // Tracks current elapsed time in animation
-    float mAnimTimer = 0.0f;
+    Animation *mCurrentAnimation;
 
-    // The frames per second the animation should run at
-    float mAnimFPS = 10.0f;
+    float mFrameTimer = 0.0f;
+    int mCurrentFrameIndex = 0;
+    int mRemainingLoops;
+
+    // How fast should the animation run
+    float mAnimSpeed = 1.0f;
 
     // Whether or not the animation is paused (defaults to false)
     bool mIsPaused = false;

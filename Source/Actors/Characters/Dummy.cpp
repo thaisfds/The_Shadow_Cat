@@ -14,10 +14,9 @@ Dummy::Dummy(class Game* game, float forwardSpeed)
     mRigidBodyComponent->SetApplyGravity(false);
 
     mAnimatorComponent->AddAnimation("Idle", {0});
-    mAnimatorComponent->AddAnimation("Hit", {1, 2, 2, 0});
+    mAnimatorComponent->AddAnimation("Hit", {1, 2, 0});
 
-    mAnimatorComponent->SetAnimation("Idle");
-    mAnimatorComponent->SetAnimFPS(10.0f);
+    mAnimatorComponent->LoopAnimation("Idle");
 }
 
 Dummy::~Dummy()

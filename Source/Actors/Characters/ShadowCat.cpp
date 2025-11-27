@@ -26,8 +26,7 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     mAnimatorComponent->AddAnimation("Run", {0, 1, 2, 3});
     mAnimatorComponent->AddAnimation("BasicAttack", {4, 5, 6, 7, 8, 0});
     
-    mAnimatorComponent->SetAnimation("Idle");
-    mAnimatorComponent->SetAnimFPS(10.0f);
+    mAnimatorComponent->LoopAnimation("Idle");
 }
 
 void ShadowCat::OnProcessInput(const uint8_t *state)
