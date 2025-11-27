@@ -50,12 +50,8 @@ void BasicAttack::Execute()
     mAttackTimer = 0.0f;
     mDamageApplied = false;
     
-    int mouseX, mouseY;
-    SDL_GetMouseState(&mouseX, &mouseY);
-    Vector2 mousePos(static_cast<float>(mouseX), static_cast<float>(mouseY));
-    Vector2 cameraPos = mCharacter->GetGame()->GetCameraPos();
-    Vector2 worldMousePos = mousePos + cameraPos;
-    mAttackDirection = worldMousePos - mCharacter->GetPosition();
+    Vector2 mouseWorldPos = mCharacter->GetGame()->GetMouseWorldPosition();
+    mAttackDirection = mouseWorldPos - mCharacter->GetPosition();
     mAttackDirection.Normalize();
     
     mCharacter->SetAnimationLock(true);

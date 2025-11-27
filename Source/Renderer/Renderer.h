@@ -50,6 +50,8 @@ public:
     class Texture* GetTexture(const std::string& fileName);
 	class Shader* GetBaseShader() const { return mBaseShader; }
     class Font* GetFont(const std::string& fileName);
+    float GetScreenWidth() { return mScreenWidth; }
+    float GetScreenHeight() { return mScreenHeight; }
 
 private:
     void Draw(RendererMode mode, const Matrix4 &modelMatrix, const Vector2 &cameraPos, VertexArray *vertices,

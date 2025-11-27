@@ -287,6 +287,9 @@ Font* Renderer::GetFont(const std::string& fileName)
 
 void Renderer::UpdateViewport(int windowWidth, int windowHeight)
 {
+    mScreenWidth = windowWidth;
+    mScreenHeight = windowHeight;
+
     float targetAspect = GameConstants::WINDOW_WIDTH / (float)GameConstants::WINDOW_HEIGHT;
     float windowAspect = (float)windowWidth / (float)windowHeight;
     

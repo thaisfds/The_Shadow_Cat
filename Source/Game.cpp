@@ -576,3 +576,20 @@ void Game::Shutdown()
 	SDL_DestroyWindow(mWindow);
 	SDL_Quit();
 }
+
+Vector2 Game::GetMouseWorldPosition()
+{
+	int mouseX, mouseY;
+	SDL_GetMouseState(&mouseX, &mouseY);
+
+	float scaleX = static_cast<float>(GameConstants::WINDOW_WIDTH) / static_cast<float>(mRenderer->GetScreenWidth());
+	float scaleY = static_cast<float>(GameConstants::WINDOW_HEIGHT) / static_cast<float>(mRenderer->GetScreenHeight());
+	mouseX = static_cast<int>(mouseX * scaleX);
+	mouseY = static_cast<int>(mouseY * scaleY);
+
+	Vector2 worldPos;
+	worldPos.x = static_cast<float>(mouseX) + mCameraPos.x;
+	worldPos.y = static_cast<float>(mouseY) + mCameraPos.y;
+
+	return worldPos;
+}

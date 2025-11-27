@@ -60,6 +60,9 @@ public:
     Vector2 &GetCameraPos() { return mCameraPos; };
     void SetCameraPos(const Vector2 &position) { mCameraPos = position; };
 
+    // Mouse position
+    Vector2 GetMouseWorldPosition();
+
     // Game specific
     const class ShadowCat *GetPlayer() { return mShadowCat; }
     class HUD* GetHUD() { return mHUD; }
