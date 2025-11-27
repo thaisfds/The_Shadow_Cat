@@ -661,6 +661,68 @@ inline constexpr Vector4 Vector4::Infinity(Math::Infinity, Math::Infinity, Math:
 inline constexpr Vector4 Vector4::NegInfinity(Math::NegInfinity, Math::NegInfinity,
                                               Math::NegInfinity,Math::NegInfinity);
 
+
+class Matrix2
+{
+public:
+	float mat[2][2]; // NOLINT
+
+	// NOLINTBEGIN
+	Matrix2() { *this = Matrix2::Identity; }
+
+	explicit Matrix2(float inMat[2][2]) { memcpy(mat, inMat, 4 * sizeof(float)); }
+	// NOLINTEND
+
+	// Cast to a const float pointer
+	const float* GetAsFloatPtr() const { return reinterpret_cast<const float*>(&mat[0][0]); }
+
+	// Matrix multiplication
+	[[nodiscard]] friend Matrix2 operator*(const Matrix2& left, const Matrix2& right)
+	{
+		Matrix2 retVal;
+		// row 0
+		retVal.mat[0][0] = left.mat[0][0] * right.mat[0][0] + left.mat[0][1] * right.mat[1][0];
+
+		retVal.mat[0][1] = left.mat[0][0] * right.mat[0][1] + left.mat[0][1] * right.mat[1][1];
+
+		// row 1
+		retVal.mat[1][0] = left.mat[1][0] * right.mat[0][0] + left.mat[1][1] * right.mat[1][0];
+
+		retVal.mat[1][1] = left.mat[1][0] * right.mat[0][1] + left.mat[1][1] * right.mat[1][1];
+
+		return retVal;
+	}
+
+	Matrix2& operator*=(const Matrix2& right)
+	{
+		*this = *this * right;
+		return *this;
+	}
+
+	// Vector multiplication
+	[[nodiscard]] friend Vector2 operator*(const Matrix2& mat, const Vector2& vec)
+	{
+		Vector2 retVal;
+		retVal.x = mat.mat[0][0] * vec.x + mat.mat[0][1] * vec.y;
+		retVal.y = mat.mat[1][0] * vec.x + mat.mat[1][1] * vec.y;
+		return retVal;
+	}
+
+	// Create a rotation matrix about the Z axis
+	// theta is in radians
+	static Matrix2 CreateRotation(float theta)
+	{
+		float temp[2][2] =
+		{
+			{ Math::Cos(theta), Math::Sin(theta) },
+			{ -Math::Sin(theta), Math::Cos(theta) }
+		};
+		return Matrix2(temp);
+	}
+
+	static const Matrix2 Identity; // NOLINT
+};
+
 // 3x3 Matrix
 class Matrix3
 {
