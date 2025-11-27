@@ -16,7 +16,7 @@ namespace GameConstants
     // Physics constants
     constexpr float MAX_SPEED_X = 750.0f;
     constexpr float MAX_SPEED_Y = 750.0f;
-    constexpr float GRAVITY = 2000.0f;
+    constexpr float GRAVITY = 0.0f;
 
     // Input constants
     constexpr int JOYSTICK_DEAD_ZONE = 8000;
