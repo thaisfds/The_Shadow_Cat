@@ -70,6 +70,7 @@ public:
     SDL_GameController *mController;
 
     // Debug
+    bool IsDebugging() { return mIsDebugging; }
     DebugActor* GetDebugActor() { return mDebugActor; }
 
 private:

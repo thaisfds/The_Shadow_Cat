@@ -19,7 +19,7 @@ std::vector<AABBColliderComponent*> PhysicsUtils::ConeCast(Game *game, Vector2 o
 			hitColliders.push_back(collider);
 	}
 
-	DebugDrawPolygon(game, coneTriangle, 0.5f, 15);
+	if (game->IsDebugging()) DebugDrawPolygon(game, coneTriangle, 0.5f, 15);
 	return hitColliders;
 }
 
