@@ -27,7 +27,8 @@ Game::Game()
 	mLevelData(nullptr),
 	mAudio(nullptr),
     mHUD(nullptr),
-	mShadowCat(nullptr)
+	mShadowCat(nullptr),
+	mController(nullptr)
 {
 }
 
