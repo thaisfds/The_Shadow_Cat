@@ -83,6 +83,10 @@ private:
     int **LoadLevel(const std::string &fileName, int width, int height);
     void BuildLevel(int **levelData, int width, int height);
 
+    // Current level dimensions
+    int mLevelWidth;
+    int mLevelHeight;
+
     // All the actors in the game
     std::vector<class Actor *> mActors;
     std::vector<class Actor *> mPendingActors;

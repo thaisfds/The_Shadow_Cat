@@ -28,7 +28,9 @@ Game::Game()
 	mAudio(nullptr),
     mHUD(nullptr),
 	mShadowCat(nullptr),
-	mController(nullptr)
+	mController(nullptr),
+	mLevelWidth(0),
+	mLevelHeight(0)
 {
 }
 
@@ -96,7 +98,7 @@ bool Game::Initialize()
     mAudio->CacheAllSounds();
 
 	// First scene
-    SetScene(GameScene::MainMenu);
+    SetScene(GameScene::Level1);
 
 	mTicksCount = SDL_GetTicks();
 
@@ -138,9 +140,14 @@ void Game::SetScene(GameScene nextScene)
 			// new MainMenu(this, "../Assets/Fonts/arial.ttf");
             break;
 
+        case GameScene::Lobby:
+            mCurrentScene = GameScene::Lobby;
+            InitializeActors();
+            break;
+
         case GameScene::Level1:
             mCurrentScene = GameScene::Level1;
-
+            InitializeActors();
             break;
     }
 }
@@ -150,11 +157,29 @@ void Game::InitializeActors()
 	// Initialize debug actor
 	mDebugActor = new DebugActor(this);
 
-	mLevelData = LoadLevel("../Assets/Levels/Lobby/Lobby.csv", GameConstants::LEVEL_WIDTH, GameConstants::LEVEL_HEIGHT);
+	std::string levelPath;
+	
+	// Choose level based on current scene
+	if (mCurrentScene == GameScene::Lobby) {
+		levelPath = "../Assets/Levels/Lobby/Lobby.csv";
+		mLevelWidth = 11;
+		mLevelHeight = 11;
+	} else if (mCurrentScene == GameScene::Level1) {
+		levelPath = "../Assets/Levels/Level1/Level1.csv";
+		mLevelWidth = 29;
+		mLevelHeight = 30;
+	} else {
+		// Default to lobby dimensions
+		levelPath = "../Assets/Levels/Lobby/Lobby.csv";
+		mLevelWidth = 11;
+		mLevelHeight = 11;
+	}
+
+	mLevelData = LoadLevel(levelPath, mLevelWidth, mLevelHeight);
 
 	if (mLevelData)
 	{
-		BuildLevel(mLevelData, GameConstants::LEVEL_WIDTH, GameConstants::LEVEL_HEIGHT);
+		BuildLevel(mLevelData, mLevelWidth, mLevelHeight);
 	}
 }
 
@@ -487,11 +512,21 @@ void Game::GenerateOutput()
 	// Clear back buffer
 	mRenderer->Clear();
 
-	Texture *backgroundTexture = mRenderer->GetTexture("../Assets/Levels/Lobby/LobbyBackground.png");
+	// Get background texture based on current scene
+	std::string backgroundPath;
+	if (mCurrentScene == GameScene::Lobby) {
+		backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
+	} else if (mCurrentScene == GameScene::Level1) {
+		backgroundPath = "../Assets/Levels/Level1/Level1Background.png";
+	} else {
+		backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
+	}
+
+	Texture *backgroundTexture = mRenderer->GetTexture(backgroundPath);
 	if (backgroundTexture)
 	{
-		float levelPixelWidth = static_cast<float>(GameConstants::LEVEL_WIDTH) * static_cast<float>(GameConstants::TILE_SIZE);
-		float levelPixelHeight = static_cast<float>(GameConstants::LEVEL_HEIGHT) * static_cast<float>(GameConstants::TILE_SIZE);
+		float levelPixelWidth = static_cast<float>(mLevelWidth) * static_cast<float>(GameConstants::TILE_SIZE);
+		float levelPixelHeight = static_cast<float>(mLevelHeight) * static_cast<float>(GameConstants::TILE_SIZE);
 
 		float desiredWidth = levelPixelWidth;
 		float desiredHeight = levelPixelHeight;
@@ -552,7 +587,7 @@ void Game::Shutdown()
 	// Delete level data
 	if (mLevelData)
 	{
-		for (int i = 0; i < GameConstants::LEVEL_HEIGHT; ++i)
+		for (int i = 0; i < mLevelHeight; ++i)
 		{
 			delete[] mLevelData[i];
 		}
