@@ -29,6 +29,14 @@ void Character::OnUpdate(float deltaTime)
     const float maxX = mGame->GetLevelWidth() * GameConstants::TILE_SIZE - margin;
     const float maxY = mGame->GetLevelHeight() * GameConstants::TILE_SIZE - margin;
 
+    // Debug: Print level dimensions once
+    static bool printed = false;
+    if (!printed) {
+        printf("Level dimensions: %d x %d tiles\n", mGame->GetLevelWidth(), mGame->GetLevelHeight());
+        printf("Max boundaries: %.2f x %.2f\n", maxX, maxY);
+        printed = true;
+    }
+
     mPosition.x = Math::Clamp(mPosition.x, margin, maxX);
     mPosition.y = Math::Clamp(mPosition.y, margin, maxY);
 
