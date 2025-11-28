@@ -252,11 +252,14 @@ void Game::BuildLevel(int **levelData, int width, int height)
 
 			Vector2 position(x, y);
 
-			// Player spawn
+			// Player spawn - only create if we don't already have a player
 			if (tileID == 0)
 			{
-				mShadowCat = new ShadowCat(this);
-				mShadowCat->SetPosition(position);
+				if (!mShadowCat)
+				{
+					mShadowCat = new ShadowCat(this);
+					mShadowCat->SetPosition(position);
+				}
 			}
 			// Blocks
 			else if (tileID >= 4 && tileID <= 10)
