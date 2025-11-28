@@ -451,6 +451,24 @@ void Game::UpdateCamera()
 		// Center camera on ShadowCat by subtracting half of window dimensions
 		mCameraPos.x = targetX - (GameConstants::WINDOW_WIDTH / 2.0f);
 		mCameraPos.y = targetY - (GameConstants::WINDOW_HEIGHT / 2.0f);
+
+		// Clamp camera to level boundaries
+		float levelPixelWidth = static_cast<float>(mLevelWidth) * static_cast<float>(GameConstants::TILE_SIZE);
+		float levelPixelHeight = static_cast<float>(mLevelHeight) * static_cast<float>(GameConstants::TILE_SIZE);
+
+		// Prevent camera from showing area outside the level
+		float maxCameraX = levelPixelWidth - GameConstants::WINDOW_WIDTH;
+		float maxCameraY = levelPixelHeight - GameConstants::WINDOW_HEIGHT;
+
+		// Clamp camera position
+		if (mCameraPos.x < 0.0f)
+			mCameraPos.x = 0.0f;
+		if (mCameraPos.y < 0.0f)
+			mCameraPos.y = 0.0f;
+		if (mCameraPos.x > maxCameraX)
+			mCameraPos.x = maxCameraX;
+		if (mCameraPos.y > maxCameraY)
+			mCameraPos.y = maxCameraY;
 	}
 }
 
