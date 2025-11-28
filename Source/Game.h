@@ -67,6 +67,10 @@ public:
     const class ShadowCat *GetPlayer() { return mShadowCat; }
     class HUD* GetHUD() { return mHUD; }
 
+    // Level dimensions
+    int GetLevelWidth() const { return mLevelWidth; }
+    int GetLevelHeight() const { return mLevelHeight; }
+
     SDL_GameController *mController;
 
     // Debug
