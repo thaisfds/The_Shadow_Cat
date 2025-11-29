@@ -3,6 +3,7 @@
 #include <map>
 #include <fstream>
 #include "Actors/Characters/Dummy.h"
+#include "Actors/Characters/BasicEnemy.h"
 #include "CSV.h"
 #include "Game.h"
 #include "GameConstants.h"
@@ -275,6 +276,12 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			{
 				auto dummy = new Dummy(this);
 				dummy->SetPosition(position);
+			}
+			// BasicEnemy (WhiteCat)
+			else if (tileID == 12)
+			{
+				auto enemy = new BasicEnemy(this);
+				enemy->SetPosition(position);
 			}
 		}
 	}
