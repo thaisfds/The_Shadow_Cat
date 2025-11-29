@@ -72,7 +72,7 @@ void BasicEnemy::TakeDamage(int damage)
     
     if (mGame->IsDebugging())
     {
-        printf("HP after: %d\n", hp);
+        SDL_Log("HP after: %d", hp);
     }
     
     if (hp <= 0)
