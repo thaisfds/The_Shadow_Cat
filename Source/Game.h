@@ -13,7 +13,7 @@ enum class GameScene
     MainMenu,
     Lobby,
     Level1,
-    GameOver
+    Level1Boss
 };
 
 class Game
