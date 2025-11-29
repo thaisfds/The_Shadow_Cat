@@ -88,6 +88,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/DebugActor.h
         Source/Components/AnimatedParticleSystemComponent.cpp
         Source/Components/AnimatedParticleSystemComponent.h
+        Source/Components/Skills/Dash.cpp
+        Source/Components/Skills/Dash.h
         Source/Components/Physics/CollisionFilter.h
 )
 

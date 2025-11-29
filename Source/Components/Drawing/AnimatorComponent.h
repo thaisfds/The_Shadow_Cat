@@ -31,8 +31,8 @@ public:
 
     // Set the current active animation
     void LoopAnimation(const std::string &name);
-    void PlayAnimation(const std::string &name, int loops);
-    void PlayAnimationOnce(const std::string &name) { PlayAnimation(name, 1); }
+    void PlayAnimation(const std::string &name, int loops, bool reset = true);
+    void PlayAnimationOnce(const std::string &name, bool reset = true) { PlayAnimation(name, 1, reset); }
 
     void ResetAnimation();
 
@@ -46,7 +46,7 @@ public:
     float GetCurrentAnimationDuration() const;
 
 private:
-    void SetAnimation(const std::string &name);
+    void SetAnimation(const std::string &name, bool reset = true);
 
     bool LoadAnimationData(const std::string &animationName);
     bool LoadSpriteSheetData(const std::string &dataPath);

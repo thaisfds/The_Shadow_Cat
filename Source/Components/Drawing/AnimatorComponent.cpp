@@ -193,14 +193,14 @@ void AnimatorComponent::LoopAnimation(const std::string &name)
 {
 	if (mLoopAnimName == name) return;
 
-	SetAnimation(name);
+	SetAnimation(name, false);
 	mLoopAnimName = name;
 }
 
 
-void AnimatorComponent::PlayAnimation(const std::string &name, int loops)
+void AnimatorComponent::PlayAnimation(const std::string &name, int loops, bool reset)
 {
-	SetAnimation(name);
+	SetAnimation(name, reset);
 	mRemainingLoops = loops;
 }
 
@@ -210,10 +210,11 @@ void AnimatorComponent::ResetAnimation()
 	mFrameTimer = 0.0f;
 }
 
-void AnimatorComponent::SetAnimation(const std::string &name)
+void AnimatorComponent::SetAnimation(const std::string &name, bool reset)
 {
 	auto animIter = mAnimations.find(name);
 	if (animIter == mAnimations.end()) return SDL_Log("Animation %s not found!", name.c_str());
+	if (!reset && mCurrentAnimation == &animIter->second) return;
 
 	mCurrentAnimation = &animIter->second;
 	mCurrentFrameIndex = 0;
