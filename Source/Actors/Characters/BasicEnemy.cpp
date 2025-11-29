@@ -56,7 +56,17 @@ void BasicEnemy::TakeDamage(int damage)
 {
     if (mIsDead) return;  // Don't take damage if already dead
 
+    if (mGame->IsDebugging())
+    {
+        printf("BasicEnemy taking %d damage. HP before: %d\n", damage, hp);
+    }
+    
     hp = Math::Max(hp - damage, 0);
+    
+    if (mGame->IsDebugging())
+    {
+        printf("HP after: %d\n", hp);
+    }
     
     if (hp <= 0)
     {
