@@ -16,8 +16,8 @@ Character::Character(class Game *game, float forwardSpeed)
 {
     if (mGame->IsDebugging())
     {
-        printf("Character spawned at position: (%.2f, %.2f)\n", mPosition.x, mPosition.y);
-        printf("Level dimensions at spawn: %d x %d tiles\n", mGame->GetLevelWidth(), mGame->GetLevelHeight());
+        SDL_Log("Character spawned at position: (%.2f, %.2f)", mPosition.x, mPosition.y);
+        SDL_Log("Level dimensions at spawn: %d x %d tiles", mGame->GetLevelWidth(), mGame->GetLevelHeight());
     }
 }
 
@@ -38,8 +38,8 @@ void Character::OnUpdate(float deltaTime)
     {
         static bool printed = false;
         if (!printed) {
-            printf("Level dimensions: %d x %d tiles\n", mGame->GetLevelWidth(), mGame->GetLevelHeight());
-            printf("Max boundaries: %.2f x %.2f\n", maxX, maxY);
+            SDL_Log("Level dimensions: %d x %d tiles", mGame->GetLevelWidth(), mGame->GetLevelHeight());
+            SDL_Log("Max boundaries: %.2f x %.2f", maxX, maxY);
             printed = true;
         }
     }

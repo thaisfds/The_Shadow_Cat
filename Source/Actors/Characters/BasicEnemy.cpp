@@ -58,14 +58,14 @@ void BasicEnemy::TakeDamage(int damage)
 
     if (mGame->IsDebugging())
     {
-        printf("BasicEnemy taking %d damage. HP before: %d\n", damage, hp);
+        SDL_Log("BasicEnemy taking %d damage. HP before: %d", damage, hp);
     }
     
     hp = Math::Max(hp - damage, 0);
     
     if (mGame->IsDebugging())
     {
-        printf("HP after: %d\n", hp);
+        SDL_Log("HP after: %d", hp);
     }
     
     if (hp <= 0)
