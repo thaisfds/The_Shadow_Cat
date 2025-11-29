@@ -21,7 +21,7 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed)
     mRigidBodyComponent->SetApplyGravity(false);
 
     // Set enemy health (lower than player's 10)
-    hp = 30;
+    hp = 3;
 
     // Setup animations
     mAnimatorComponent->AddAnimation("Idle", {1});  // Frame 1 is Idle
@@ -67,6 +67,8 @@ void BasicEnemy::TakeDamage(int damage)
     {
         SDL_Log("HP after: %d", hp);
     }
+    
+    hp = Math::Max(hp - damage, 0);
     
     if (hp <= 0)
     {
