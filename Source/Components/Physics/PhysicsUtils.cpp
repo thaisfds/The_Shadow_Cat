@@ -7,13 +7,13 @@ std::vector<AABBColliderComponent*> PhysicsUtils::ConeCast(Game *game, Vector2 o
 {
 	float radiusSq = radius * radius;
 	auto colliders = game->GetColliders();
-	std::vector<Vector2> coneTriangle = PhysicsUtils::CreateConeTriangle(origin, direction, angle, radius);
+	std::vector<Vector2> coneTriangle = CreateConeTriangle(origin, direction, angle, radius);
 	ParticleSystemComponent* debugParticles = game->GetDebugActor()->GetParticleSystemComponent();
 	std::vector<AABBColliderComponent*> hitColliders;
 	for (auto collider : colliders)
 	{
 		if (collider->GetLayer() != layer) continue;
-		if (PhysicsUtils::GetPointAABBDistanceSquared(origin, collider) > radiusSq) continue;
+		if (GetPointAABBDistanceSquared(origin, collider) > radiusSq) continue;
 
 		if (OverlapTriangleAABB(coneTriangle, collider))
 			hitColliders.push_back(collider);
