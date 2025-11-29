@@ -1,6 +1,7 @@
 #include "AnimatedParticleSystemComponent.h"
 #include "../GameConstants.h"
 #include "Physics/AABBColliderComponent.h"
+#include "Physics/CollisionFilter.h"
 #include "Physics/RigidBodyComponent.h"
 
 
@@ -9,7 +10,15 @@ AnimatedParticle::AnimatedParticle(class Game *game, bool hasCollider, std::stri
 {
 	mAnimatorComponent = new AnimatorComponent(this, particleAnimName, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
 	mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 0.0f, true);
-	if (hasCollider) mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, ColliderLayer::Blocks);
+
+	if (hasCollider)
+	{
+		CollisionFilter filter;
+		filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::Environment});
+		filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player, CollisionGroup::Enemy, CollisionGroup::Environment});
+
+		mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, filter);
+	} 
 
 	SetState(ActorState::Paused);
 	mAnimatorComponent->SetVisible(false);

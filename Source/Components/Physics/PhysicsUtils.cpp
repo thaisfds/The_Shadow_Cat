@@ -2,8 +2,9 @@
 #include "AABBColliderComponent.h"
 #include "../../Game.h"
 #include "../ParticleSystemComponent.h"
+#include "CollisionFilter.h"
 
-std::vector<AABBColliderComponent*> PhysicsUtils::ConeCast(Game *game, Vector2 origin, Vector2 direction, float angle, float radius, ColliderLayer layer)
+std::vector<AABBColliderComponent*> PhysicsUtils::ConeCast(Game *game, Vector2 origin, Vector2 direction, float angle, float radius, CollisionFilter filter)
 {
 	float radiusSq = radius * radius;
 	auto colliders = game->GetColliders();
@@ -12,7 +13,7 @@ std::vector<AABBColliderComponent*> PhysicsUtils::ConeCast(Game *game, Vector2 o
 	std::vector<AABBColliderComponent*> hitColliders;
 	for (auto collider : colliders)
 	{
-		if (collider->GetLayer() != layer) continue;
+		if (!CollisionFilter::ShouldCollide(filter, collider->GetFilter())) continue;
 		if (GetPointAABBDistanceSquared(origin, collider) > radiusSq) continue;
 
 		if (OverlapTriangleAABB(coneTriangle, collider))

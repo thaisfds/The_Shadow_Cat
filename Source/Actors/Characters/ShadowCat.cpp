@@ -18,7 +18,8 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
 {
     mAnimatorComponent = new AnimatorComponent(this, "ShadowCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
-    mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, ColliderLayer::Player);
+    mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, GetBasePlayerFilter());
+    
     mSkillInputHandler = new SkillInputHandler(this);
     mRigidBodyComponent->SetApplyGravity(false);
 }

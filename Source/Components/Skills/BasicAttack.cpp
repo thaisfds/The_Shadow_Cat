@@ -47,7 +47,11 @@ void BasicAttack::Update(float deltaTime)
             mCharacter->GetScale().x < 0.0f
         );
 
-        auto hitColliders = PhysicsUtils::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mAttackDirection, mConeAngle, mConeRadius, ColliderLayer::Enemy);
+        CollisionFilter filter;
+        filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::PlayerSkills});
+        filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Enemy});
+        
+        auto hitColliders = PhysicsUtils::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mAttackDirection, mConeAngle, mConeRadius, filter);
         for (auto collider : hitColliders)
         {
             auto enemyActor = collider->GetOwner();

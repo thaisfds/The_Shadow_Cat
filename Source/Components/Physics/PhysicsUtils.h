@@ -1,8 +1,8 @@
 #pragma once
 #include "../../Math.h"
+#include "CollisionFilter.h"
 #include <vector>
 
-enum class ColliderLayer;
 class AABBColliderComponent;
 class Game;
 
@@ -11,7 +11,7 @@ class PhysicsUtils
 public:
 	PhysicsUtils() = delete; // Prevent instantiation
 
-	static std::vector<AABBColliderComponent*> ConeCast(Game* game, Vector2 origin, Vector2 direction, float angle, float radius, ColliderLayer layer);
+	static std::vector<AABBColliderComponent*> ConeCast(Game* game, Vector2 origin, Vector2 direction, float angle, float radius, CollisionFilter filter);
 	
 	static bool OverlapCircleAABB(Vector2 center, float radius, AABBColliderComponent* aabb);
 	static bool OverlapTriangleAABB(const std::vector<Vector2>& triangle, AABBColliderComponent* aabb);
@@ -22,6 +22,8 @@ public:
 	static float GetPointAABBDistanceSquared(Vector2 point, AABBColliderComponent* aabb);
 	
 	static void DebugDrawPolygon(class Game* game, const std::vector<Vector2>& polygon, float lifetime, int particlesPerEdge = 20);
+
+	static bool ShouldCollide(unsigned int belongsToA, unsigned int collidesWithA, unsigned int belongsToB, unsigned int collidesWithB);
 
 private:
 	static std::vector<Vector2> GetPolygonEdges(const std::vector<Vector2>& poly);
