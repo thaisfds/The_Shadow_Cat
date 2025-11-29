@@ -21,7 +21,7 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed)
     mRigidBodyComponent->SetApplyGravity(false);
 
     // Set enemy health (lower than player's 10)
-    hp = 3;
+    hp = 30;
 
     // Setup animations
     mAnimatorComponent->AddAnimation("Idle", {1});  // Frame 1 is Idle
