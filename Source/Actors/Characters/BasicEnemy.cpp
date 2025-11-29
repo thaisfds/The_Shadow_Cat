@@ -70,6 +70,11 @@ void BasicEnemy::TakeDamage(int damage)
     
     hp = Math::Max(hp - damage, 0);
     
+    if (mGame->IsDebugging())
+    {
+        printf("HP after: %d\n", hp);
+    }
+    
     if (hp <= 0)
     {
         Kill();
