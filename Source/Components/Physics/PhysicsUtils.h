@@ -13,6 +13,7 @@ public:
 
 	static std::vector<AABBColliderComponent*> ConeCast(Game* game, Vector2 origin, Vector2 direction, float angle, float radius, ColliderLayer layer);
 	
+	static bool OverlapCircleAABB(Vector2 center, float radius, AABBColliderComponent* aabb);
 	static bool OverlapTriangleAABB(const std::vector<Vector2>& triangle, AABBColliderComponent* aabb);
 	static bool OverlapPolygons(const std::vector<Vector2>& polyA, const std::vector<Vector2>& polyB);
 	

@@ -23,6 +23,13 @@ std::vector<AABBColliderComponent*> PhysicsUtils::ConeCast(Game *game, Vector2 o
 	return hitColliders;
 }
 
+bool PhysicsUtils::OverlapCircleAABB(Vector2 center, float radius, AABBColliderComponent *aabb)
+{
+	float radiusSq = radius * radius;
+	float distSq = GetPointAABBDistanceSquared(center, aabb);
+	return distSq <= radiusSq;
+}
+
 bool PhysicsUtils::OverlapTriangleAABB(const std::vector<Vector2>& triangle, AABBColliderComponent *aabb)
 {
 	Vector2 aabbMin = aabb->GetMin();
