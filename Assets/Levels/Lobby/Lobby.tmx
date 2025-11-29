@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="11" height="11" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="1">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="21" height="13" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="1">
  <editorsettings>
   <export target="Lobby.csv" format="csv"/>
  </editorsettings>
  <tileset firstgid="1" source="../MapTileset.tsx"/>
  <imagelayer id="2" name="Image Layer 1" offsetx="-1.22152" offsety="0">
-  <image source="LobbyBackground.png" width="352" height="352"/>
+  <image source="LobbyBackground.png" width="672" height="416"/>
  </imagelayer>
- <layer id="1" name="Tile Layer 1" width="11" height="11">
+ <layer id="1" name="Tile Layer 1" width="21" height="13">
   <data encoding="csv">
-8,7,8,7,8,7,8,7,8,7,8,
-5,0,0,0,0,0,0,0,0,0,5,
-6,0,0,0,0,0,0,0,0,0,6,
-5,0,0,0,10,9,10,0,0,0,5,
-6,0,0,0,11,1,11,0,0,0,6,
-5,0,0,0,0,0,0,0,0,0,5,
-6,0,0,0,0,12,0,0,0,0,6,
-5,0,0,0,0,0,0,0,0,0,5,
-6,0,0,0,0,0,0,0,0,0,6,
-5,0,0,0,0,0,0,0,0,0,5,
-8,7,8,10,0,0,0,10,8,7,8
+8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,
+5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,
+5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,
+5,0,0,0,0,0,10,9,10,0,0,0,10,9,10,0,0,0,0,0,5,
+6,0,0,0,0,0,11,1,11,0,0,0,11,0,11,0,0,0,0,0,6,
+5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+6,0,0,0,0,0,0,12,0,0,0,0,0,12,0,0,0,0,0,0,6,
+5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,
+5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+8,7,8,10,0,0,0,0,0,0,10,8,7,8,10,0,0,0,0,10,8
 </data>
  </layer>
 </map>

@@ -162,8 +162,8 @@ void Game::InitializeActors()
 	// Choose level based on current scene
 	if (mCurrentScene == GameScene::Lobby) {
 		levelPath = "../Assets/Levels/Lobby/Lobby.csv";
-		mLevelWidth = 11;
-		mLevelHeight = 11;
+		mLevelWidth = 21;
+		mLevelHeight = 13;
 	} else if (mCurrentScene == GameScene::Level1) {
 		levelPath = "../Assets/Levels/Level1/Level1.csv";
 		mLevelWidth = 29;
@@ -171,8 +171,8 @@ void Game::InitializeActors()
 	} else {
 		// Default to lobby dimensions
 		levelPath = "../Assets/Levels/Lobby/Lobby.csv";
-		mLevelWidth = 11;
-		mLevelHeight = 11;
+		mLevelWidth = 21;
+		mLevelHeight = 13;
 	}
 
 	mLevelData = LoadLevel(levelPath, mLevelWidth, mLevelHeight);
