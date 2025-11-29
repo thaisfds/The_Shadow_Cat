@@ -86,6 +86,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/Physics/PhysicsUtils.h
         Source/Actors/DebugActor.cpp
         Source/Actors/DebugActor.h
+        Source/Components/AnimatedParticleSystemComponent.cpp
+        Source/Components/AnimatedParticleSystemComponent.h
 )
 
 configure_local_linking(${PROJECT_NAME})

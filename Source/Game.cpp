@@ -15,6 +15,7 @@
 #include "Actors/Block.h"
 #include "Actors/Spawner.h"
 #include "Actors/Characters/ShadowCat.h"
+#include "Components/AnimatedParticleSystemComponent.h"
 
 Game::Game()
 	: mWindow(nullptr),
@@ -149,6 +150,9 @@ void Game::InitializeActors()
 {
 	// Initialize debug actor
 	mDebugActor = new DebugActor(this);
+
+	mAttackTrailActor = new Actor(this);
+    new AnimatedParticleSystemComponent(mAttackTrailActor, "AttackTrailAnim", false);
 
 	mLevelData = LoadLevel("../Assets/Levels/Lobby/Lobby.csv", GameConstants::LEVEL_WIDTH, GameConstants::LEVEL_HEIGHT);
 

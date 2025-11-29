@@ -1,5 +1,6 @@
 #include "BasicAttack.h"
 
+#include "../AnimatedParticleSystemComponent.h"
 #include "../../Actors/Actor.h"
 #include "../../Actors/Characters/Character.h"
 #include "../Drawing/AnimatorComponent.h"
@@ -22,8 +23,8 @@ BasicAttack::BasicAttack(Actor* owner, int updateOrder)
     mAttackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("BasicAttack");
     if (mAttackDuration == 0.0f) mAttackDuration = 1.0f;
 
-    mConeRadius = 100.0f;
-    mConeAngle = Math::ToRadians(30.0f);
+    mConeRadius = 50.0f;
+    mConeAngle = Math::ToRadians(45.0f);
     mDamage = 10;
 }
 
@@ -37,6 +38,15 @@ void BasicAttack::Update(float deltaTime)
     if (mAttackTimer >= mDamageDelay && !mDamageApplied)
     {
         mDamageApplied = true;
+        // This should emit particle only when damaging, not here. Also, make a playOnce for animatedParticles
+        mCharacter->GetGame()->GetAttackTrailActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
+            0.3f,
+            0.0f,
+            mCharacter->GetPosition() + mAttackDirection * mConeRadius,
+            std::atan2(mAttackDirection.y, mAttackDirection.x),
+            mCharacter->GetScale().x < 0.0f
+        );
+
         auto hitColliders = PhysicsUtils::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mAttackDirection, mConeAngle, mConeRadius, ColliderLayer::Enemy);
         for (auto collider : hitColliders)
         {
@@ -60,6 +70,11 @@ void BasicAttack::Execute()
     Vector2 mouseWorldPos = mCharacter->GetGame()->GetMouseWorldPosition();
     mAttackDirection = mouseWorldPos - mCharacter->GetPosition();
     mAttackDirection.Normalize();
+
+    if (mAttackDirection.x > 0.0f)
+        mCharacter->SetScale(Vector2(1.0f, mCharacter->GetScale().y));
+    else if (mAttackDirection.x < 0.0f)
+        mCharacter->SetScale(Vector2(-1.0f, mCharacter->GetScale().y));
     
     mCharacter->SetMovementLock(true);
 }
