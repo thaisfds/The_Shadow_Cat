@@ -14,6 +14,9 @@ Character::Character(class Game *game, float forwardSpeed)
     , mIsMoving(false)
     , hp(10)
 {
+    // Debug: Check level dimensions at spawn
+    printf("Character spawned at position: (%.2f, %.2f)\n", mPosition.x, mPosition.y);
+    printf("Level dimensions at spawn: %d x %d tiles\n", mGame->GetLevelWidth(), mGame->GetLevelHeight());
 }
 
 Character::~Character()
