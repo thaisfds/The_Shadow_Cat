@@ -224,17 +224,20 @@ int **Game::LoadLevel(const std::string &fileName, int width, int height)
 		}
 	}
 
-	SDL_Log("--- Level CSV Content ---");
-	for (int i = 0; i < height; ++i)
+	if (mIsDebugging)
 	{
-		std::string rowStr = "";
-		for (int j = 0; j < width; ++j)
+		SDL_Log("--- Level CSV Content ---");
+		for (int i = 0; i < height; ++i)
 		{
-			rowStr += std::to_string(levelData[i][j]) + " ";
+			std::string rowStr = "";
+			for (int j = 0; j < width; ++j)
+			{
+				rowStr += std::to_string(levelData[i][j]) + " ";
+			}
+			SDL_Log("%s", rowStr.c_str());
 		}
-		SDL_Log("%s", rowStr.c_str());
+		SDL_Log("-----------------------------");
 	}
-	SDL_Log("-----------------------------");
 
 	return levelData;
 }

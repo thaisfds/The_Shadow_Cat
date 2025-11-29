@@ -14,9 +14,11 @@ Character::Character(class Game *game, float forwardSpeed)
     , mIsMoving(false)
     , hp(10)
 {
-    // Debug: Check level dimensions at spawn
-    printf("Character spawned at position: (%.2f, %.2f)\n", mPosition.x, mPosition.y);
-    printf("Level dimensions at spawn: %d x %d tiles\n", mGame->GetLevelWidth(), mGame->GetLevelHeight());
+    if (mGame->IsDebugging())
+    {
+        printf("Character spawned at position: (%.2f, %.2f)\n", mPosition.x, mPosition.y);
+        printf("Level dimensions at spawn: %d x %d tiles\n", mGame->GetLevelWidth(), mGame->GetLevelHeight());
+    }
 }
 
 Character::~Character()
@@ -32,12 +34,14 @@ void Character::OnUpdate(float deltaTime)
     const float maxX = mGame->GetLevelWidth() * GameConstants::TILE_SIZE - margin;
     const float maxY = mGame->GetLevelHeight() * GameConstants::TILE_SIZE - margin;
 
-    // Debug: Print level dimensions once
-    static bool printed = false;
-    if (!printed) {
-        printf("Level dimensions: %d x %d tiles\n", mGame->GetLevelWidth(), mGame->GetLevelHeight());
-        printf("Max boundaries: %.2f x %.2f\n", maxX, maxY);
-        printed = true;
+    if (mGame->IsDebugging())
+    {
+        static bool printed = false;
+        if (!printed) {
+            printf("Level dimensions: %d x %d tiles\n", mGame->GetLevelWidth(), mGame->GetLevelHeight());
+            printf("Max boundaries: %.2f x %.2f\n", maxX, maxY);
+            printed = true;
+        }
     }
 
     mPosition.x = Math::Clamp(mPosition.x, margin, maxX);
