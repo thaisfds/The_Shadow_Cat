@@ -10,6 +10,7 @@
     - [ ] Patrol behaviour
     - [ ] Chase player when nearby
     - [ ] Full state machine
+    - [ ] Drop stuff when killed?
 - [ ] [Juan] Player basic combat 
     - [ ] basic
     - [ ] charged
