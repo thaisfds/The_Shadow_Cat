@@ -98,7 +98,7 @@ bool Game::Initialize()
     mAudio->CacheAllSounds();
 
 	// First scene
-    SetScene(GameScene::Level1);
+    SetScene(GameScene::Lobby);
 
 	mTicksCount = SDL_GetTicks();
 
