@@ -33,7 +33,8 @@ public:
     void DrawTexture(const Vector2 &position, const Vector2 &size,  float rotation,
                      const Vector3 &color, Texture *texture,
                      const Vector4 &textureRect = Vector4::UnitRect,
-                     const Vector2 &cameraPos = Vector2::Zero, bool flip = false,
+                     const Vector2 &cameraPos = Vector2::Zero, bool flipH = false,
+                     bool flipV = false,
                      float textureFactor = 1.0f);
 
     void DrawGeometry(const Vector2 &position, const Vector2 &size,  float rotation,

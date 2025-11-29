@@ -1,0 +1,9 @@
+{
+  "image": "../Assets/Sprites/AttackTrail/AttackTrail.png",
+  "spriteSheetData": "../Assets/Sprites/AttackTrail/AttackTrail.json",
+  "animations": 
+  {
+    "Trail": [0, 1, 2, 3, 4, 5]
+  },
+  "base": "Trail"
+}

@@ -16,17 +16,11 @@
 ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     : Character(game, forwardSpeed)
 {
-    mAnimatorComponent = new AnimatorComponent(this, "../Assets/Sprites/ShadowCat/ShadowCat.png", "../Assets/Sprites/ShadowCat/ShadowCat.json", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+    mAnimatorComponent = new AnimatorComponent(this, "ShadowCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
     mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, ColliderLayer::Player);
     mSkillInputHandler = new SkillInputHandler(this);
     mRigidBodyComponent->SetApplyGravity(false);
-
-    mAnimatorComponent->AddAnimation("Idle", {0});
-    mAnimatorComponent->AddAnimation("Run", {0, 1, 2, 3});
-    mAnimatorComponent->AddAnimation("BasicAttack", {4, 5, 6, 7, 8, 0});
-    
-    mAnimatorComponent->LoopAnimation("Idle");
 }
 
 void ShadowCat::OnProcessInput(const uint8_t *state)
