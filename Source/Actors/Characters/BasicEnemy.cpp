@@ -38,6 +38,7 @@ BasicEnemy::BasicEnemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPoi
     // Store patrol waypoints
     mPatrolWaypoints[0] = patrolPointA;
     mPatrolWaypoints[1] = patrolPointB;
+    
     // Use WhiteCat sprite
     mAnimatorComponent = new AnimatorComponent(this, "WhiteCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
@@ -94,7 +95,7 @@ void BasicEnemy::OnUpdate(float deltaTime)
     
     // Check for player detection based on current state
     bool playerInProximity = IsPlayerInProximity();  // Close range (360 degrees)
-    bool playerInCone = IsPlayerInRange();  // Cone detection (initial)
+    bool playerInCone = IsPlayerInRange();  // Cone detection
     bool playerInChaseRange = IsPlayerInChaseRange();  // Circle detection (chase)
     bool playerInAttackRange = IsPlayerInAttackRange();
     
@@ -166,26 +167,9 @@ void BasicEnemy::OnUpdate(float deltaTime)
 
 void BasicEnemy::TakeDamage(int damage)
 {
-    if (mIsDead) return;  // Don't take damage if already dead
+    if (mIsDead) return;
 
-    if (mGame->IsDebugging())
-    {
-        SDL_Log("BasicEnemy taking %d damage. HP before: %d", damage, hp);
-    }
-    
     hp = Math::Max(hp - damage, 0);
-    
-    if (mGame->IsDebugging())
-    {
-        SDL_Log("HP after: %d", hp);
-    }
-    
-    hp = Math::Max(hp - damage, 0);
-    
-    if (mGame->IsDebugging())
-    {
-        SDL_Log("HP after: %d", hp);
-    }
     
     if (hp <= 0)
     {
@@ -193,7 +177,6 @@ void BasicEnemy::TakeDamage(int damage)
     }
     else
     {
-        // Play hit animation
         mAnimatorComponent->PlayAnimationOnce("Hit");
     }
 }
@@ -425,6 +408,7 @@ void BasicEnemy::UpdateSearching(float deltaTime)
     if (playerInProximity || playerInCone)
     {
         // Found the player again!
+        // Found the player again!
         mCurrentState = AIState::Chase;
         if (mGame->IsDebugging())
         {
@@ -494,6 +478,7 @@ void BasicEnemy::UpdateReturningToPatrol(float deltaTime)
     // Check if we've reached the patrol area (within 20 pixels of a waypoint)
     if (distanceToWaypoint < 20.0f)
     {
+        // Back in patrol area, resume normal patrol
         // Back in patrol area, resume normal patrol
         mCurrentState = AIState::Patrol;
         mCurrentWaypoint = nearestWaypoint;
