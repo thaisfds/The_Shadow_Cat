@@ -81,8 +81,6 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Characters/Character.h
         Source/Actors/Characters/Dummy.cpp
         Source/Actors/Characters/Dummy.h
-        Source/Actors/Characters/BasicEnemy.cpp
-        Source/Actors/Characters/BasicEnemy.h
         Source/GameConstants.h
         Source/Components/Physics/PhysicsUtils.cpp
         Source/Components/Physics/PhysicsUtils.h
