@@ -10,8 +10,12 @@
     - [x] Patrol mode
     - [x] Detects player
     - [ ] Chases player
-        - [ ] Handling obstacles in path
+        - [ ] Test obstacle handling
     - [ ] Attacks player
+        - [ ] Test attack animation
+        - [ ] Test cooldown
+        - [ ] Player death
+    - [ ] Flexiblility for bosses and spawning animation
     - [ ] (maybe) Detection radius smaller than give-up-from-persuit radius
     - [ ] (maybe) Memory of last seen player position
     - [ ] (maybe) Return to original patrol area

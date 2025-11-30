@@ -7,7 +7,8 @@ public:
     enum class AIState
     {
         Patrol,
-        Chase
+        Chase,
+        Attack
     };
 
     BasicEnemy(class Game* game, float forwardSpeed = 0.0f, float patrolDistance = 200.0f);
@@ -36,11 +37,19 @@ private:
     // Chase behavior
     float mChaseSpeed;
     
+    // Attack behavior
+    float mAttackRange;
+    float mAttackCooldown;
+    float mAttackTimer;
+    int mAttackDamage;
+    
     // Player detection
     float mDetectionRadius;
     bool mPlayerDetected;
     
     bool IsPlayerInRange() const;
+    bool IsPlayerInAttackRange() const;
     void UpdatePatrol(float deltaTime);
     void UpdateChase(float deltaTime);
+    void UpdateAttack(float deltaTime);
 };

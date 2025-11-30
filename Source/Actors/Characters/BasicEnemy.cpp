@@ -18,6 +18,10 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mPatrolDirection(1)
     , mPatrolSpeed(50.0f)
     , mChaseSpeed(80.0f)
+    , mAttackRange(64.0f)
+    , mAttackCooldown(1.5f)
+    , mAttackTimer(0.0f)
+    , mAttackDamage(1)
     , mDetectionRadius(200.0f)
     , mPlayerDetected(false)
 {
@@ -72,24 +76,39 @@ void BasicEnemy::OnUpdate(float deltaTime)
     // Don't move if dead
     if (mIsDead) return;
     
+    // Update attack cooldown timer
+    if (mAttackTimer > 0.0f)
+    {
+        mAttackTimer -= deltaTime;
+    }
+    
     // Check for player detection
     mPlayerDetected = IsPlayerInRange();
+    bool playerInAttackRange = IsPlayerInAttackRange();
     
     // State transitions
-    if (mPlayerDetected && mCurrentState == AIState::Patrol)
+    if (playerInAttackRange && mCurrentState != AIState::Attack)
+    {
+        mCurrentState = AIState::Attack;
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy: -> Attack");
+        }
+    }
+    else if (!playerInAttackRange && mPlayerDetected && mCurrentState != AIState::Chase)
     {
         mCurrentState = AIState::Chase;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Patrol -> Chase");
+            SDL_Log("BasicEnemy: -> Chase");
         }
     }
-    else if (!mPlayerDetected && mCurrentState == AIState::Chase)
+    else if (!mPlayerDetected && mCurrentState != AIState::Patrol)
     {
         mCurrentState = AIState::Patrol;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Chase -> Patrol");
+            SDL_Log("BasicEnemy: -> Patrol");
         }
     }
     
@@ -101,6 +120,9 @@ void BasicEnemy::OnUpdate(float deltaTime)
             break;
         case AIState::Chase:
             UpdateChase(deltaTime);
+            break;
+        case AIState::Attack:
+            UpdateAttack(deltaTime);
             break;
     }
 }
@@ -149,6 +171,18 @@ bool BasicEnemy::IsPlayerInRange() const
     float detectionRadiusSquared = mDetectionRadius * mDetectionRadius;
     
     return distanceSquared <= detectionRadiusSquared;
+}
+
+bool BasicEnemy::IsPlayerInAttackRange() const
+{
+    const ShadowCat* player = mGame->GetPlayer();
+    if (!player) return false;
+    
+    Vector2 toPlayer = player->GetPosition() - mPosition;
+    float distanceSquared = toPlayer.LengthSq();
+    float attackRangeSquared = mAttackRange * mAttackRange;
+    
+    return distanceSquared <= attackRangeSquared;
 }
 
 void BasicEnemy::UpdatePatrol(float deltaTime)
@@ -227,6 +261,44 @@ void BasicEnemy::UpdateChase(float deltaTime)
     else if (toPlayer.x < 0.0f)
     {
         SetScale(Vector2(-1.0f, 1.0f));
+    }
+}
+
+void BasicEnemy::UpdateAttack(float deltaTime)
+{
+    const ShadowCat* player = mGame->GetPlayer();
+    if (!player) return;
+    
+    // Stop moving during attack
+    mRigidBodyComponent->SetVelocity(Vector2::Zero);
+    
+    // Face the player
+    Vector2 toPlayer = player->GetPosition() - mPosition;
+    if (toPlayer.x > 0.0f)
+    {
+        SetScale(Vector2(1.0f, 1.0f));
+    }
+    else if (toPlayer.x < 0.0f)
+    {
+        SetScale(Vector2(-1.0f, 1.0f));
+    }
+    
+    // Attack if cooldown is ready
+    if (mAttackTimer <= 0.0f)
+    {
+        // Deal damage to player (need to cast away const)
+        const_cast<ShadowCat*>(player)->TakeDamage(mAttackDamage);
+        
+        // Reset cooldown
+        mAttackTimer = mAttackCooldown;
+        
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy attacked player for %d damage!", mAttackDamage);
+        }
+        
+        // Play hit animation (brief attack indication)
+        mAnimatorComponent->PlayAnimationOnce("Hit");
     }
 }
 
