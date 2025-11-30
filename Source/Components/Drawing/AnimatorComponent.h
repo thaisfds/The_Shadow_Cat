@@ -19,7 +19,7 @@ class AnimatorComponent : public DrawComponent
 {
 public:
     // (Lower draw order corresponds with further back)
-    AnimatorComponent(class Actor *owner, const std::string &texturePath, const std::string &dataPath,
+    AnimatorComponent(class Actor *owner, const std::string &animationName,
                       int width, int height, int drawOrder = 100);
     ~AnimatorComponent() override;
 
@@ -31,8 +31,10 @@ public:
 
     // Set the current active animation
     void LoopAnimation(const std::string &name);
-    void PlayAnimation(const std::string &name, int loops);
-    void PlayAnimationOnce(const std::string &name) { PlayAnimation(name, 1); }
+    void PlayAnimation(const std::string &name, int loops, bool reset = true);
+    void PlayAnimationOnce(const std::string &name, bool reset = true) { PlayAnimation(name, 1, reset); }
+
+    void ResetAnimation();
 
     // Use to pause/unpause the animation
     void SetIsPaused(bool pause) { mIsPaused = pause; }
@@ -41,10 +43,12 @@ public:
     void AddAnimation(const std::string &name, const std::vector<int> &images);
 
     float GetAnimationDuration(const std::string &name);
+    float GetCurrentAnimationDuration() const;
 
 private:
-    void SetAnimation(const std::string &name);
+    void SetAnimation(const std::string &name, bool reset = true);
 
+    bool LoadAnimationData(const std::string &animationName);
     bool LoadSpriteSheetData(const std::string &dataPath);
 
     // Sprite sheet texture

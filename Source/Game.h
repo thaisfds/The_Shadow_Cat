@@ -73,6 +73,8 @@ public:
     bool IsDebugging() { return mIsDebugging; }
     DebugActor* GetDebugActor() { return mDebugActor; }
 
+    Actor* GetAttackTrailActor() { return mAttackTrailActor; }
+
 private:
     void ProcessInput();
     void UpdateGame(float deltaTime);
@@ -119,6 +121,9 @@ private:
     class ShadowCat *mShadowCat;
     class HUD *mHUD;
     int **mLevelData;
+
+    // Global particle system
+    class Actor *mAttackTrailActor;
 
     // Debug
     bool mIsDebugging;

@@ -1,41 +1,29 @@
-//
-// Created by Lucas N. Ferreira on 28/09/23.
-//
-
 #pragma once
 #include "../Component.h"
 #include "../../Math.h"
+#include "CollisionFilter.h"
 #include "RigidBodyComponent.h"
 #include <vector>
 #include <set>
 
-enum class ColliderLayer
-{
-	Player,
-	Enemy,
-	Blocks,
-	Mushroom,
-};
-
 class AABBColliderComponent : public Component
 {
 public:
-	AABBColliderComponent(class Actor *owner, int dx, int dy, int w, int h,
-						  ColliderLayer layer, bool isStatic = false, int updateOrder = 10);
+	AABBColliderComponent(class Actor *owner, int dx, int dy, int w, int h, CollisionFilter filter, bool isStatic = false, int updateOrder = 10);
 
 	~AABBColliderComponent() override;
 
 	bool Intersect(const AABBColliderComponent &b) const;
 
 	float DetectHorizontalCollision(RigidBodyComponent *rigidBody);
-
 	float DetectVertialCollision(RigidBodyComponent *rigidBody);
 
 	Vector2 GetMin() const;
 
 	Vector2 GetMax() const;
 
-	ColliderLayer GetLayer() const { return mLayer; }
+	CollisionFilter GetFilter() const { return mFilter; }
+	void SetFilter(CollisionFilter filter) { mFilter = filter; }
 
 	// Drawing for debug purposes
 	void DebugDraw(class Renderer *renderer) override;
@@ -46,17 +34,17 @@ public:
 
 private:
 	float GetMinVerticalOverlap(AABBColliderComponent *b) const;
-
 	float GetMinHorizontalOverlap(AABBColliderComponent *b) const;
 
 	void ResolveHorizontalCollisions(RigidBodyComponent *rigidBody, const float minOverlap);
-
 	void ResolveVerticalCollisions(RigidBodyComponent *rigidBody, const float minOverlap);
+
+	bool ShouldCollideWith(AABBColliderComponent* other) const;
 
 	Vector2 mOffset;
 	int mWidth;
 	int mHeight;
 	bool mIsStatic;
 
-	ColliderLayer mLayer;
+	CollisionFilter mFilter;
 };

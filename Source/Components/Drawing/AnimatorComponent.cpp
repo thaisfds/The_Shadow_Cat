@@ -6,18 +6,69 @@
 #include <fstream>
 #include <map>
 
-AnimatorComponent::AnimatorComponent(class Actor *owner, const std::string &texPath, const std::string &dataPath,
+const std::string ANIMATION_DATA_PATH = "../Assets/AnimationData/";
+
+AnimatorComponent::AnimatorComponent(class Actor *owner, const std::string &animationName,
 									 int width, int height, int drawOrder)
 	: DrawComponent(owner, drawOrder), mIsPaused(false), mWidth(width), mHeight(height), mTextureFactor(1.0f), mCurrentAnimation(nullptr), mLoopAnimName(""), mRemainingLoops(-1)
 	, mAnimSpeed(1.0f), mFrameTimer(0.0f), mCurrentFrameIndex(0)
 {
-	mSpriteTexture = mOwner->GetGame()->GetRenderer()->GetTexture(texPath);
+	bool loaded = LoadAnimationData(animationName);
+	if (!loaded)
+		mSpriteTexture = mOwner->GetGame()->GetRenderer()->GetTexture("../Assets/Sprites/NoTexture/NoTexture.png");
+}
 
-	if (!dataPath.empty())
+bool AnimatorComponent::LoadAnimationData(const std::string &animationName)
+{
+	std::ifstream animFile(ANIMATION_DATA_PATH + animationName + ".json");
+
+	if (!animFile.is_open())
 	{
-		if (!LoadSpriteSheetData(dataPath))
-			SDL_Log("Failed to load sprite sheet data for %s", texPath.c_str());
+		SDL_Log("Failed to open animation file: %s", (animationName).c_str());
+		return false;
 	}
+
+	nlohmann::json animData = nlohmann::json::parse(animFile);
+	if (animData.is_null())
+	{
+		SDL_Log("Failed to parse animation file: %s", (animationName).c_str());
+		return false;
+	}
+
+	std::string texturePath = animData["image"].get<std::string>();
+	if (texturePath.empty())
+	{
+		SDL_Log("No texture path specified in animation file: %s", (animationName).c_str());
+		return false;
+	}
+
+	mSpriteTexture = mOwner->GetGame()->GetRenderer()->GetTexture(texturePath);
+
+	std::string spriteSheetDataPath = animData["spriteSheetData"].get<std::string>();
+	if (spriteSheetDataPath.empty())
+	{
+		SDL_Log("No sprite sheet data path specified in animation file: %s", (animationName).c_str());
+		return false;
+	}
+
+	if (!LoadSpriteSheetData(spriteSheetDataPath))
+	{
+		SDL_Log("Failed to load sprite sheet data for %s", texturePath.c_str());
+		return false;
+	}
+
+	for (const auto& [animName, frameIndices] : animData["animations"].items())
+	{
+		std::vector<int> indices = frameIndices.get<std::vector<int>>();
+		AddAnimation(animName, indices);
+	}
+	if (mAnimations.empty())
+		for (auto spriteIndex = 0; spriteIndex < mSpriteSheetData.size(); ++spriteIndex)
+			AddAnimation(std::to_string(spriteIndex), { spriteIndex });
+
+	std::string baseAnim = animData.contains("base") ? animData["base"].get<std::string>() : mAnimations.begin()->first;
+	LoopAnimation(baseAnim);
+	return true;
 }
 
 AnimatorComponent::~AnimatorComponent()
@@ -79,7 +130,7 @@ bool AnimatorComponent::LoadSpriteSheetData(const std::string &dataPath)
 		int y = frame["frame"]["y"].get<int>();
 		int w = frame["frame"]["w"].get<int>();
 		int h = frame["frame"]["h"].get<int>();
-	    
+		
 		int duration = frame["duration"].get<int>();
 
 		auto sprite = Sprite{
@@ -95,7 +146,7 @@ bool AnimatorComponent::LoadSpriteSheetData(const std::string &dataPath)
 
 void AnimatorComponent::Draw(Renderer *renderer)
 {
-	if (mIsVisible)
+	if (mIsVisible && mSpriteTexture)
 	{
 		Vector4 texRect = Vector4::UnitRect;
 
@@ -103,6 +154,7 @@ void AnimatorComponent::Draw(Renderer *renderer)
 			texRect = mCurrentAnimation ? mCurrentAnimation->frames[mCurrentFrameIndex]->uv : mSpriteSheetData[0].uv;
 
 		bool flipH = (mOwner->GetScale().x < 0.0f);
+		bool flipV = (mOwner->GetScale().y < 0.0f);
 
 		renderer->DrawTexture(
 			mOwner->GetPosition(),
@@ -113,52 +165,60 @@ void AnimatorComponent::Draw(Renderer *renderer)
 			texRect,
 			mOwner->GetGame()->GetCameraPos(),
 			flipH,
+			flipV,
 			mTextureFactor);
 	}
 }
 
 void AnimatorComponent::Update(float deltaTime)
 {
-    if (mIsPaused || mAnimations.empty()) return;
+	if (mIsPaused || mCurrentAnimation == nullptr) return;
 
-    mFrameTimer += deltaTime * mAnimSpeed;
-    if (mFrameTimer >= mCurrentAnimation->frames[mCurrentFrameIndex]->duration)
-    {
-        mFrameTimer -= mCurrentAnimation->frames[mCurrentFrameIndex]->duration;
-        mCurrentFrameIndex++;
-        if (mCurrentFrameIndex >= mCurrentAnimation->frames.size())
-        {
-            mRemainingLoops--;
+	mFrameTimer += deltaTime * mAnimSpeed;
+	if (mFrameTimer >= mCurrentAnimation->frames[mCurrentFrameIndex]->duration)
+	{
+		mFrameTimer -= mCurrentAnimation->frames[mCurrentFrameIndex]->duration;
+		mCurrentFrameIndex++;
+		if (mCurrentFrameIndex >= mCurrentAnimation->frames.size())
+		{
+			mRemainingLoops--;
 
-            if (mRemainingLoops == 0) SetAnimation(mLoopAnimName); // Return to loop animation after finishing
-            else mCurrentFrameIndex = 0; // Loop animation
-        }
-    }
+			if (mRemainingLoops == 0) SetAnimation(mLoopAnimName); // Return to loop animation after finishing
+			else mCurrentFrameIndex = 0; // Loop animation
+		}
+	}
 }
 
 void AnimatorComponent::LoopAnimation(const std::string &name)
 {
 	if (mLoopAnimName == name) return;
 
-    SetAnimation(name);
+	SetAnimation(name, false);
 	mLoopAnimName = name;
 }
 
 
-void AnimatorComponent::PlayAnimation(const std::string &name, int loops)
+void AnimatorComponent::PlayAnimation(const std::string &name, int loops, bool reset)
 {
-    SetAnimation(name);
-    mRemainingLoops = loops;
+	SetAnimation(name, reset);
+	mRemainingLoops = loops;
 }
 
-void AnimatorComponent::SetAnimation(const std::string &name)
+void AnimatorComponent::ResetAnimation()
 {
-    auto animIter = mAnimations.find(name);
-    if (animIter == mAnimations.end()) return SDL_Log("Animation %s not found!", name.c_str());
+	mCurrentFrameIndex = 0;
+	mFrameTimer = 0.0f;
+}
 
-    mCurrentAnimation = &animIter->second;
-    mCurrentFrameIndex = 0;
-    mFrameTimer = 0.0f;
+void AnimatorComponent::SetAnimation(const std::string &name, bool reset)
+{
+	auto animIter = mAnimations.find(name);
+	if (animIter == mAnimations.end()) return SDL_Log("Animation %s not found!", name.c_str());
+	if (!reset && mCurrentAnimation == &animIter->second) return;
+
+	mCurrentAnimation = &animIter->second;
+	mCurrentFrameIndex = 0;
+	mFrameTimer = 0.0f;
 }
 
 void AnimatorComponent::AddAnimation(const std::string &name, const std::vector<int> &spriteNums)
@@ -179,7 +239,13 @@ void AnimatorComponent::AddAnimation(const std::string &name, const std::vector<
 
 float AnimatorComponent::GetAnimationDuration(const std::string &name)
 {
-    auto iter = mAnimations.find(name);
-    if (iter == mAnimations.end()) return 0.0f;
-    return iter->second.totalDuration;
+	auto iter = mAnimations.find(name);
+	if (iter == mAnimations.end()) return 0.0f;
+	return iter->second.totalDuration;
+}
+
+float AnimatorComponent::GetCurrentAnimationDuration() const
+{
+	if (!mCurrentAnimation) return 0.0f;
+	return mCurrentAnimation->totalDuration;
 }

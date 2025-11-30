@@ -1,0 +1,10 @@
+{
+  "image": "../Assets/Sprites/Dummy/Dummy.png",
+  "spriteSheetData": "../Assets/Sprites/Dummy/Dummy.json",
+  "animations": 
+  {
+    "Idle": [0],
+    "Hit": [1, 2, 0]
+  },
+  "base": "Idle"
+}

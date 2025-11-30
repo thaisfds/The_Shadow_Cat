@@ -1,5 +1,6 @@
 #pragma once
 #include "../Actor.h"
+#include "../../Components/Physics/CollisionFilter.h"
 
 class RigidBodyComponent;
 class AnimatorComponent;
@@ -21,6 +22,22 @@ public:
 
     bool GetMovementLock() const { return mIsMovementLocked; }
     void SetMovementLock(bool isLocked);
+
+    static CollisionFilter GetBasePlayerFilter()
+    {
+        CollisionFilter filter;
+        filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::Player});
+        filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Environment, CollisionGroup::Enemy, CollisionGroup::EnemySkills});
+        return filter;
+    };
+
+    static CollisionFilter GetBaseEnemyFilter()
+    {
+        CollisionFilter filter;
+        filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::Enemy});
+        filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player, CollisionGroup::Environment, CollisionGroup::PlayerSkills});
+        return filter;
+    };
 
 protected:
     void ManageAnimations();

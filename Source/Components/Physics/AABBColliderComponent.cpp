@@ -1,19 +1,15 @@
-//
-// Created by Lucas N. Ferreira on 28/09/23.
-//
-
 #include "AABBColliderComponent.h"
 #include "../../Actors/Actor.h"
 #include "../../Game.h"
+#include "CollisionFilter.h"
 
-AABBColliderComponent::AABBColliderComponent(class Actor *owner, int dx, int dy, int w, int h,
-											 ColliderLayer layer, bool isStatic, int updateOrder)
+AABBColliderComponent::AABBColliderComponent(class Actor *owner, int dx, int dy, int w, int h, CollisionFilter filter, bool isStatic, int updateOrder)
 	: Component(owner, updateOrder)
 	  , mOffset(Vector2((float) dx, (float) dy))
 	  , mIsStatic(isStatic)
 	  , mWidth(w)
 	  , mHeight(h)
-	  , mLayer(layer)
+	  , mFilter(filter)
 {
 	GetGame()->AddCollider(this);
 }
@@ -90,16 +86,13 @@ float AABBColliderComponent::DetectHorizontalCollision(RigidBodyComponent *rigid
 
 	for (auto other: colliders)
 	{
-		if (other == this) continue;
-		if (!other->IsEnabled()) continue;
+		if (!ShouldCollideWith(other)) continue;
+		if (!Intersect(*other)) continue;
 
-		if (Intersect(*other))
-		{
-			float overlap = GetMinHorizontalOverlap(other);
-			ResolveHorizontalCollisions(rigidBody, overlap);
-			mOwner->OnHorizontalCollision(overlap, other);
-			minOverlap = overlap;
-		}
+		float overlap = GetMinHorizontalOverlap(other);
+		ResolveHorizontalCollisions(rigidBody, overlap);
+		mOwner->OnHorizontalCollision(overlap, other);
+		minOverlap = overlap;
 	}
 
 	return minOverlap;
@@ -116,17 +109,14 @@ float AABBColliderComponent::DetectVertialCollision(RigidBodyComponent *rigidBod
 
 	for (auto other: colliders)
 	{
-		if (other == this) continue;
-		if (!other->IsEnabled()) continue;
+		if (!ShouldCollideWith(other)) continue;
+		if (!Intersect(*other)) continue;
 
-		if (Intersect(*other))
-		{
-			float overlap = GetMinVerticalOverlap(other);
-			ResolveVerticalCollisions(rigidBody, overlap);
-			mOwner->OnVerticalCollision(overlap, other);
-			minOverlap = overlap;
-			hasCollision = true;
-		}
+		float overlap = GetMinVerticalOverlap(other);
+		ResolveVerticalCollisions(rigidBody, overlap);
+		mOwner->OnVerticalCollision(overlap, other);
+		minOverlap = overlap;
+		hasCollision = true;
 	}
 
 	if (!hasCollision) mOwner->SetOffGround();
@@ -173,4 +163,13 @@ void AABBColliderComponent::SetSize(int width, int height)
 void AABBColliderComponent::SetOffset(Vector2 offset)
 {
 	mOffset = offset;
+}
+
+bool AABBColliderComponent::ShouldCollideWith(AABBColliderComponent* other) const
+{
+	if (other == this) return false;
+	if (!other->IsEnabled()) return false;
+	if (!CollisionFilter::ShouldCollide(mFilter, other->GetFilter())) return false; 
+
+	return true;
 }

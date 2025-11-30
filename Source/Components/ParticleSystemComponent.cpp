@@ -9,7 +9,15 @@ Particle::Particle(class Game *game, int width, int height, bool hasCollider)
 {
     mDrawComponent = new RectComponent(this, width, height, RendererMode::TRIANGLES);
     mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 0.0f, true);
-    if (hasCollider) mColliderComponent = new AABBColliderComponent(this, 0, 0, width, height, ColliderLayer::Blocks);
+
+    if (hasCollider)
+    {
+        CollisionFilter filter;
+        filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::Environment});
+        filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player, CollisionGroup::Enemy, CollisionGroup::Environment});
+        
+        mColliderComponent = new AABBColliderComponent(this, 0, 0, width, height, filter);
+    }
 
     SetState(ActorState::Paused);
     mDrawComponent->SetVisible(false);
