@@ -47,9 +47,11 @@ private:
     float mDetectionRadius;
     float mDetectionAngle;  // Cone angle in radians
     float mChaseDetectionRadius;  // Larger circle used during chase
+    float mProximityRadius;  // Small circle for close-range detection (360 degrees)
     bool mPlayerDetected;
     
     bool IsPlayerInRange() const;
+    bool IsPlayerInProximity() const;
     bool IsPlayerInChaseRange() const;
     bool IsPlayerInAttackRange() const;
     Vector2 GetForwardDirection() const;

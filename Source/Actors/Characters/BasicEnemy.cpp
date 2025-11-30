@@ -25,6 +25,7 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mDetectionRadius(200.0f)
     , mDetectionAngle(Math::ToRadians(120.0f))  // 120 degree cone in front
     , mChaseDetectionRadius(250.0f)  // 25% larger radius for chase persistence
+    , mProximityRadius(90.0f)  // Close-range detection (about 1.5 tiles)
     , mPlayerDetected(false)
 {
     // Use WhiteCat sprite
@@ -85,11 +86,12 @@ void BasicEnemy::OnUpdate(float deltaTime)
     }
     
     // Check for player detection based on current state
+    bool playerInProximity = IsPlayerInProximity();  // Close range (360 degrees)
     bool playerInCone = IsPlayerInRange();  // Cone detection (initial)
     bool playerInChaseRange = IsPlayerInChaseRange();  // Circle detection (chase)
     bool playerInAttackRange = IsPlayerInAttackRange();
     
-    // State transitions
+    // State transitions (priority order matters!)
     if (playerInAttackRange && mCurrentState != AIState::Attack)
     {
         mCurrentState = AIState::Attack;
@@ -98,13 +100,13 @@ void BasicEnemy::OnUpdate(float deltaTime)
             SDL_Log("BasicEnemy: -> Attack");
         }
     }
-    else if (mCurrentState == AIState::Patrol && playerInCone)
+    else if (mCurrentState == AIState::Patrol && (playerInProximity || playerInCone))
     {
-        // Only start chasing from patrol if player enters the cone
+        // Start chasing if player enters proximity OR cone
         mCurrentState = AIState::Chase;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: -> Chase (cone detection)");
+            SDL_Log("BasicEnemy: -> Chase (%s)", playerInProximity ? "proximity" : "cone detection");
         }
     }
     else if ((mCurrentState == AIState::Chase || mCurrentState == AIState::Attack) && !playerInAttackRange && playerInChaseRange)
@@ -130,7 +132,7 @@ void BasicEnemy::OnUpdate(float deltaTime)
     }
     
     // Update detected flag for debug visualization
-    mPlayerDetected = (mCurrentState == AIState::Patrol) ? playerInCone : playerInChaseRange;
+    mPlayerDetected = (mCurrentState == AIState::Patrol) ? (playerInProximity || playerInCone) : playerInChaseRange;
     
     // Execute state behavior
     switch (mCurrentState)
@@ -204,6 +206,19 @@ bool BasicEnemy::IsPlayerInRange() const
     
     // Player is detected if within half the cone angle
     return angleToPlayer <= (mDetectionAngle / 2.0f);
+}
+
+bool BasicEnemy::IsPlayerInProximity() const
+{
+    const ShadowCat* player = mGame->GetPlayer();
+    if (!player) return false;
+    
+    Vector2 toPlayer = player->GetPosition() - mPosition;
+    float distanceSquared = toPlayer.LengthSq();
+    float proximityRadiusSquared = mProximityRadius * mProximityRadius;
+    
+    // Simple circular check - works 360 degrees
+    return distanceSquared <= proximityRadiusSquared;
 }
 
 bool BasicEnemy::IsPlayerInChaseRange() const
@@ -414,6 +429,23 @@ void BasicEnemy::OnDebugDraw(Renderer* renderer)
             renderer->DrawRect(leftPoint, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
             renderer->DrawRect(rightPoint, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
         }
+        
+        // Always draw proximity circle (white/light blue color)
+        Vector3 proximityColor = Vector3(0.8f, 0.8f, 1.0f); // Light blue
+        const int proxSegments = 24;
+        const float proxAngleStep = Math::TwoPi / proxSegments;
+        
+        for (int i = 0; i < proxSegments; i++)
+        {
+            float angle1 = i * proxAngleStep;
+            
+            Vector2 p1 = mPosition + Vector2(
+                Math::Cos(angle1) * mProximityRadius,
+                Math::Sin(angle1) * mProximityRadius
+            );
+            
+            renderer->DrawRect(p1, Vector2(3.0f, 3.0f), 0.0f, proximityColor, mGame->GetCameraPos(), RendererMode::LINES);
+        }
     }
     else
     {
@@ -437,6 +469,23 @@ void BasicEnemy::OnDebugDraw(Renderer* renderer)
             );
             
             renderer->DrawRect(p1, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
+        }
+        
+        // Always draw proximity circle (white/light blue color)
+        Vector3 proximityColor = Vector3(0.8f, 0.8f, 1.0f); // Light blue
+        const int proxSegments = 24;
+        const float proxAngleStep = Math::TwoPi / proxSegments;
+        
+        for (int i = 0; i < proxSegments; i++)
+        {
+            float angle1 = i * proxAngleStep;
+            
+            Vector2 p1 = mPosition + Vector2(
+                Math::Cos(angle1) * mProximityRadius,
+                Math::Sin(angle1) * mProximityRadius
+            );
+            
+            renderer->DrawRect(p1, Vector2(3.0f, 3.0f), 0.0f, proximityColor, mGame->GetCameraPos(), RendererMode::LINES);
         }
     }
 }
