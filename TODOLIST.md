@@ -7,7 +7,14 @@
     - [x] gamepad 
 - [ ] [Juan] Create enemy
     - [ ] Basic static
-    - [ ] smart
+    - [ ] Patrol mode
+    - [ ] Detects player
+    - [ ] Chases player
+        - [ ] Handling obstacles in path
+    - [ ] Attacks player
+    - [ ] (maybe) Detection radius smaller than give-up-from-persuit radius
+    - [ ] (maybe) Memory of last seen player position
+    - [ ] (maybe) Return to original patrol area
 - [ ] [Juan] Player basic combat 
     - [ ] basic
     - [ ] charged
