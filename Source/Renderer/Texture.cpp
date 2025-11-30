@@ -23,6 +23,9 @@ bool Texture::Load(const std::string &filePath) {
     glGenTextures(1, &mTextureID);
     glBindTexture(GL_TEXTURE_2D, mTextureID);
 
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -39,8 +42,6 @@ bool Texture::Load(const std::string &filePath) {
     glTexImage2D(GL_TEXTURE_2D, 0, format, mWidth, mHeight, 0, format,GL_UNSIGNED_BYTE, surf->pixels);
 
     SDL_FreeSurface(surf);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
 
     return true;
 }

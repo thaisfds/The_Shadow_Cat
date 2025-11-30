@@ -24,6 +24,13 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     
     mSkillInputHandler = new SkillInputHandler(this);
     mRigidBodyComponent->SetApplyGravity(false);
+
+    // Setup animations
+    mAnimatorComponent->AddAnimation("Idle", {0});
+    mAnimatorComponent->AddAnimation("Run", {0, 1, 2, 3});
+    mAnimatorComponent->AddAnimation("BasicAttack", {4, 5, 6, 7, 8, 0});
+    
+    mAnimatorComponent->LoopAnimation("Idle");
 }
 
 void ShadowCat::OnProcessInput(const uint8_t *state)

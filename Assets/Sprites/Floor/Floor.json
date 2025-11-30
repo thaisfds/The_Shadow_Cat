@@ -278,6 +278,14 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
     "duration": 100
+   },
+   "Floor35.aseprite": {
+    "frame": { "x": 1120, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
    }
  },
  "meta": {
@@ -285,7 +293,7 @@
   "version": "1.x-dev",
   "image": "Floor.png",
   "format": "RGBA8888",
-  "size": { "w": 1120, "h": 32 },
+  "size": { "w": 1152, "h": 32 },
   "scale": "1",
   "frameTags": [
   ],
