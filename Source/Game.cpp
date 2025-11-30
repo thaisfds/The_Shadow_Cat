@@ -128,11 +128,9 @@ void Game::SetScene(GameScene nextScene)
     switch (nextScene) {
         case GameScene::MainMenu:
             mCurrentScene = GameScene::MainMenu;
-
+			
 			// Main menu back music
 			// mAudio->PlaySound("Music.ogg", true);
-
-			//InitializeActors();
 
 			// Still debugging this
 			new MainMenu(this, "../Assets/Fonts/Pixellari.ttf");
@@ -495,7 +493,7 @@ void Game::GenerateOutput()
 	mRenderer->Clear();
 
 	Texture *backgroundTexture = mRenderer->GetTexture("../Assets/Levels/Lobby/LobbyBackground.png");
-	if (backgroundTexture and false)
+	if (backgroundTexture)
 	{
 		float levelPixelWidth = static_cast<float>(GameConstants::LEVEL_WIDTH) * static_cast<float>(GameConstants::TILE_SIZE);
 		float levelPixelHeight = static_cast<float>(GameConstants::LEVEL_HEIGHT) * static_cast<float>(GameConstants::TILE_SIZE);
