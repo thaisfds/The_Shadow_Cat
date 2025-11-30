@@ -140,13 +140,6 @@ void Game::SetScene(GameScene nextScene)
 			new MainMenu(this, "../Assets/Fonts/Pixellari.ttf");
             break;
 
-		case GameScene::Lobby:
-            mCurrentScene = GameScene::Lobby;
-
-			InitializeActors();
-
-			break;
-
         case GameScene::Lobby:
             mCurrentScene = GameScene::Lobby;
             InitializeActors();
