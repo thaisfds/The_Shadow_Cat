@@ -22,7 +22,7 @@ Game::Game()
 	mRenderer(nullptr),
 	mTicksCount(0),
 	mIsRunning(true),
-	mIsDebugging(false),
+	mIsDebugging(true),
 	mUpdatingActors(false),
 	mCameraPos(Vector2::Zero),
 	mLevelData(nullptr),
