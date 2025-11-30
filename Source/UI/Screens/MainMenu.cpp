@@ -23,7 +23,7 @@ MainMenu::MainMenu(class Game* game, const std::string& fontName)
     // Customize buttons
     for (auto button : mButtons) {
         button->SetTextColor(Vector3(1.0f, 1.0f, 1.0f));
-        //button->SetBackgroundColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+        button->SetBackgroundColor(Vector4(0.0f, 0.0f, 1.0f, 1.0f));
     }    
 }
 
