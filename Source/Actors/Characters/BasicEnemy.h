@@ -9,10 +9,11 @@ public:
         Patrol,
         Chase,
         Searching,
+        ReturningToPatrol,
         Attack
     };
 
-    BasicEnemy(class Game* game, float forwardSpeed = 0.0f, float patrolDistance = 200.0f);
+    BasicEnemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, float forwardSpeed = 0.0f);
     virtual ~BasicEnemy();
 
     void OnUpdate(float deltaTime) override;
@@ -29,10 +30,9 @@ private:
     AIState mCurrentState;
     
     // Patrol movement
-    Vector2 mPatrolStartPos;
+    Vector2 mPatrolWaypoints[2];  // Two patrol points to walk between
+    int mCurrentWaypoint;  // Index of current target waypoint (0 or 1)
     Vector2 mPreviousPosition;
-    float mPatrolDistance;
-    int mPatrolDirection;  // 1 for right, -1 for left
     float mPatrolSpeed;
     Vector2 mMovementDirection;  // Actual movement direction for cone detection
     bool mIsPatrolPaused;  // Pausing before turning
@@ -69,5 +69,6 @@ private:
     void UpdatePatrol(float deltaTime);
     void UpdateChase(float deltaTime);
     void UpdateSearching(float deltaTime);
+    void UpdateReturningToPatrol(float deltaTime);
     void UpdateAttack(float deltaTime);
 };

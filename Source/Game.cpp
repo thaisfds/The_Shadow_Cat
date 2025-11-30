@@ -100,7 +100,7 @@ bool Game::Initialize()
     mAudio->CacheAllSounds();
 
 	// First scene
-		SetScene(GameScene::Level1);
+		SetScene(GameScene::Lobby);
 
 	mTicksCount = SDL_GetTicks();
 
@@ -284,16 +284,22 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto dummy = new Dummy(this);
 				dummy->SetPosition(position);
 			}
-			// BasicEnemy (WhiteCat)
+			// BasicEnemy (WhiteCat) - small patrol
 			else if (tileID == 12)
 			{
-				auto enemy = new BasicEnemy(this, 0.0f, 100.0f);
+				// Create waypoints 100 pixels to left and right of spawn position
+				Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
+				Vector2 waypointB = position + Vector2(100.0f, 0.0f);
+				auto enemy = new BasicEnemy(this, waypointA, waypointB);
 				enemy->SetPosition(position);
 			}
 			// BasicEnemy with larger patrol (WhiteCat2)
 			else if (tileID == 13)
 			{
-				auto enemy = new BasicEnemy(this, 0.0f, 400.0f);
+				// Create waypoints 200 pixels to left and right of spawn position
+				Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
+				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
+				auto enemy = new BasicEnemy(this, waypointA, waypointB);
 				enemy->SetPosition(position);
 			}
 		}

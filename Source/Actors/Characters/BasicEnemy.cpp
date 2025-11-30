@@ -8,14 +8,13 @@
 #include "../../Renderer/Renderer.h"
 #include <SDL.h>
 
-BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistance)
+BasicEnemy::BasicEnemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, float forwardSpeed)
     : Character(game, forwardSpeed)
     , mDeathTimer(0.0f)
     , mIsPlayingDeathAnim(false)
     , mCurrentState(AIState::Patrol)
-    , mPatrolDistance(patrolDistance)
+    , mCurrentWaypoint(0)  // Start by moving toward first waypoint
     , mPreviousPosition(Vector2::Zero)
-    , mPatrolDirection(1)
     , mPatrolSpeed(50.0f)
     , mMovementDirection(Vector2(1.0f, 0.0f))  // Start facing right
     , mIsPatrolPaused(false)
@@ -36,6 +35,9 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mProximityRadius(100.0f)  // Close-range detection (about 1.6 tiles)
     , mPlayerDetected(false)
 {
+    // Store patrol waypoints
+    mPatrolWaypoints[0] = patrolPointA;
+    mPatrolWaypoints[1] = patrolPointB;
     // Use WhiteCat sprite
     mAnimatorComponent = new AnimatorComponent(this, "WhiteCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
@@ -58,9 +60,6 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     mAnimatorComponent->AddAnimation("Death", {2, 1, 0});  // Run animation frames as death effect
 
     mAnimatorComponent->LoopAnimation("Run");
-    
-    // Patrol start position will be set when position is first updated
-    mPatrolStartPos = Vector2::Zero;
 }
 
 BasicEnemy::~BasicEnemy()
@@ -155,6 +154,9 @@ void BasicEnemy::OnUpdate(float deltaTime)
             break;
         case AIState::Searching:
             UpdateSearching(deltaTime);
+            break;
+        case AIState::ReturningToPatrol:
+            UpdateReturningToPatrol(deltaTime);
             break;
         case AIState::Attack:
             UpdateAttack(deltaTime);
@@ -283,18 +285,7 @@ bool BasicEnemy::IsPlayerInAttackRange() const
 
 void BasicEnemy::UpdatePatrol(float deltaTime)
 {
-    // Set patrol start position on first update (when position is valid)
-    if (mPatrolStartPos.x == 0.0f && mPatrolStartPos.y == 0.0f)
-    {
-        mPatrolStartPos = mPosition;
-        mPreviousPosition = mPosition;
-        if (mGame->IsDebugging())
-        {
-            SDL_Log("BasicEnemy patrol starting at: (%.2f, %.2f)", mPatrolStartPos.x, mPatrolStartPos.y);
-        }
-    }
-    
-    // If paused, count down timer before turning
+    // If paused, count down timer before moving to next waypoint
     if (mIsPatrolPaused)
     {
         mPatrolPauseTimer -= deltaTime;
@@ -306,23 +297,16 @@ void BasicEnemy::UpdatePatrol(float deltaTime)
         
         if (mPatrolPauseTimer <= 0.0f)
         {
-            // Pause complete, turn around
+            // Pause complete, switch to next waypoint
             mIsPatrolPaused = false;
-            mPatrolDirection *= -1;
+            mCurrentWaypoint = (mCurrentWaypoint + 1) % 2;  // Toggle between 0 and 1
             
             if (mGame->IsDebugging())
             {
-                SDL_Log("BasicEnemy: Pause complete, now facing %s", mPatrolDirection > 0 ? "right" : "left");
-            }
-            
-            // Update sprite facing direction
-            if (mPatrolDirection > 0)
-            {
-                SetScale(Vector2(1.0f, 1.0f));
-            }
-            else
-            {
-                SetScale(Vector2(-1.0f, 1.0f));
+                SDL_Log("BasicEnemy: Pause complete, now moving toward waypoint %d at (%.2f, %.2f)", 
+                        mCurrentWaypoint, 
+                        mPatrolWaypoints[mCurrentWaypoint].x, 
+                        mPatrolWaypoints[mCurrentWaypoint].y);
             }
             
             // Resume moving
@@ -332,18 +316,39 @@ void BasicEnemy::UpdatePatrol(float deltaTime)
         return;  // Don't continue with patrol logic while paused
     }
     
-    // Check if enemy hit a wall (position didn't change despite velocity)
-    float positionChange = Math::Abs(mPosition.x - mPreviousPosition.x);
-    if (positionChange < 0.1f && deltaTime > 0.0f)
+    // Get direction to current waypoint
+    Vector2 toWaypoint = mPatrolWaypoints[mCurrentWaypoint] - mPosition;
+    float distanceToWaypoint = toWaypoint.Length();
+    
+    // Check if we've reached the waypoint (within 10 pixels)
+    if (distanceToWaypoint < 10.0f)
     {
-        // We're stuck, start pause before turning
+        // Reached waypoint, start pause before moving to next one
         mIsPatrolPaused = true;
         mPatrolPauseTimer = mPatrolPauseDuration;
         mIsMoving = false;  // Stop animation immediately
         
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Hit wall, pausing before turn (%.2f seconds)", mPatrolPauseDuration);
+            SDL_Log("BasicEnemy: Reached waypoint %d, pausing (%.2f seconds)", 
+                    mCurrentWaypoint, mPatrolPauseDuration);
+        }
+        
+        return;  // Start pause immediately
+    }
+    
+    // Check if enemy hit a wall (position didn't change despite velocity)
+    float positionChange = (mPosition - mPreviousPosition).Length();
+    if (positionChange < 0.1f && deltaTime > 0.0f)
+    {
+        // We're stuck, start pause and switch waypoints
+        mIsPatrolPaused = true;
+        mPatrolPauseTimer = mPatrolPauseDuration;
+        mIsMoving = false;  // Stop animation immediately
+        
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy: Hit wall, pausing before switching waypoints (%.2f seconds)", mPatrolPauseDuration);
         }
         
         return;  // Start pause immediately
@@ -351,51 +356,19 @@ void BasicEnemy::UpdatePatrol(float deltaTime)
     
     mPreviousPosition = mPosition;
     
-    // Patrol movement
-    float distanceFromStart = mPosition.x - mPatrolStartPos.x;
-    
-    // Check if we need to turn around based on patrol distance
-    if (mPatrolDirection == 1 && distanceFromStart >= mPatrolDistance)
-    {
-        // Start pause before turning
-        mIsPatrolPaused = true;
-        mPatrolPauseTimer = mPatrolPauseDuration;
-        mIsMoving = false;  // Stop animation immediately
-        
-        if (mGame->IsDebugging())
-        {
-            SDL_Log("BasicEnemy: Reached patrol limit (right), pausing before turn (%.2f seconds)", mPatrolPauseDuration);
-        }
-        
-        return;  // Start pause immediately
-    }
-    else if (mPatrolDirection == -1 && distanceFromStart <= -mPatrolDistance)
-    {
-        // Start pause before turning
-        mIsPatrolPaused = true;
-        mPatrolPauseTimer = mPatrolPauseDuration;
-        mIsMoving = false;  // Stop animation immediately
-        
-        if (mGame->IsDebugging())
-        {
-            SDL_Log("BasicEnemy: Reached patrol limit (left), pausing before turn (%.2f seconds)", mPatrolPauseDuration);
-        }
-        
-        return;  // Start pause immediately
-    }
-    
-    // Set velocity for patrol movement
-    Vector2 velocity(mPatrolDirection * mPatrolSpeed, 0.0f);
+    // Move toward current waypoint
+    toWaypoint.Normalize();
+    Vector2 velocity = toWaypoint * mPatrolSpeed;
     mRigidBodyComponent->SetVelocity(velocity);
     mMovementDirection = velocity;  // Track movement direction for cone detection
     mIsMoving = true;  // Set to true so ManageAnimations plays Run
     
-    // Update sprite facing direction
-    if (mPatrolDirection > 0)
+    // Update sprite facing direction based on movement
+    if (toWaypoint.x > 0.0f)
     {
         SetScale(Vector2(1.0f, 1.0f));
     }
-    else
+    else if (toWaypoint.x < 0.0f)
     {
         SetScale(Vector2(-1.0f, 1.0f));
     }
@@ -437,10 +410,10 @@ void BasicEnemy::UpdateSearching(float deltaTime)
     // Give up searching after duration expires
     if (mSearchTimer >= mSearchDuration)
     {
-        mCurrentState = AIState::Patrol;
+        mCurrentState = AIState::ReturningToPatrol;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Search timed out -> Patrol");
+            SDL_Log("BasicEnemy: Search timed out -> ReturningToPatrol");
         }
         return;
     }
@@ -467,10 +440,10 @@ void BasicEnemy::UpdateSearching(float deltaTime)
     // If we've reached the last known position, give up
     if (distanceToLastKnown < 20.0f)  // Within 20 pixels (close enough)
     {
-        mCurrentState = AIState::Patrol;
+        mCurrentState = AIState::ReturningToPatrol;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Reached last known position but player not found -> Patrol");
+            SDL_Log("BasicEnemy: Reached last known position but player not found -> ReturningToPatrol");
         }
         return;
     }
@@ -487,6 +460,62 @@ void BasicEnemy::UpdateSearching(float deltaTime)
         SetScale(Vector2(1.0f, 1.0f));
     }
     else if (toLastKnown.x < 0.0f)
+    {
+        SetScale(Vector2(-1.0f, 1.0f));
+    }
+}
+
+void BasicEnemy::UpdateReturningToPatrol(float deltaTime)
+{
+    // Check if player re-enters detection range while returning
+    bool playerInProximity = IsPlayerInProximity();
+    bool playerInCone = IsPlayerInRange();
+    
+    if (playerInProximity || playerInCone)
+    {
+        // Found the player again!
+        mCurrentState = AIState::Chase;
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy: Player detected while returning -> Chase");
+        }
+        return;
+    }
+    
+    // Find nearest patrol waypoint
+    float distToWaypoint0 = (mPatrolWaypoints[0] - mPosition).Length();
+    float distToWaypoint1 = (mPatrolWaypoints[1] - mPosition).Length();
+    int nearestWaypoint = (distToWaypoint0 < distToWaypoint1) ? 0 : 1;
+    
+    // Get direction to nearest waypoint
+    Vector2 toWaypoint = mPatrolWaypoints[nearestWaypoint] - mPosition;
+    float distanceToWaypoint = toWaypoint.Length();
+    
+    // Check if we've reached the patrol area (within 20 pixels of a waypoint)
+    if (distanceToWaypoint < 20.0f)
+    {
+        // Back in patrol area, resume normal patrol
+        mCurrentState = AIState::Patrol;
+        mCurrentWaypoint = nearestWaypoint;
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy: Reached patrol area -> Patrol");
+        }
+        return;
+    }
+    
+    // Move toward nearest waypoint
+    toWaypoint.Normalize();
+    Vector2 velocity = toWaypoint * mPatrolSpeed;
+    mRigidBodyComponent->SetVelocity(velocity);
+    mMovementDirection = velocity;  // Track movement direction for cone detection
+    
+    // Update sprite facing direction based on movement
+    if (toWaypoint.x > 0.0f)
+    {
+        SetScale(Vector2(1.0f, 1.0f));
+    }
+    else if (toWaypoint.x < 0.0f)
     {
         SetScale(Vector2(-1.0f, 1.0f));
     }
@@ -728,6 +757,41 @@ void BasicEnemy::OnDebugDraw(Renderer* renderer)
             
             renderer->DrawRect(p1, Vector2(3.0f, 3.0f), 0.0f, proximityColor, mGame->GetCameraPos(), RendererMode::LINES);
         }
+    }
+    
+    // Always draw patrol waypoints (green squares) for all states
+    Vector3 waypointColor = Vector3(0.0f, 1.0f, 0.0f); // Green
+    Vector3 currentWaypointColor = Vector3(0.0f, 1.0f, 1.0f); // Cyan for current target
+    
+    for (int i = 0; i < 2; i++)
+    {
+        Vector3 color = (i == mCurrentWaypoint && mCurrentState == AIState::Patrol) ? currentWaypointColor : waypointColor;
+        
+        // Draw a square at each waypoint
+        for (int dx = -8; dx <= 8; dx += 4)
+        {
+            for (int dy = -8; dy <= 8; dy += 4)
+            {
+                renderer->DrawRect(
+                    mPatrolWaypoints[i] + Vector2(dx, dy),
+                    Vector2(4.0f, 4.0f),
+                    0.0f,
+                    color,
+                    mGame->GetCameraPos(),
+                    RendererMode::LINES
+                );
+            }
+        }
+    }
+    
+    // Draw line between waypoints
+    Vector2 waypointDiff = mPatrolWaypoints[1] - mPatrolWaypoints[0];
+    const int linePoints = 15;
+    for (int i = 0; i <= linePoints; i++)
+    {
+        float t = i / (float)linePoints;
+        Vector2 point = mPatrolWaypoints[0] + waypointDiff * t;
+        renderer->DrawRect(point, Vector2(2.0f, 2.0f), 0.0f, waypointColor, mGame->GetCameraPos(), RendererMode::LINES);
     }
 }
 
