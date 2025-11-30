@@ -9,8 +9,9 @@
 #include "Components/Drawing/DrawComponent.h"
 #include "Components/Physics/RigidBodyComponent.h"
 #include "Random.h"
-#include "UI/Screens/HUD.h"
 #include "UI/Screens/MainMenu.h"
+#include "UI/Screens/HUD.h"
+#include "UI/Screens/TutorialHUD.h"
 #include "Actors/Actor.h"
 #include "Actors/Block.h"
 #include "Actors/Spawner.h"
@@ -118,7 +119,6 @@ void Game::UnloadScene()
     mUIStack.clear();
 
     // Reset states
-    mHUD = nullptr;
 	mShadowCat = nullptr;
 }
 
@@ -133,7 +133,6 @@ void Game::SetScene(GameScene nextScene)
 			// Main menu back music
 			// mAudio->PlaySound("Music.ogg", true);
 
-			// Still debugging this
 			new MainMenu(this, "../Assets/Fonts/Pixellari.ttf");
             break;
 
@@ -141,6 +140,12 @@ void Game::SetScene(GameScene nextScene)
             mCurrentScene = GameScene::Lobby;
 
 			InitializeActors();
+
+			// Always shown
+			mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf", 6); 
+
+			// Toggleable tutorial HUD
+			mTutorialHUD = new TutorialHUD(this, "../Assets/Fonts/Pixellari.ttf");
 
 			break;
 
@@ -346,6 +351,11 @@ void Game::ProcessInput()
 			// Debug toggle
 			if (event.key.keysym.sym == SDLK_F1 && event.key.repeat == 0)
 				mIsDebugging = !mIsDebugging;
+
+			// Tutorial HUD toggle
+			if (event.key.keysym.sym == SDLK_h && event.key.repeat == 0)
+				if (mTutorialHUD)
+					mTutorialHUD->ToggleControlVisibility();
 
 			// Pass event to actors
 			for (auto actor : mActors) actor->OnHandleEvent(event);

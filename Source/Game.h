@@ -120,6 +120,7 @@ private:
     // Game-specific
     class ShadowCat *mShadowCat;
     class HUD *mHUD;
+    class TutorialHUD *mTutorialHUD;
     int **mLevelData;
 
     // Global particle system
