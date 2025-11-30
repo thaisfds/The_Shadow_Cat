@@ -102,7 +102,7 @@ bool Game::Initialize()
     mAudio->CacheAllSounds();
 
 	// First scene
-    SetScene(GameScene::Lobby);
+    SetScene(GameScene::MainMenu);
 
 	mTicksCount = SDL_GetTicks();
 
@@ -155,6 +155,7 @@ void Game::SetScene(GameScene nextScene)
 
         case GameScene::Level1:
             mCurrentScene = GameScene::Level1;
+
             InitializeActors();
             break;
     }
@@ -575,17 +576,34 @@ void Game::GenerateOutput()
 
 	// Get background texture based on current scene
 	std::string backgroundPath;
-	if (mCurrentScene == GameScene::Lobby) {
-		backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
-	} else if (mCurrentScene == GameScene::Level1) {
-		backgroundPath = "../Assets/Levels/Level1/Level1Background.png";
-	} else {
-		backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
+
+	switch (mCurrentScene) {
+		case GameScene::MainMenu:
+			backgroundPath = "../Assets/HUD/MainMenuBackground.png";
+			break;
+		case GameScene::Lobby:
+			backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
+			break;
+		case GameScene::Level1:
+			backgroundPath = "../Assets/Levels/Level1/Level1Background.png";
+			break;
+		default:
+			backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
+			break;
 	}
 
 	Texture *backgroundTexture = mRenderer->GetTexture(backgroundPath);
 	if (backgroundTexture)
 	{
+		// Main menu static image overrides scaling
+		if (mCurrentScene == GameScene::MainMenu) {
+			Vector2 position(GameConstants::WINDOW_WIDTH / 2.0f, GameConstants::WINDOW_HEIGHT / 2.0f);
+			Vector2 size(static_cast<float>(backgroundTexture->GetWidth()), static_cast<float>(backgroundTexture->GetHeight()));
+
+			mRenderer->DrawTexture(position, size, 0.0f, Vector3(1.0f, 1.0f, 1.0f),
+								   backgroundTexture, Vector4::UnitRect, Vector2::Zero);
+		} else {
+		// Align background to level size	
 		float levelPixelWidth = static_cast<float>(mLevelWidth) * static_cast<float>(GameConstants::TILE_SIZE);
 		float levelPixelHeight = static_cast<float>(mLevelHeight) * static_cast<float>(GameConstants::TILE_SIZE);
 
@@ -609,6 +627,7 @@ void Game::GenerateOutput()
 
 		mRenderer->DrawTexture(position, size, 0.0f, Vector3(1.0f, 1.0f, 1.0f),
 							   backgroundTexture, Vector4::UnitRect, mCameraPos);
+		}
 	}
 
 	for (auto drawable : mDrawables)
