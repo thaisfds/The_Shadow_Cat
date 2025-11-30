@@ -94,6 +94,22 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
     "duration": 100
+   },
+   "MapTileset_12.aseprite": {
+    "frame": { "x": 384, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
+   },
+   "MapTileset_13.aseprite": {
+    "frame": { "x": 416, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 100
    }
  },
  "meta": {
@@ -101,7 +117,7 @@
   "version": "1.x-dev",
   "image": "MapTileset.png",
   "format": "RGBA8888",
-  "size": { "w": 384, "h": 32 },
+  "size": { "w": 448, "h": 32 },
   "scale": "1",
   "frameTags": [
   ],
