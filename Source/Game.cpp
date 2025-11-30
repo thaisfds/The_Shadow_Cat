@@ -132,13 +132,20 @@ void Game::SetScene(GameScene nextScene)
     switch (nextScene) {
         case GameScene::MainMenu:
             mCurrentScene = GameScene::MainMenu;
-
+			
 			// Main menu back music
 			// mAudio->PlaySound("Music.ogg", true);
 
 			// Still debugging this
-			// new MainMenu(this, "../Assets/Fonts/arial.ttf");
+			new MainMenu(this, "../Assets/Fonts/Pixellari.ttf");
             break;
+
+		case GameScene::Lobby:
+            mCurrentScene = GameScene::Lobby;
+
+			InitializeActors();
+
+			break;
 
         case GameScene::Lobby:
             mCurrentScene = GameScene::Lobby;

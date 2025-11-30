@@ -6,11 +6,9 @@ MainMenu::MainMenu(class Game* game, const std::string& fontName)
 {
     const float SCALE = 0.6f;
 
-    AddImage("../Assets/HUD/ShieldBar.png", Vector2(0.0f, 100.0f), SCALE);
-
     // Using lambda as on click functions
     AddButton("NEW GAME", [game]() {
-        game->SetScene(GameScene::Level1);
+        game->SetScene(GameScene::Lobby);
     }, Vector2(0.0f, -50.0f), SCALE);
 
     AddButton("QUIT", [this, game]() {
