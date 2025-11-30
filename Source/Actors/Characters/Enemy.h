@@ -1,7 +1,7 @@
 #pragma once
 #include "Character.h"
 
-class BasicEnemy : public Character
+class Enemy : public Character
 {
 public:
     enum class AIState
@@ -13,8 +13,8 @@ public:
         Attack
     };
 
-    BasicEnemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, float forwardSpeed = 0.0f);
-    virtual ~BasicEnemy();
+    Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, float forwardSpeed = 0.0f);
+    virtual ~Enemy();
 
     void OnUpdate(float deltaTime) override;
     void TakeDamage(int damage) override;

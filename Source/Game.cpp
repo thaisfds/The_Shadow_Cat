@@ -16,7 +16,7 @@
 #include "Actors/Spawner.h"
 #include "Actors/Characters/ShadowCat.h"
 #include "Components/AnimatedParticleSystemComponent.h"
-#include "Actors/Characters/BasicEnemy.h"
+#include "Actors/Characters/Enemy.h"
 
 Game::Game()
 	: mWindow(nullptr),
@@ -284,22 +284,22 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto dummy = new Dummy(this);
 				dummy->SetPosition(position);
 			}
-			// BasicEnemy (WhiteCat) - small patrol
+			// Enemy (WhiteCat) - small patrol
 			else if (tileID == 12)
 			{
 				// Create waypoints 100 pixels to left and right of spawn position
 				Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
 				Vector2 waypointB = position + Vector2(100.0f, 0.0f);
-				auto enemy = new BasicEnemy(this, waypointA, waypointB);
+				auto enemy = new Enemy(this, waypointA, waypointB);
 				enemy->SetPosition(position);
 			}
-			// BasicEnemy with larger patrol (WhiteCat2)
+			// Enemy with larger patrol (WhiteCat2)
 			else if (tileID == 13)
 			{
 				// Create waypoints 200 pixels to left and right of spawn position
 				Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
 				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
-				auto enemy = new BasicEnemy(this, waypointA, waypointB);
+				auto enemy = new Enemy(this, waypointA, waypointB);
 				enemy->SetPosition(position);
 			}
 		}
@@ -609,11 +609,11 @@ void Game::GenerateOutput()
 			// Call debug draw for actor
 			auto actor = drawable->GetOwner();
 			
-			// Check if actor is a BasicEnemy and call its debug draw
-			auto basicEnemy = dynamic_cast<BasicEnemy*>(actor);
-			if (basicEnemy)
+			// Check if actor is an Enemy and call its debug draw
+			auto enemy = dynamic_cast<Enemy*>(actor);
+			if (enemy)
 			{
-				basicEnemy->OnDebugDraw(mRenderer);
+				enemy->OnDebugDraw(mRenderer);
 			}
 			
 			// Call debug draw for actor components

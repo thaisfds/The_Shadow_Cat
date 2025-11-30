@@ -1,4 +1,4 @@
-#include "BasicEnemy.h"
+#include "Enemy.h"
 #include "ShadowCat.h"
 #include "../../Game.h"
 #include "../../GameConstants.h"
@@ -8,7 +8,7 @@
 #include "../../Renderer/Renderer.h"
 #include <SDL.h>
 
-BasicEnemy::BasicEnemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, float forwardSpeed)
+Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, float forwardSpeed)
     : Character(game, forwardSpeed)
     , mDeathTimer(0.0f)
     , mIsPlayingDeathAnim(false)
@@ -63,11 +63,11 @@ BasicEnemy::BasicEnemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPoi
     mAnimatorComponent->LoopAnimation("Run");
 }
 
-BasicEnemy::~BasicEnemy()
+Enemy::~Enemy()
 {
 }
 
-void BasicEnemy::OnUpdate(float deltaTime)
+void Enemy::OnUpdate(float deltaTime)
 {
     Character::OnUpdate(deltaTime);
 
@@ -105,7 +105,7 @@ void BasicEnemy::OnUpdate(float deltaTime)
         mCurrentState = AIState::Attack;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: -> Attack");
+            SDL_Log("Enemy: -> Attack");
         }
     }
     else if (mCurrentState == AIState::Patrol && (playerInProximity || playerInCone))
@@ -114,7 +114,7 @@ void BasicEnemy::OnUpdate(float deltaTime)
         mCurrentState = AIState::Chase;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: -> Chase (%s)", playerInProximity ? "proximity" : "cone detection");
+            SDL_Log("Enemy: -> Chase (%s)", playerInProximity ? "proximity" : "cone detection");
         }
     }
     else if ((mCurrentState == AIState::Chase || mCurrentState == AIState::Attack) && !playerInAttackRange && playerInChaseRange)
@@ -125,7 +125,7 @@ void BasicEnemy::OnUpdate(float deltaTime)
             mCurrentState = AIState::Chase;
             if (mGame->IsDebugging())
             {
-                SDL_Log("BasicEnemy: Attack -> Chase");
+                SDL_Log("Enemy: Attack -> Chase");
             }
         }
     }
@@ -136,7 +136,7 @@ void BasicEnemy::OnUpdate(float deltaTime)
         mSearchTimer = 0.0f;  // Reset search timer
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Player lost -> Searching (last known: %.2f, %.2f)", 
+            SDL_Log("Enemy: Player lost -> Searching (last known: %.2f, %.2f)", 
                     mLastKnownPlayerPos.x, mLastKnownPlayerPos.y);
         }
     }
@@ -165,7 +165,7 @@ void BasicEnemy::OnUpdate(float deltaTime)
     }
 }
 
-void BasicEnemy::TakeDamage(int damage)
+void Enemy::TakeDamage(int damage)
 {
     if (mIsDead) return;
 
@@ -181,7 +181,7 @@ void BasicEnemy::TakeDamage(int damage)
     }
 }
 
-bool BasicEnemy::IsPlayerInRange() const
+bool Enemy::IsPlayerInRange() const
 {
     const ShadowCat* player = mGame->GetPlayer();
     if (!player) return false;
@@ -209,7 +209,7 @@ bool BasicEnemy::IsPlayerInRange() const
     return angleToPlayer <= (mDetectionAngle / 2.0f);
 }
 
-bool BasicEnemy::IsPlayerInProximity() const
+bool Enemy::IsPlayerInProximity() const
 {
     const ShadowCat* player = mGame->GetPlayer();
     if (!player) return false;
@@ -222,7 +222,7 @@ bool BasicEnemy::IsPlayerInProximity() const
     return distanceSquared <= proximityRadiusSquared;
 }
 
-bool BasicEnemy::IsPlayerInChaseRange() const
+bool Enemy::IsPlayerInChaseRange() const
 {
     const ShadowCat* player = mGame->GetPlayer();
     if (!player) return false;
@@ -235,7 +235,7 @@ bool BasicEnemy::IsPlayerInChaseRange() const
     return distanceSquared <= chaseRadiusSquared;
 }
 
-Vector2 BasicEnemy::GetForwardDirection() const
+Vector2 Enemy::GetForwardDirection() const
 {
     // Use actual movement direction if available (length > 0.1)
     // This ensures cone follows movement direction in Patrol and Searching states
@@ -254,7 +254,7 @@ Vector2 BasicEnemy::GetForwardDirection() const
         return Vector2(-1.0f, 0.0f);  // Facing left
 }
 
-bool BasicEnemy::IsPlayerInAttackRange() const
+bool Enemy::IsPlayerInAttackRange() const
 {
     const ShadowCat* player = mGame->GetPlayer();
     if (!player) return false;
@@ -266,7 +266,7 @@ bool BasicEnemy::IsPlayerInAttackRange() const
     return distanceSquared <= attackRangeSquared;
 }
 
-void BasicEnemy::UpdatePatrol(float deltaTime)
+void Enemy::UpdatePatrol(float deltaTime)
 {
     // If paused, count down timer before moving to next waypoint
     if (mIsPatrolPaused)
@@ -286,7 +286,7 @@ void BasicEnemy::UpdatePatrol(float deltaTime)
             
             if (mGame->IsDebugging())
             {
-                SDL_Log("BasicEnemy: Pause complete, now moving toward waypoint %d at (%.2f, %.2f)", 
+                SDL_Log("Enemy: Pause complete, now moving toward waypoint %d at (%.2f, %.2f)", 
                         mCurrentWaypoint, 
                         mPatrolWaypoints[mCurrentWaypoint].x, 
                         mPatrolWaypoints[mCurrentWaypoint].y);
@@ -313,7 +313,7 @@ void BasicEnemy::UpdatePatrol(float deltaTime)
         
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Reached waypoint %d, pausing (%.2f seconds)", 
+            SDL_Log("Enemy: Reached waypoint %d, pausing (%.2f seconds)", 
                     mCurrentWaypoint, mPatrolPauseDuration);
         }
         
@@ -331,7 +331,7 @@ void BasicEnemy::UpdatePatrol(float deltaTime)
         
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Hit wall, pausing before switching waypoints (%.2f seconds)", mPatrolPauseDuration);
+            SDL_Log("Enemy: Hit wall, pausing before switching waypoints (%.2f seconds)", mPatrolPauseDuration);
         }
         
         return;  // Start pause immediately
@@ -357,7 +357,7 @@ void BasicEnemy::UpdatePatrol(float deltaTime)
     }
 }
 
-void BasicEnemy::UpdateChase(float deltaTime)
+void Enemy::UpdateChase(float deltaTime)
 {
     const ShadowCat* player = mGame->GetPlayer();
     if (!player) return;
@@ -385,7 +385,7 @@ void BasicEnemy::UpdateChase(float deltaTime)
     }
 }
 
-void BasicEnemy::UpdateSearching(float deltaTime)
+void Enemy::UpdateSearching(float deltaTime)
 {
     // Count down search timer
     mSearchTimer += deltaTime;
@@ -396,7 +396,7 @@ void BasicEnemy::UpdateSearching(float deltaTime)
         mCurrentState = AIState::ReturningToPatrol;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Search timed out -> ReturningToPatrol");
+            SDL_Log("Enemy: Search timed out -> ReturningToPatrol");
         }
         return;
     }
@@ -412,7 +412,7 @@ void BasicEnemy::UpdateSearching(float deltaTime)
         mCurrentState = AIState::Chase;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Player re-detected during search -> Chase");
+            SDL_Log("Enemy: Player re-detected during search -> Chase");
         }
         return;
     }
@@ -427,7 +427,7 @@ void BasicEnemy::UpdateSearching(float deltaTime)
         mCurrentState = AIState::ReturningToPatrol;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Reached last known position but player not found -> ReturningToPatrol");
+            SDL_Log("Enemy: Reached last known position but player not found -> ReturningToPatrol");
         }
         return;
     }
@@ -449,7 +449,7 @@ void BasicEnemy::UpdateSearching(float deltaTime)
     }
 }
 
-void BasicEnemy::UpdateReturningToPatrol(float deltaTime)
+void Enemy::UpdateReturningToPatrol(float deltaTime)
 {
     // Check if player re-enters detection range while returning
     bool playerInProximity = IsPlayerInProximity();
@@ -461,7 +461,7 @@ void BasicEnemy::UpdateReturningToPatrol(float deltaTime)
         mCurrentState = AIState::Chase;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Player detected while returning -> Chase");
+            SDL_Log("Enemy: Player detected while returning -> Chase");
         }
         return;
     }
@@ -484,7 +484,7 @@ void BasicEnemy::UpdateReturningToPatrol(float deltaTime)
         mCurrentWaypoint = nearestWaypoint;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: Reached patrol area -> Patrol");
+            SDL_Log("Enemy: Reached patrol area -> Patrol");
         }
         return;
     }
@@ -506,7 +506,7 @@ void BasicEnemy::UpdateReturningToPatrol(float deltaTime)
     }
 }
 
-void BasicEnemy::UpdateAttack(float deltaTime)
+void Enemy::UpdateAttack(float deltaTime)
 {
     const ShadowCat* player = mGame->GetPlayer();
     if (!player) return;
@@ -537,7 +537,7 @@ void BasicEnemy::UpdateAttack(float deltaTime)
         
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy attacked player for %d damage!", mAttackDamage);
+            SDL_Log("Enemy attacked player for %d damage!", mAttackDamage);
         }
         
         // Play hit animation (brief attack indication)
@@ -545,7 +545,7 @@ void BasicEnemy::UpdateAttack(float deltaTime)
     }
 }
 
-void BasicEnemy::OnDebugDraw(Renderer* renderer)
+void Enemy::OnDebugDraw(class Renderer* renderer)
 {
     if (!mGame->IsDebugging()) return;
     
@@ -780,7 +780,7 @@ void BasicEnemy::OnDebugDraw(Renderer* renderer)
     }
 }
 
-void BasicEnemy::Kill()
+void Enemy::Kill()
 {
     if (mIsDead) return;  // Prevent multiple death triggers
 
