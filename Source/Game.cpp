@@ -287,7 +287,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			// BasicEnemy (WhiteCat)
 			else if (tileID == 12)
 			{
-				auto enemy = new BasicEnemy(this);
+				auto enemy = new BasicEnemy(this, 0.0f, 100.0f);
 				enemy->SetPosition(position);
 			}
 			// BasicEnemy with larger patrol (WhiteCat2)
