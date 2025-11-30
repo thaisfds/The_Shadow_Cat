@@ -2,7 +2,7 @@
 #include "../Game.h"
 #include "../GameConstants.h"
 #include "../Components/Drawing/AnimatorComponent.h"
-#include "../Components/Physics/AABBColliderComponent.h"
+#include "../Components/Physics/ColliderComponent.h"
 
 Block::Block(Game *game, const std::string &texturePath)
 	: Actor(game)

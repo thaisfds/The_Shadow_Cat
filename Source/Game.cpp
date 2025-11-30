@@ -475,12 +475,12 @@ void Game::RemoveDrawable(class DrawComponent *drawable)
 	mDrawables.erase(iter);
 }
 
-void Game::AddCollider(class AABBColliderComponent *collider)
+void Game::AddCollider(class ColliderComponent *collider)
 {
 	mColliders.emplace_back(collider);
 }
 
-void Game::RemoveCollider(AABBColliderComponent *collider)
+void Game::RemoveCollider(ColliderComponent *collider)
 {
 	auto iter = std::find(mColliders.begin(), mColliders.end(), collider);
 	mColliders.erase(iter);

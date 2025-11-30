@@ -20,7 +20,7 @@ private:
 
 	class AnimatorComponent *mAnimatorComponent;
 	class RigidBodyComponent *mRigidBodyComponent;
-	class AABBColliderComponent *mColliderComponent;
+	class ColliderComponent *mColliderComponent;
 };
 
 class AnimatedParticleSystemComponent : public Component

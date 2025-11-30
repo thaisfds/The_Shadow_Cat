@@ -21,7 +21,7 @@ private:
 
     class DrawComponent *mDrawComponent;
     class RigidBodyComponent *mRigidBodyComponent;
-    class AABBColliderComponent *mColliderComponent;
+    class ColliderComponent *mColliderComponent;
 };
 
 class ParticleSystemComponent : public Component

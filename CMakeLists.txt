@@ -31,8 +31,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/Drawing/DrawComponent.h
         Source/Components/Physics/RigidBodyComponent.cpp
         Source/Components/Physics/RigidBodyComponent.h
-        Source/Components/Physics/AABBColliderComponent.cpp
-        Source/Components/Physics/AABBColliderComponent.h
+        Source/Components/Physics/ColliderComponent.cpp
+        Source/Components/Physics/ColliderComponent.h
         Source/Components/ParticleSystemComponent.cpp
         Source/Components/ParticleSystemComponent.h
         Source/Renderer/Renderer.cpp
@@ -82,8 +82,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Characters/Dummy.cpp
         Source/Actors/Characters/Dummy.h
         Source/GameConstants.h
-        Source/Components/Physics/PhysicsUtils.cpp
-        Source/Components/Physics/PhysicsUtils.h
+        Source/Components/Physics/Physics.cpp
+        Source/Components/Physics/Physics.h
         Source/Actors/DebugActor.cpp
         Source/Actors/DebugActor.h
         Source/Components/AnimatedParticleSystemComponent.cpp
@@ -91,6 +91,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/Dash.cpp
         Source/Components/Skills/Dash.h
         Source/Components/Physics/CollisionFilter.h
+        Source/Components/Physics/Collider.cpp
+        Source/Components/Physics/Collider.h
 )
 
 configure_local_linking(${PROJECT_NAME})

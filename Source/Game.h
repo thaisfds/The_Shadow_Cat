@@ -52,9 +52,9 @@ public:
     std::vector<class DrawComponent *> &GetDrawables() { return mDrawables; }
 
     // Collider functions
-    void AddCollider(class AABBColliderComponent *collider);
-    void RemoveCollider(class AABBColliderComponent *collider);
-    std::vector<class AABBColliderComponent *> &GetColliders() { return mColliders; }
+    void AddCollider(class ColliderComponent *collider);
+    void RemoveCollider(class ColliderComponent *collider);
+    std::vector<class ColliderComponent *> &GetColliders() { return mColliders; }
 
     // Camera functions
     Vector2 &GetCameraPos() { return mCameraPos; };
@@ -96,7 +96,7 @@ private:
     std::vector<class DrawComponent *> mDrawables;
 
     // All the collision components
-    std::vector<class AABBColliderComponent *> mColliders;
+    std::vector<class ColliderComponent *> mColliders;
 
     // All UI screens in the game
     std::vector<class UIScreen*> mUIStack;
