@@ -1,9 +1,11 @@
 #include "BasicEnemy.h"
+#include "ShadowCat.h"
 #include "../../Game.h"
 #include "../../GameConstants.h"
 #include "../../Components/Drawing/AnimatorComponent.h"
-#include "../../Components/Physics/RigidBodyComponent.h"
 #include "../../Components/Physics/AABBColliderComponent.h"
+#include "../../Components/Physics/RigidBodyComponent.h"
+#include "../../Renderer/Renderer.h"
 #include <SDL.h>
 
 BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistance)
@@ -13,6 +15,8 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mPatrolDistance(patrolDistance)
     , mPatrolDirection(1)
     , mPatrolSpeed(50.0f)
+    , mDetectionRadius(300.0f)
+    , mPlayerDetected(false)
 {
     // Use WhiteCat sprite
     mAnimatorComponent = new AnimatorComponent(this, "ShadowCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
@@ -64,6 +68,14 @@ void BasicEnemy::OnUpdate(float deltaTime)
     
     // Don't move if dead
     if (mIsDead) return;
+    
+    // Check for player detection
+    mPlayerDetected = IsPlayerInRange();
+    
+    if (mGame->IsDebugging() && mPlayerDetected)
+    {
+        SDL_Log("BasicEnemy detected player!");
+    }
     
     // Set patrol start position on first update (when position is valid)
     if (mPatrolStartPos.x == 0.0f && mPatrolStartPos.y == 0.0f)
@@ -134,6 +146,49 @@ void BasicEnemy::TakeDamage(int damage)
     {
         // Play hit animation
         mAnimatorComponent->PlayAnimationOnce("Hit");
+    }
+}
+
+bool BasicEnemy::IsPlayerInRange() const
+{
+    const ShadowCat* player = mGame->GetPlayer();
+    if (!player) return false;
+    
+    Vector2 toPlayer = player->GetPosition() - mPosition;
+    float distanceSquared = toPlayer.LengthSq();
+    float detectionRadiusSquared = mDetectionRadius * mDetectionRadius;
+    
+    return distanceSquared <= detectionRadiusSquared;
+}
+
+void BasicEnemy::OnDebugDraw(Renderer* renderer)
+{
+    if (!mGame->IsDebugging()) return;
+    
+    // Draw detection radius as a circle (approximated with points)
+    Vector3 detectionColor = mPlayerDetected ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(1.0f, 1.0f, 0.0f); // Red : Yellow
+    
+    // Draw detection circle by drawing multiple points
+    const int segments = 32;
+    const float angleStep = Math::TwoPi / segments;
+    
+    for (int i = 0; i < segments; i++)
+    {
+        float angle1 = i * angleStep;
+        float angle2 = (i + 1) * angleStep;
+        
+        Vector2 p1 = mPosition + Vector2(
+            Math::Cos(angle1) * mDetectionRadius,
+            Math::Sin(angle1) * mDetectionRadius
+        );
+        
+        Vector2 p2 = mPosition + Vector2(
+            Math::Cos(angle2) * mDetectionRadius,
+            Math::Sin(angle2) * mDetectionRadius
+        );
+        
+        // Draw small rects at each point to form a circle
+        renderer->DrawRect(p1, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
     }
 }
 

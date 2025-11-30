@@ -10,6 +10,8 @@ public:
     void OnUpdate(float deltaTime) override;
     void TakeDamage(int damage) override;
     void Kill() override;
+    
+    void OnDebugDraw(class Renderer* renderer);
 
 private:
     float mDeathTimer;
@@ -20,4 +22,10 @@ private:
     float mPatrolDistance;
     int mPatrolDirection;  // 1 for right, -1 for left
     float mPatrolSpeed;
+    
+    // Player detection
+    float mDetectionRadius;
+    bool mPlayerDetected;
+    
+    bool IsPlayerInRange() const;
 };

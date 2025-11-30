@@ -600,8 +600,18 @@ void Game::GenerateOutput()
 
 		if (mIsDebugging)
 		{
-			// Call draw for actor components
-			for (auto comp : drawable->GetOwner()->GetComponents())
+			// Call debug draw for actor
+			auto actor = drawable->GetOwner();
+			
+			// Check if actor is a BasicEnemy and call its debug draw
+			auto basicEnemy = dynamic_cast<BasicEnemy*>(actor);
+			if (basicEnemy)
+			{
+				basicEnemy->OnDebugDraw(mRenderer);
+			}
+			
+			// Call debug draw for actor components
+			for (auto comp : actor->GetComponents())
 			{
 				comp->DebugDraw(mRenderer);
 			}
