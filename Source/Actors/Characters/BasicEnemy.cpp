@@ -21,7 +21,7 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mPlayerDetected(false)
 {
     // Use WhiteCat sprite
-    mAnimatorComponent = new AnimatorComponent(this, "ShadowCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+    mAnimatorComponent = new AnimatorComponent(this, "WhiteCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
     CollisionFilter collisionFilter = {
         CollisionFilter::GroupMask({CollisionGroup::Enemy}),
