@@ -24,8 +24,10 @@ void Character::OnUpdate(float deltaTime)
 {
     Vector2 pos = GetPosition();
     const float margin = 15.0f;
-    const float maxX = GameConstants::LEVEL_WIDTH * GameConstants::TILE_SIZE - margin;
-    const float maxY = GameConstants::LEVEL_HEIGHT * GameConstants::TILE_SIZE - margin;
+    
+    // Use actual level dimensions from Game instead of constants
+    const float maxX = mGame->GetLevelWidth() * GameConstants::TILE_SIZE - margin;
+    const float maxY = mGame->GetLevelHeight() * GameConstants::TILE_SIZE - margin;
 
     mPosition.x = Math::Clamp(mPosition.x, margin, maxX);
     mPosition.y = Math::Clamp(mPosition.y, margin, maxY);
