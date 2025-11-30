@@ -6,9 +6,9 @@
     - [x] keyboard WASD
     - [x] gamepad 
 - [ ] [Juan] Create enemy
-    - [ ] Basic static
-    - [ ] Patrol mode
-    - [ ] Detects player
+    - [x] Basic static
+    - [x] Patrol mode
+    - [x] Detects player
     - [ ] Chases player
         - [ ] Handling obstacles in path
     - [ ] Attacks player
