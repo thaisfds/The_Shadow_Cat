@@ -7,16 +7,20 @@
 class HUD : public UIScreen
 {
 public:
-    HUD(class Game* game, const std::string& fontName);
+    HUD(class Game* game, const std::string& fontName, int maxHealth = 6);
 
     void SetHealth(int health);
-    void SetScore(int score);
+    void UpdateMaxHealth(int maxHealth);
 
 private:
+    int mHealth;
+    int mMaxHealth;
 
+    // Health image handling
+    void InitHealthIcons();
+    
     // HUD elements
-    UIImage *mHealth1;
-    UIImage *mHealth2;
-    UIImage *mHealth3;
-    UIText  *mScore;
+    std::vector<UIImage*> mFullHeartIcons;
+    std::vector<UIImage*> mHalfHeartIcons;
+    std::vector<UIImage*> mEmptyHeartIcons;
 };

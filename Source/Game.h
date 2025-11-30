@@ -130,6 +130,7 @@ private:
     // Game-specific
     class ShadowCat *mShadowCat;
     class HUD *mHUD;
+    class TutorialHUD *mTutorialHUD;
     int **mLevelData;
 
     class std::vector<StompActor*> mStompActors;
