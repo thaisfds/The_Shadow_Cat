@@ -14,6 +14,11 @@ Character::Character(class Game *game, float forwardSpeed)
     , mIsMoving(false)
     , hp(10)
 {
+    if (mGame->IsDebugging())
+    {
+        SDL_Log("Character spawned at position: (%.2f, %.2f)", mPosition.x, mPosition.y);
+        SDL_Log("Level dimensions at spawn: %d x %d tiles", mGame->GetLevelWidth(), mGame->GetLevelHeight());
+    }
 }
 
 Character::~Character()
@@ -24,8 +29,20 @@ void Character::OnUpdate(float deltaTime)
 {
     Vector2 pos = GetPosition();
     const float margin = 15.0f;
-    const float maxX = GameConstants::LEVEL_WIDTH * GameConstants::TILE_SIZE - margin;
-    const float maxY = GameConstants::LEVEL_HEIGHT * GameConstants::TILE_SIZE - margin;
+    
+    // Use actual level dimensions from Game instead of constants
+    const float maxX = mGame->GetLevelWidth() * GameConstants::TILE_SIZE - margin;
+    const float maxY = mGame->GetLevelHeight() * GameConstants::TILE_SIZE - margin;
+
+    if (mGame->IsDebugging())
+    {
+        static bool printed = false;
+        if (!printed) {
+            SDL_Log("Level dimensions: %d x %d tiles", mGame->GetLevelWidth(), mGame->GetLevelHeight());
+            SDL_Log("Max boundaries: %.2f x %.2f", maxX, maxY);
+            printed = true;
+        }
+    }
 
     mPosition.x = Math::Clamp(mPosition.x, margin, maxX);
     mPosition.y = Math::Clamp(mPosition.y, margin, maxY);

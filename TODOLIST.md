@@ -7,15 +7,18 @@
     - [x] gamepad 
 - [ ] [Juan] Create enemy
     - [ ] Basic static
-    - [ ] smart
+    - [ ] Patrol behaviour
+    - [ ] Chase player when nearby
+    - [ ] Full state machine
+    - [ ] Drop stuff when killed?
 - [ ] [Juan] Player basic combat 
     - [ ] basic
     - [ ] charged
     - [ ] special
     - [ ] dodge and invulnerability frame
-- [ ] [Juan] Implement camera follow and room bounds
+- [x] [Juan] Implement camera follow and room bounds
 - [ ] [_____] Load levels from CSV/TMX
-    - [ ] Forest
+    - [ ] Forest (Level 1)
     - [ ] Surroundings
     - [ ] City
     - [ ] Castle
