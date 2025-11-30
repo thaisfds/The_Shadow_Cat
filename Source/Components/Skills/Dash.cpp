@@ -3,14 +3,14 @@
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../../Game.h"
 #include "../Drawing/AnimatorComponent.h"
-#include "../Physics/AABBColliderComponent.h"
+#include "../Physics/ColliderComponent.h"
 
 Dash::Dash(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
 {
 	mName = "Dash";
 	mDescription = "Quickly dash in a direction to evade attacks.";
-	mCooldown = 2.0f;
+	mCooldown = 0.0f;
 	mCurrentCooldown = 0.0f;
 	mIsDashing = false;
 
@@ -57,10 +57,10 @@ void Dash::Execute()
 	mIsDashing = true;
 	mDashTimer = 0.0f;
 
-	CollisionFilter filter = mCharacter->GetComponent<AABBColliderComponent>()->GetFilter();
+	CollisionFilter filter = mCharacter->GetComponent<ColliderComponent>()->GetFilter();
 	filter.collidesWith = CollisionFilter::RemoveGroups(filter.collidesWith,
 		{CollisionGroup::Player, CollisionGroup::Enemy, CollisionGroup::PlayerSkills, CollisionGroup::EnemySkills});
-	mCharacter->GetComponent<AABBColliderComponent>()->SetFilter(filter);
+	mCharacter->GetComponent<ColliderComponent>()->SetFilter(filter);
 
 	StartCooldown();
 }
@@ -70,7 +70,7 @@ void Dash::EndDash()
 	mCharacter->SetAnimationLock(false);
 	mCharacter->SetMovementLock(false);
 
-	mCharacter->GetComponent<AABBColliderComponent>()->SetFilter(
+	mCharacter->GetComponent<ColliderComponent>()->SetFilter(
 		Character::GetBasePlayerFilter()
 	);
 

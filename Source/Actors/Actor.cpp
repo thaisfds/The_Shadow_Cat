@@ -61,14 +61,6 @@ void Actor::OnProcessInput(const Uint8 *keyState)
 {
 }
 
-void Actor::OnHorizontalCollision(const float minOverlap, AABBColliderComponent *other)
-{
-}
-
-void Actor::OnVerticalCollision(const float minOverlap, AABBColliderComponent *other)
-{
-}
-
 void Actor::Kill()
 {
 }

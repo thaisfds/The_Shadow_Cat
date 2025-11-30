@@ -7,7 +7,7 @@
 #include "../../GameConstants.h"
 #include "../../Components/Drawing/AnimatorComponent.h"
 #include "../../Components/Physics/RigidBodyComponent.h"
-#include "../../Components/Physics/AABBColliderComponent.h"
+#include "../../Components/Physics/ColliderComponent.h"
 #include "../../Components/ParticleSystemComponent.h"
 #include "../../Components/Skills/SkillInputHandler.h"
 #include "Character.h"
@@ -18,10 +18,19 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
 {
     mAnimatorComponent = new AnimatorComponent(this, "ShadowCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
-    mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, GetBasePlayerFilter());
+    
+    Collider *collider = new AABBCollider(GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+    mColliderComponent = new ColliderComponent(this, 0, 0, collider, GetBasePlayerFilter());
     
     mSkillInputHandler = new SkillInputHandler(this);
     mRigidBodyComponent->SetApplyGravity(false);
+
+    // Setup animations
+    mAnimatorComponent->AddAnimation("Idle", {0});
+    mAnimatorComponent->AddAnimation("Run", {0, 1, 2, 3});
+    mAnimatorComponent->AddAnimation("BasicAttack", {4, 5, 6, 7, 8, 0});
+    
+    mAnimatorComponent->LoopAnimation("Idle");
 }
 
 void ShadowCat::OnProcessInput(const uint8_t *state)
@@ -122,13 +131,5 @@ void ShadowCat::OnUpdate(float deltaTime)
 }
 
 void ShadowCat::Kill()
-{
-}
-
-void ShadowCat::OnHorizontalCollision(const float minOverlap, AABBColliderComponent *other)
-{
-}
-
-void ShadowCat::OnVerticalCollision(const float minOverlap, AABBColliderComponent *other)
 {
 }

@@ -5,6 +5,7 @@
 #include "Actors/Characters/Dummy.h"
 #include "CSV.h"
 #include "Game.h"
+#include "Components/Skills/Stomp.h"
 #include "GameConstants.h"
 #include "Components/Drawing/DrawComponent.h"
 #include "Components/Physics/RigidBodyComponent.h"
@@ -17,20 +18,23 @@
 #include "Actors/Spawner.h"
 #include "Actors/Characters/ShadowCat.h"
 #include "Components/AnimatedParticleSystemComponent.h"
+#include "Actors/Characters/BasicEnemy.h"
 
 Game::Game()
 	: mWindow(nullptr),
 	mRenderer(nullptr),
 	mTicksCount(0),
 	mIsRunning(true),
-	mIsDebugging(false),
+	mIsDebugging(true),
 	mUpdatingActors(false),
 	mCameraPos(Vector2::Zero),
 	mLevelData(nullptr),
 	mAudio(nullptr),
     mHUD(nullptr),
 	mShadowCat(nullptr),
-	mController(nullptr)
+	mController(nullptr),
+	mLevelWidth(0),
+	mLevelHeight(0)
 {
 }
 
@@ -98,7 +102,7 @@ bool Game::Initialize()
     mAudio->CacheAllSounds();
 
 	// First scene
-    SetScene(GameScene::MainMenu);
+    SetScene(GameScene::Lobby);
 
 	mTicksCount = SDL_GetTicks();
 
@@ -136,7 +140,7 @@ void Game::SetScene(GameScene nextScene)
 			new MainMenu(this, "../Assets/Fonts/Pixellari.ttf");
             break;
 
-		case GameScene::Lobby:
+        case GameScene::Lobby:
             mCurrentScene = GameScene::Lobby;
 
 			InitializeActors();
@@ -151,7 +155,7 @@ void Game::SetScene(GameScene nextScene)
 
         case GameScene::Level1:
             mCurrentScene = GameScene::Level1;
-
+            InitializeActors();
             break;
     }
 }
@@ -164,66 +168,95 @@ void Game::InitializeActors()
 	mAttackTrailActor = new Actor(this);
     new AnimatedParticleSystemComponent(mAttackTrailActor, "AttackTrailAnim", false);
 
-	mLevelData = LoadLevel("../Assets/Levels/Lobby/Lobby.csv", GameConstants::LEVEL_WIDTH, GameConstants::LEVEL_HEIGHT);
+	std::string levelPath;
+	
+	// Choose level based on current scene
+	if (mCurrentScene == GameScene::Lobby) {
+		levelPath = "../Assets/Levels/Lobby/Lobby.csv";
+	} else if (mCurrentScene == GameScene::Level1) {
+		levelPath = "../Assets/Levels/Level1/Level1.csv";
+	} else {
+		levelPath = "../Assets/Levels/Lobby/Lobby.csv";
+	}
+
+	mLevelData = LoadLevel(levelPath, mLevelWidth, mLevelHeight);
 
 	if (mLevelData)
 	{
-		BuildLevel(mLevelData, GameConstants::LEVEL_WIDTH, GameConstants::LEVEL_HEIGHT);
+		BuildLevel(mLevelData, mLevelWidth, mLevelHeight);
 	}
 }
 
-int **Game::LoadLevel(const std::string &fileName, int width, int height)
+int **Game::LoadLevel(const std::string &fileName, int &outWidth, int &outHeight)
 {
-	int **levelData = new int *[height];
-	for (int i = 0; i < height; ++i)
-	{
-		levelData[i] = new int[width];
-	}
-
 	std::ifstream levelFile(fileName);
 	if (!levelFile.is_open())
 	{
 		SDL_Log("Failed to open level file: %s", fileName.c_str());
-		for (int i = 0; i < height; ++i)
-		{
-			delete[] levelData[i];
-		}
-		delete[] levelData;
 		return nullptr;
 	}
 
+	// First pass: read all data and determine dimensions
+	std::vector<std::vector<int>> tempData;
 	std::string line;
+	int maxWidth = 0;
 
-	for (int i = 0; i < height; ++i)
+	while (std::getline(levelFile, line))
 	{
-		if (std::getline(levelFile, line))
+		std::vector<int> row = CSVHelper::Split(line);
+		if (row.size() > maxWidth)
 		{
-			std::vector<int> row = CSVHelper::Split(line);
-			for (int j = 0; j < width; ++j)
+			maxWidth = row.size();
+		}
+		tempData.push_back(row);
+	}
+
+	outHeight = tempData.size();
+	outWidth = maxWidth;
+
+	if (outHeight == 0 || outWidth == 0)
+	{
+		SDL_Log("Invalid level dimensions: %d x %d", outWidth, outHeight);
+		return nullptr;
+	}
+
+	// Allocate level data array
+	int **levelData = new int *[outHeight];
+	for (int i = 0; i < outHeight; ++i)
+	{
+		levelData[i] = new int[outWidth];
+	}
+
+	// Fill level data from temp data
+	for (int i = 0; i < outHeight; ++i)
+	{
+		for (int j = 0; j < outWidth; ++j)
+		{
+			if (j < tempData[i].size())
 			{
-				if (j < row.size())
-				{
-					levelData[i][j] = row[j];
-				}
-				else
-				{
-					levelData[i][j] = 0;
-				}
+				levelData[i][j] = tempData[i][j];
+			}
+			else
+			{
+				levelData[i][j] = 0;
 			}
 		}
 	}
 
-	SDL_Log("--- Level CSV Content ---");
-	for (int i = 0; i < height; ++i)
+	if (mIsDebugging)
 	{
-		std::string rowStr = "";
-		for (int j = 0; j < width; ++j)
+		SDL_Log("--- Level CSV Content (%d x %d) ---", outWidth, outHeight);
+		for (int i = 0; i < outHeight; ++i)
 		{
-			rowStr += std::to_string(levelData[i][j]) + " ";
+			std::string rowStr = "";
+			for (int j = 0; j < outWidth; ++j)
+			{
+				rowStr += std::to_string(levelData[i][j]) + " ";
+			}
+			SDL_Log("%s", rowStr.c_str());
 		}
-		SDL_Log("%s", rowStr.c_str());
+		SDL_Log("-----------------------------");
 	}
-	SDL_Log("-----------------------------");
 
 	return levelData;
 }
@@ -258,6 +291,18 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			{
 				auto dummy = new Dummy(this);
 				dummy->SetPosition(position);
+			}
+			// BasicEnemy (WhiteCat)
+			else if (tileID == 12)
+			{
+				auto enemy = new BasicEnemy(this);
+				enemy->SetPosition(position);
+			}
+			// BasicEnemy with larger patrol (WhiteCat2)
+			else if (tileID == 13)
+			{
+				auto enemy = new BasicEnemy(this, 0.0f, 400.0f);
+				enemy->SetPosition(position);
 			}
 		}
 	}
@@ -442,6 +487,28 @@ void Game::UpdateCamera()
 		// Center camera on ShadowCat by subtracting half of window dimensions
 		mCameraPos.x = targetX - (GameConstants::WINDOW_WIDTH / 2.0f);
 		mCameraPos.y = targetY - (GameConstants::WINDOW_HEIGHT / 2.0f);
+
+		// Since lobby is small, we allow camera to go out of bounds
+		if (mCurrentScene == GameScene::Lobby)
+			return;
+		
+		// Clamp camera to level boundaries
+		float levelPixelWidth = static_cast<float>(mLevelWidth) * static_cast<float>(GameConstants::TILE_SIZE);
+		float levelPixelHeight = static_cast<float>(mLevelHeight) * static_cast<float>(GameConstants::TILE_SIZE);
+
+		// Prevent camera from showing area outside the level
+		float maxCameraX = levelPixelWidth - GameConstants::WINDOW_WIDTH;
+		float maxCameraY = levelPixelHeight - GameConstants::WINDOW_HEIGHT;
+
+		// Clamp camera position
+		if (mCameraPos.x < 0.0f)
+			mCameraPos.x = 0.0f;
+		if (mCameraPos.y < 0.0f)
+			mCameraPos.y = 0.0f;
+		if (mCameraPos.x > maxCameraX)
+			mCameraPos.x = maxCameraX;
+		if (mCameraPos.y > maxCameraY)
+			mCameraPos.y = maxCameraY;
 	}
 }
 
@@ -490,12 +557,12 @@ void Game::RemoveDrawable(class DrawComponent *drawable)
 	mDrawables.erase(iter);
 }
 
-void Game::AddCollider(class AABBColliderComponent *collider)
+void Game::AddCollider(class ColliderComponent *collider)
 {
 	mColliders.emplace_back(collider);
 }
 
-void Game::RemoveCollider(AABBColliderComponent *collider)
+void Game::RemoveCollider(ColliderComponent *collider)
 {
 	auto iter = std::find(mColliders.begin(), mColliders.end(), collider);
 	mColliders.erase(iter);
@@ -506,11 +573,21 @@ void Game::GenerateOutput()
 	// Clear back buffer
 	mRenderer->Clear();
 
-	Texture *backgroundTexture = mRenderer->GetTexture("../Assets/Levels/Lobby/LobbyBackground.png");
+	// Get background texture based on current scene
+	std::string backgroundPath;
+	if (mCurrentScene == GameScene::Lobby) {
+		backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
+	} else if (mCurrentScene == GameScene::Level1) {
+		backgroundPath = "../Assets/Levels/Level1/Level1Background.png";
+	} else {
+		backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
+	}
+
+	Texture *backgroundTexture = mRenderer->GetTexture(backgroundPath);
 	if (backgroundTexture)
 	{
-		float levelPixelWidth = static_cast<float>(GameConstants::LEVEL_WIDTH) * static_cast<float>(GameConstants::TILE_SIZE);
-		float levelPixelHeight = static_cast<float>(GameConstants::LEVEL_HEIGHT) * static_cast<float>(GameConstants::TILE_SIZE);
+		float levelPixelWidth = static_cast<float>(mLevelWidth) * static_cast<float>(GameConstants::TILE_SIZE);
+		float levelPixelHeight = static_cast<float>(mLevelHeight) * static_cast<float>(GameConstants::TILE_SIZE);
 
 		float desiredWidth = levelPixelWidth;
 		float desiredHeight = levelPixelHeight;
@@ -571,7 +648,7 @@ void Game::Shutdown()
 	// Delete level data
 	if (mLevelData)
 	{
-		for (int i = 0; i < GameConstants::LEVEL_HEIGHT; ++i)
+		for (int i = 0; i < mLevelHeight; ++i)
 		{
 			delete[] mLevelData[i];
 		}
@@ -611,4 +688,20 @@ Vector2 Game::GetMouseWorldPosition()
 	worldPos.y = static_cast<float>(mouseY) + mCameraPos.y;
 
 	return worldPos;
+}
+
+StompActor* Game::GetStompActor()
+{
+	StompActor *stomp = nullptr;
+	for (auto actor : mStompActors)
+		if (actor->IsDead())
+			stomp = actor;
+
+	if (!stomp)
+	{
+		stomp = new StompActor(this);
+		mStompActors.push_back(stomp);
+	}
+	
+	return stomp;
 }

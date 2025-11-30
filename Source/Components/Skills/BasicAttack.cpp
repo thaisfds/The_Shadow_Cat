@@ -5,8 +5,8 @@
 #include "../../Actors/Characters/Character.h"
 #include "../Drawing/AnimatorComponent.h"
 #include "../Drawing/DrawComponent.h"
-#include "../Physics/AABBColliderComponent.h"
-#include "../Physics/PhysicsUtils.h"
+#include "../Physics/ColliderComponent.h"
+#include "../Physics/Physics.h"
 #include "../../Game.h"
 
 
@@ -51,7 +51,7 @@ void BasicAttack::Update(float deltaTime)
         filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::PlayerSkills});
         filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Enemy});
         
-        auto hitColliders = PhysicsUtils::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mAttackDirection, mConeAngle, mConeRadius, filter);
+        auto hitColliders = Physics::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mAttackDirection, mConeAngle, mConeRadius, filter);
         for (auto collider : hitColliders)
         {
             auto enemyActor = collider->GetOwner();

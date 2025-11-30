@@ -4,7 +4,7 @@
 
 class RigidBodyComponent;
 class AnimatorComponent;
-class AABBColliderComponent;
+class ColliderComponent;
 
 class Character : public Actor
 {
@@ -46,7 +46,7 @@ protected:
 
     class RigidBodyComponent *mRigidBodyComponent;
     class AnimatorComponent *mAnimatorComponent;
-    class AABBColliderComponent *mColliderComponent;
+    class ColliderComponent *mColliderComponent;
 
     float mForwardSpeed;
 

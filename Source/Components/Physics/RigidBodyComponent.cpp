@@ -7,7 +7,7 @@
 #include "../../Game.h"
 #include "../../GameConstants.h"
 #include "RigidBodyComponent.h"
-#include "AABBColliderComponent.h"
+#include "ColliderComponent.h"
 
 RigidBodyComponent::RigidBodyComponent(class Actor* owner, float mass, float friction, bool applyGravity, int updateOrder)
         :Component(owner, updateOrder)
@@ -50,23 +50,15 @@ void RigidBodyComponent::Update(float deltaTime)
         mVelocity.x = 0.f;
     }
 
-    auto collider = mOwner->GetComponent<AABBColliderComponent>();
+    auto collider = mOwner->GetComponent<ColliderComponent>();
 
-    mOwner->SetPosition(Vector2(mOwner->GetPosition().x + mVelocity.x * deltaTime,
-                                     mOwner->GetPosition().y));
+    Vector2 pos = mOwner->GetPosition();
+    pos.x += mVelocity.x * deltaTime;
+    pos.y += mVelocity.y * deltaTime;
 
-    if (collider)
-    {
-        collider->DetectHorizontalCollision(this);
-    }
+    mOwner->SetPosition(pos);
 
-    mOwner->SetPosition(Vector2(mOwner->GetPosition().x,
-                                    mOwner->GetPosition().y + mVelocity.y * deltaTime));
-
-    if (collider)
-    {
-        collider->DetectVertialCollision(this);
-    }
+    if (collider) collider->DetectCollisions(this);
 
     mAcceleration.Set(0.f, 0.f);
 }
