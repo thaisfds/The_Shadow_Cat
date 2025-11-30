@@ -100,7 +100,7 @@ bool Game::Initialize()
     mAudio->CacheAllSounds();
 
 	// First scene
-    SetScene(GameScene::MainMenu);
+    SetScene(GameScene::Lobby);
 
 	mTicksCount = SDL_GetTicks();
 
@@ -136,15 +136,18 @@ void Game::SetScene(GameScene nextScene)
 			// Main menu back music
 			// mAudio->PlaySound("Music.ogg", true);
 
-			InitializeActors();
-
 			// Still debugging this
 			// new MainMenu(this, "../Assets/Fonts/arial.ttf");
             break;
 
+        case GameScene::Lobby:
+            mCurrentScene = GameScene::Lobby;
+            InitializeActors();
+            break;
+
         case GameScene::Level1:
             mCurrentScene = GameScene::Level1;
-
+            InitializeActors();
             break;
     }
 }
