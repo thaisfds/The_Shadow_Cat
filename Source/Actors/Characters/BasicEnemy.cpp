@@ -21,6 +21,10 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mPatrolPauseTimer(0.0f)
     , mPatrolPauseDuration(0.75f)  // Pause for 0.75 seconds before turning
     , mChaseSpeed(80.0f)
+    , mLastKnownPlayerPos(Vector2::Zero)
+    , mSearchTimer(0.0f)
+    , mSearchDuration(5.0f)  // Search for 5 seconds before giving up
+    , mSearchSpeed(60.0f)  // Slower than chase speed
     , mAttackRange(64.0f)
     , mAttackCooldown(1.5f)
     , mAttackTimer(0.0f)
@@ -126,11 +130,13 @@ void BasicEnemy::OnUpdate(float deltaTime)
     }
     else if ((mCurrentState == AIState::Chase || mCurrentState == AIState::Attack) && !playerInChaseRange)
     {
-        // Return to patrol when player leaves chase range completely
-        mCurrentState = AIState::Patrol;
+        // Player left chase range - enter Searching state
+        mCurrentState = AIState::Searching;
+        mSearchTimer = 0.0f;  // Reset search timer
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: -> Patrol");
+            SDL_Log("BasicEnemy: Player lost -> Searching (last known: %.2f, %.2f)", 
+                    mLastKnownPlayerPos.x, mLastKnownPlayerPos.y);
         }
     }
     
@@ -145,6 +151,9 @@ void BasicEnemy::OnUpdate(float deltaTime)
             break;
         case AIState::Chase:
             UpdateChase(deltaTime);
+            break;
+        case AIState::Searching:
+            UpdateSearching(deltaTime);
             break;
         case AIState::Attack:
             UpdateAttack(deltaTime);
@@ -381,6 +390,9 @@ void BasicEnemy::UpdateChase(float deltaTime)
     const ShadowCat* player = mGame->GetPlayer();
     if (!player) return;
     
+    // Update last known position while chasing
+    mLastKnownPlayerPos = player->GetPosition();
+    
     // Calculate direction to player
     Vector2 toPlayer = player->GetPosition() - mPosition;
     toPlayer.Normalize();
@@ -395,6 +407,68 @@ void BasicEnemy::UpdateChase(float deltaTime)
         SetScale(Vector2(1.0f, 1.0f));
     }
     else if (toPlayer.x < 0.0f)
+    {
+        SetScale(Vector2(-1.0f, 1.0f));
+    }
+}
+
+void BasicEnemy::UpdateSearching(float deltaTime)
+{
+    // Count down search timer
+    mSearchTimer += deltaTime;
+    
+    // Give up searching after duration expires
+    if (mSearchTimer >= mSearchDuration)
+    {
+        mCurrentState = AIState::Patrol;
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy: Search timed out -> Patrol");
+        }
+        return;
+    }
+    
+    // Check if player has re-entered detection range
+    bool playerInProximity = IsPlayerInProximity();
+    bool playerInCone = IsPlayerInRange();
+    
+    if (playerInProximity || playerInCone)
+    {
+        // Found the player again!
+        mCurrentState = AIState::Chase;
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy: Player re-detected during search -> Chase");
+        }
+        return;
+    }
+    
+    // Calculate direction to last known position
+    Vector2 toLastKnown = mLastKnownPlayerPos - mPosition;
+    float distanceToLastKnown = toLastKnown.Length();
+    
+    // If we've reached the last known position, give up
+    if (distanceToLastKnown < 20.0f)  // Within 20 pixels (close enough)
+    {
+        mCurrentState = AIState::Patrol;
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy: Reached last known position but player not found -> Patrol");
+        }
+        return;
+    }
+    
+    // Move toward last known position
+    toLastKnown.Normalize();
+    Vector2 velocity = toLastKnown * mSearchSpeed;
+    mRigidBodyComponent->SetVelocity(velocity);
+    
+    // Update sprite facing direction based on movement
+    if (toLastKnown.x > 0.0f)
+    {
+        SetScale(Vector2(1.0f, 1.0f));
+    }
+    else if (toLastKnown.x < 0.0f)
     {
         SetScale(Vector2(-1.0f, 1.0f));
     }
@@ -511,6 +585,88 @@ void BasicEnemy::OnDebugDraw(Renderer* renderer)
             );
             
             renderer->DrawRect(p1, Vector2(3.0f, 3.0f), 0.0f, proximityColor, mGame->GetCameraPos(), RendererMode::LINES);
+        }
+    }
+    else if (mCurrentState == AIState::Searching)
+    {
+        // Draw search area visualization - orange/yellow color to indicate searching
+        Vector3 searchColor = Vector3(1.0f, 0.6f, 0.0f); // Orange
+        const int segments = 32;
+        const float angleStep = Math::TwoPi / segments;
+        
+        // Draw detection cone (still active during search)
+        Vector2 forward = GetForwardDirection();
+        float baseAngle = Math::Atan2(forward.y, forward.x);
+        
+        const int coneSegments = 16;
+        float halfConeAngle = mDetectionAngle / 2.0f;
+        float startAngle = baseAngle - halfConeAngle;
+        float coneAngleStep = mDetectionAngle / coneSegments;
+        
+        for (int i = 0; i < coneSegments; i++)
+        {
+            float angle1 = startAngle + i * coneAngleStep;
+            
+            Vector2 p1 = mPosition + Vector2(
+                Math::Cos(angle1) * mDetectionRadius,
+                Math::Sin(angle1) * mDetectionRadius
+            );
+            
+            renderer->DrawRect(p1, Vector2(3.0f, 3.0f), 0.0f, searchColor, mGame->GetCameraPos(), RendererMode::LINES);
+        }
+        
+        // Draw proximity circle
+        Vector3 proximityColor = Vector3(0.8f, 0.8f, 1.0f);
+        const int proxSegments = 24;
+        const float proxAngleStep = Math::TwoPi / proxSegments;
+        
+        for (int i = 0; i < proxSegments; i++)
+        {
+            float angle1 = i * proxAngleStep;
+            
+            Vector2 p1 = mPosition + Vector2(
+                Math::Cos(angle1) * mProximityRadius,
+                Math::Sin(angle1) * mProximityRadius
+            );
+            
+            renderer->DrawRect(p1, Vector2(3.0f, 3.0f), 0.0f, proximityColor, mGame->GetCameraPos(), RendererMode::LINES);
+        }
+        
+        // Draw last known position marker (X shape)
+        Vector3 markerColor = Vector3(1.0f, 0.0f, 1.0f); // Magenta
+        float markerSize = 16.0f;
+        
+        // Draw X at last known position
+        for (int i = -1; i <= 1; i++)
+        {
+            renderer->DrawRect(
+                mLastKnownPlayerPos + Vector2(i * 4.0f, i * 4.0f),
+                Vector2(5.0f, 5.0f),
+                0.0f,
+                markerColor,
+                mGame->GetCameraPos(),
+                RendererMode::LINES
+            );
+            renderer->DrawRect(
+                mLastKnownPlayerPos + Vector2(i * 4.0f, -i * 4.0f),
+                Vector2(5.0f, 5.0f),
+                0.0f,
+                markerColor,
+                mGame->GetCameraPos(),
+                RendererMode::LINES
+            );
+        }
+        
+        // Draw line from enemy to last known position
+        Vector2 toLastKnown = mLastKnownPlayerPos - mPosition;
+        float distance = toLastKnown.Length();
+        const int linePoints = 10;
+        
+        for (int i = 0; i <= linePoints; i++)
+        {
+            float t = i / (float)linePoints;
+            Vector2 point = mPosition + toLastKnown * t;
+            renderer->DrawRect(point, Vector2(3.0f, 3.0f), 0.0f, markerColor, mGame->GetCameraPos(), RendererMode::LINES);
         }
     }
     else

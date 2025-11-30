@@ -18,7 +18,8 @@
         - [ ] Player death
     - [ ] Flexiblility for bosses and spawning animation (skills vs state machine)(complex)
     - [x] (maybe) Detection radius smaller than give-up-from-persuit radius
-    - [ ] (maybe) Memory of last seen player position
+    - [x] (maybe) Waits for a while before turning on patrol
+    - [x] (maybe) Memory of last seen player position
     - [ ] (maybe) Return to original patrol area
 - [ ] [Juan] Player basic combat 
     - [ ] basic

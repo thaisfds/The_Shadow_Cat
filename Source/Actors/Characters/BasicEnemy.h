@@ -8,6 +8,7 @@ public:
     {
         Patrol,
         Chase,
+        Searching,
         Attack
     };
 
@@ -40,6 +41,12 @@ private:
     // Chase behavior
     float mChaseSpeed;
     
+    // Searching behavior
+    Vector2 mLastKnownPlayerPos;
+    float mSearchTimer;
+    float mSearchDuration;  // How long to search before giving up
+    float mSearchSpeed;
+    
     // Attack behavior
     float mAttackRange;
     float mAttackCooldown;
@@ -60,5 +67,6 @@ private:
     Vector2 GetForwardDirection() const;
     void UpdatePatrol(float deltaTime);
     void UpdateChase(float deltaTime);
+    void UpdateSearching(float deltaTime);
     void UpdateAttack(float deltaTime);
 };
