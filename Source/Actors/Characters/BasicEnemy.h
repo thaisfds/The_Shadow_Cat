@@ -46,9 +46,11 @@ private:
     // Player detection
     float mDetectionRadius;
     float mDetectionAngle;  // Cone angle in radians
+    float mChaseDetectionRadius;  // Larger circle used during chase
     bool mPlayerDetected;
     
     bool IsPlayerInRange() const;
+    bool IsPlayerInChaseRange() const;
     bool IsPlayerInAttackRange() const;
     Vector2 GetForwardDirection() const;
     void UpdatePatrol(float deltaTime);

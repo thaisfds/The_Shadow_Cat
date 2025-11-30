@@ -24,6 +24,7 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mAttackDamage(1)
     , mDetectionRadius(200.0f)
     , mDetectionAngle(Math::ToRadians(120.0f))  // 120 degree cone in front
+    , mChaseDetectionRadius(250.0f)  // 25% larger radius for chase persistence
     , mPlayerDetected(false)
 {
     // Use WhiteCat sprite
@@ -83,8 +84,9 @@ void BasicEnemy::OnUpdate(float deltaTime)
         mAttackTimer -= deltaTime;
     }
     
-    // Check for player detection
-    mPlayerDetected = IsPlayerInRange();
+    // Check for player detection based on current state
+    bool playerInCone = IsPlayerInRange();  // Cone detection (initial)
+    bool playerInChaseRange = IsPlayerInChaseRange();  // Circle detection (chase)
     bool playerInAttackRange = IsPlayerInAttackRange();
     
     // State transitions
@@ -96,22 +98,39 @@ void BasicEnemy::OnUpdate(float deltaTime)
             SDL_Log("BasicEnemy: -> Attack");
         }
     }
-    else if (!playerInAttackRange && mPlayerDetected && mCurrentState != AIState::Chase)
+    else if (mCurrentState == AIState::Patrol && playerInCone)
     {
+        // Only start chasing from patrol if player enters the cone
         mCurrentState = AIState::Chase;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy: -> Chase");
+            SDL_Log("BasicEnemy: -> Chase (cone detection)");
         }
     }
-    else if (!mPlayerDetected && mCurrentState != AIState::Patrol)
+    else if ((mCurrentState == AIState::Chase || mCurrentState == AIState::Attack) && !playerInAttackRange && playerInChaseRange)
     {
+        // Stay in chase if already chasing/attacking and player is still in chase range
+        if (mCurrentState == AIState::Attack)
+        {
+            mCurrentState = AIState::Chase;
+            if (mGame->IsDebugging())
+            {
+                SDL_Log("BasicEnemy: Attack -> Chase");
+            }
+        }
+    }
+    else if ((mCurrentState == AIState::Chase || mCurrentState == AIState::Attack) && !playerInChaseRange)
+    {
+        // Return to patrol when player leaves chase range completely
         mCurrentState = AIState::Patrol;
         if (mGame->IsDebugging())
         {
             SDL_Log("BasicEnemy: -> Patrol");
         }
     }
+    
+    // Update detected flag for debug visualization
+    mPlayerDetected = (mCurrentState == AIState::Patrol) ? playerInCone : playerInChaseRange;
     
     // Execute state behavior
     switch (mCurrentState)
@@ -185,6 +204,19 @@ bool BasicEnemy::IsPlayerInRange() const
     
     // Player is detected if within half the cone angle
     return angleToPlayer <= (mDetectionAngle / 2.0f);
+}
+
+bool BasicEnemy::IsPlayerInChaseRange() const
+{
+    const ShadowCat* player = mGame->GetPlayer();
+    if (!player) return false;
+    
+    Vector2 toPlayer = player->GetPosition() - mPosition;
+    float distanceSquared = toPlayer.LengthSq();
+    float chaseRadiusSquared = mChaseDetectionRadius * mChaseDetectionRadius;
+    
+    // Simple circular check - no angle restriction during chase
+    return distanceSquared <= chaseRadiusSquared;
 }
 
 Vector2 BasicEnemy::GetForwardDirection() const
@@ -329,57 +361,83 @@ void BasicEnemy::OnDebugDraw(Renderer* renderer)
 {
     if (!mGame->IsDebugging()) return;
     
-    // Draw detection cone
     Vector3 detectionColor = mPlayerDetected ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(1.0f, 1.0f, 0.0f); // Red : Yellow
     
-    Vector2 forward = GetForwardDirection();
-    float baseAngle = Math::Atan2(forward.y, forward.x);
-    
-    // Draw cone arc
-    const int segments = 16;
-    float halfConeAngle = mDetectionAngle / 2.0f;
-    float startAngle = baseAngle - halfConeAngle;
-    float angleStep = mDetectionAngle / segments;
-    
-    // Draw the arc
-    for (int i = 0; i < segments; i++)
+    // Draw different visualization based on state
+    if (mCurrentState == AIState::Patrol)
     {
-        float angle1 = startAngle + i * angleStep;
-        float angle2 = startAngle + (i + 1) * angleStep;
+        // Draw detection cone during patrol
+        Vector2 forward = GetForwardDirection();
+        float baseAngle = Math::Atan2(forward.y, forward.x);
         
-        Vector2 p1 = mPosition + Vector2(
-            Math::Cos(angle1) * mDetectionRadius,
-            Math::Sin(angle1) * mDetectionRadius
+        const int segments = 16;
+        float halfConeAngle = mDetectionAngle / 2.0f;
+        float startAngle = baseAngle - halfConeAngle;
+        float angleStep = mDetectionAngle / segments;
+        
+        // Draw the arc
+        for (int i = 0; i < segments; i++)
+        {
+            float angle1 = startAngle + i * angleStep;
+            float angle2 = startAngle + (i + 1) * angleStep;
+            
+            Vector2 p1 = mPosition + Vector2(
+                Math::Cos(angle1) * mDetectionRadius,
+                Math::Sin(angle1) * mDetectionRadius
+            );
+            
+            Vector2 p2 = mPosition + Vector2(
+                Math::Cos(angle2) * mDetectionRadius,
+                Math::Sin(angle2) * mDetectionRadius
+            );
+            
+            renderer->DrawRect(p1, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
+        }
+        
+        // Draw cone edges
+        Vector2 leftEdge = mPosition + Vector2(
+            Math::Cos(startAngle) * mDetectionRadius,
+            Math::Sin(startAngle) * mDetectionRadius
+        );
+        Vector2 rightEdge = mPosition + Vector2(
+            Math::Cos(startAngle + mDetectionAngle) * mDetectionRadius,
+            Math::Sin(startAngle + mDetectionAngle) * mDetectionRadius
         );
         
-        Vector2 p2 = mPosition + Vector2(
-            Math::Cos(angle2) * mDetectionRadius,
-            Math::Sin(angle2) * mDetectionRadius
-        );
-        
-        renderer->DrawRect(p1, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
+        const int edgePoints = 8;
+        for (int i = 0; i <= edgePoints; i++)
+        {
+            float t = i / (float)edgePoints;
+            Vector2 leftPoint = mPosition + (leftEdge - mPosition) * t;
+            Vector2 rightPoint = mPosition + (rightEdge - mPosition) * t;
+            
+            renderer->DrawRect(leftPoint, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
+            renderer->DrawRect(rightPoint, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
+        }
     }
-    
-    // Draw cone edges (lines from center to arc ends)
-    Vector2 leftEdge = mPosition + Vector2(
-        Math::Cos(startAngle) * mDetectionRadius,
-        Math::Sin(startAngle) * mDetectionRadius
-    );
-    Vector2 rightEdge = mPosition + Vector2(
-        Math::Cos(startAngle + mDetectionAngle) * mDetectionRadius,
-        Math::Sin(startAngle + mDetectionAngle) * mDetectionRadius
-    );
-    
-    // Draw points along the edges
-    const int edgePoints = 8;
-    for (int i = 0; i <= edgePoints; i++)
+    else
     {
-        float t = i / (float)edgePoints;
-        Vector2 leftPoint = mPosition + (leftEdge - mPosition) * t;
-        Vector2 rightPoint = mPosition + (rightEdge - mPosition) * t;
+        // Draw chase circle during chase/attack states
+        const int segments = 32;
+        const float angleStep = Math::TwoPi / segments;
         
-        renderer->DrawRect(leftPoint, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
-        renderer->DrawRect(rightPoint, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
+        for (int i = 0; i < segments; i++)
+        {
+            float angle1 = i * angleStep;
+            float angle2 = (i + 1) * angleStep;
+            
+            Vector2 p1 = mPosition + Vector2(
+                Math::Cos(angle1) * mChaseDetectionRadius,
+                Math::Sin(angle1) * mChaseDetectionRadius
+            );
+            
+            Vector2 p2 = mPosition + Vector2(
+                Math::Cos(angle2) * mChaseDetectionRadius,
+                Math::Sin(angle2) * mChaseDetectionRadius
+            );
+            
+            renderer->DrawRect(p1, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
+        }
     }
 }
 
