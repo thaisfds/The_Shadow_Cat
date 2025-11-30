@@ -33,6 +33,9 @@ private:
     float mPatrolDistance;
     int mPatrolDirection;  // 1 for right, -1 for left
     float mPatrolSpeed;
+    bool mIsPatrolPaused;  // Pausing before turning
+    float mPatrolPauseTimer;
+    float mPatrolPauseDuration;  // How long to pause before turning
     
     // Chase behavior
     float mChaseSpeed;

@@ -17,6 +17,9 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mPreviousPosition(Vector2::Zero)
     , mPatrolDirection(1)
     , mPatrolSpeed(50.0f)
+    , mIsPatrolPaused(false)
+    , mPatrolPauseTimer(0.0f)
+    , mPatrolPauseDuration(0.75f)  // Pause for 0.75 seconds before turning
     , mChaseSpeed(80.0f)
     , mAttackRange(64.0f)
     , mAttackCooldown(1.5f)
@@ -44,8 +47,8 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     hp = 30;
 
     // Setup animations
-    mAnimatorComponent->AddAnimation("Idle", {1});  // Frame 1 is Idle
-    mAnimatorComponent->AddAnimation("Run", {0, 2});  // Frames 0 and 2 for running
+    mAnimatorComponent->AddAnimation("Idle", {1});  // Frame 1 is idle (still frame)
+    mAnimatorComponent->AddAnimation("Run", {0, 2});  // Frames 0 and 2 for running (animated)
     mAnimatorComponent->AddAnimation("Hit", {0, 1});  // Flicker between frames for hit effect
     mAnimatorComponent->AddAnimation("Death", {2, 1, 0});  // Run animation frames as death effect
 
@@ -268,16 +271,58 @@ void BasicEnemy::UpdatePatrol(float deltaTime)
         }
     }
     
+    // If paused, count down timer before turning
+    if (mIsPatrolPaused)
+    {
+        mPatrolPauseTimer -= deltaTime;
+        
+        // Stop moving during pause
+        mRigidBodyComponent->SetVelocity(Vector2::Zero);
+        mIsMoving = false;  // Set to false so ManageAnimations plays Idle
+        
+        if (mPatrolPauseTimer <= 0.0f)
+        {
+            // Pause complete, turn around
+            mIsPatrolPaused = false;
+            mPatrolDirection *= -1;
+            
+            if (mGame->IsDebugging())
+            {
+                SDL_Log("BasicEnemy: Pause complete, now facing %s", mPatrolDirection > 0 ? "right" : "left");
+            }
+            
+            // Update sprite facing direction
+            if (mPatrolDirection > 0)
+            {
+                SetScale(Vector2(1.0f, 1.0f));
+            }
+            else
+            {
+                SetScale(Vector2(-1.0f, 1.0f));
+            }
+            
+            // Resume moving
+            mIsMoving = true;  // Set to true so ManageAnimations plays Run
+        }
+        
+        return;  // Don't continue with patrol logic while paused
+    }
+    
     // Check if enemy hit a wall (position didn't change despite velocity)
     float positionChange = Math::Abs(mPosition.x - mPreviousPosition.x);
     if (positionChange < 0.1f && deltaTime > 0.0f)
     {
-        // We're stuck, turn around
-        mPatrolDirection *= -1;
+        // We're stuck, start pause before turning
+        mIsPatrolPaused = true;
+        mPatrolPauseTimer = mPatrolPauseDuration;
+        mIsMoving = false;  // Stop animation immediately
+        
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy hit wall, turning around");
+            SDL_Log("BasicEnemy: Hit wall, pausing before turn (%.2f seconds)", mPatrolPauseDuration);
         }
+        
+        return;  // Start pause immediately
     }
     
     mPreviousPosition = mPosition;
@@ -288,16 +333,37 @@ void BasicEnemy::UpdatePatrol(float deltaTime)
     // Check if we need to turn around based on patrol distance
     if (mPatrolDirection == 1 && distanceFromStart >= mPatrolDistance)
     {
-        mPatrolDirection = -1;
+        // Start pause before turning
+        mIsPatrolPaused = true;
+        mPatrolPauseTimer = mPatrolPauseDuration;
+        mIsMoving = false;  // Stop animation immediately
+        
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy: Reached patrol limit (right), pausing before turn (%.2f seconds)", mPatrolPauseDuration);
+        }
+        
+        return;  // Start pause immediately
     }
     else if (mPatrolDirection == -1 && distanceFromStart <= -mPatrolDistance)
     {
-        mPatrolDirection = 1;
+        // Start pause before turning
+        mIsPatrolPaused = true;
+        mPatrolPauseTimer = mPatrolPauseDuration;
+        mIsMoving = false;  // Stop animation immediately
+        
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy: Reached patrol limit (left), pausing before turn (%.2f seconds)", mPatrolPauseDuration);
+        }
+        
+        return;  // Start pause immediately
     }
     
     // Set velocity for patrol movement
     Vector2 velocity(mPatrolDirection * mPatrolSpeed, 0.0f);
     mRigidBodyComponent->SetVelocity(velocity);
+    mIsMoving = true;  // Set to true so ManageAnimations plays Run
     
     // Update sprite facing direction
     if (mPatrolDirection > 0)
