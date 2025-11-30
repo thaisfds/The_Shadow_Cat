@@ -9,7 +9,8 @@
     - [x] Basic static
     - [x] Patrol mode
     - [x] Detects player
-    - [ ] Chases player
+        - [ ] Dead zone (cone-like detection, ignores player if they are behind them)
+    - [x] Chases player
         - [ ] Test obstacle handling
     - [ ] Attacks player
         - [ ] Test attack animation

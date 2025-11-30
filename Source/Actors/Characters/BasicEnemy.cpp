@@ -23,6 +23,7 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mAttackTimer(0.0f)
     , mAttackDamage(1)
     , mDetectionRadius(200.0f)
+    , mDetectionAngle(Math::ToRadians(120.0f))  // 120 degree cone in front
     , mPlayerDetected(false)
 {
     // Use WhiteCat sprite
@@ -170,7 +171,29 @@ bool BasicEnemy::IsPlayerInRange() const
     float distanceSquared = toPlayer.LengthSq();
     float detectionRadiusSquared = mDetectionRadius * mDetectionRadius;
     
-    return distanceSquared <= detectionRadiusSquared;
+    // Check distance first
+    if (distanceSquared > detectionRadiusSquared)
+        return false;
+    
+    // Check if player is within detection cone (in front of enemy)
+    Vector2 forward = GetForwardDirection();
+    toPlayer.Normalize();
+    
+    // Calculate angle between forward direction and direction to player
+    float dotProduct = Vector2::Dot(forward, toPlayer);
+    float angleToPlayer = Math::Acos(dotProduct);
+    
+    // Player is detected if within half the cone angle
+    return angleToPlayer <= (mDetectionAngle / 2.0f);
+}
+
+Vector2 BasicEnemy::GetForwardDirection() const
+{
+    // Enemy faces right when scale.x > 0, left when scale.x < 0
+    if (mScale.x > 0.0f)
+        return Vector2(1.0f, 0.0f);  // Facing right
+    else
+        return Vector2(-1.0f, 0.0f);  // Facing left
 }
 
 bool BasicEnemy::IsPlayerInAttackRange() const
@@ -306,17 +329,23 @@ void BasicEnemy::OnDebugDraw(Renderer* renderer)
 {
     if (!mGame->IsDebugging()) return;
     
-    // Draw detection radius as a circle (approximated with points)
+    // Draw detection cone
     Vector3 detectionColor = mPlayerDetected ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(1.0f, 1.0f, 0.0f); // Red : Yellow
     
-    // Draw detection circle by drawing multiple points
-    const int segments = 32;
-    const float angleStep = Math::TwoPi / segments;
+    Vector2 forward = GetForwardDirection();
+    float baseAngle = Math::Atan2(forward.y, forward.x);
     
+    // Draw cone arc
+    const int segments = 16;
+    float halfConeAngle = mDetectionAngle / 2.0f;
+    float startAngle = baseAngle - halfConeAngle;
+    float angleStep = mDetectionAngle / segments;
+    
+    // Draw the arc
     for (int i = 0; i < segments; i++)
     {
-        float angle1 = i * angleStep;
-        float angle2 = (i + 1) * angleStep;
+        float angle1 = startAngle + i * angleStep;
+        float angle2 = startAngle + (i + 1) * angleStep;
         
         Vector2 p1 = mPosition + Vector2(
             Math::Cos(angle1) * mDetectionRadius,
@@ -328,8 +357,29 @@ void BasicEnemy::OnDebugDraw(Renderer* renderer)
             Math::Sin(angle2) * mDetectionRadius
         );
         
-        // Draw small rects at each point to form a circle
         renderer->DrawRect(p1, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
+    }
+    
+    // Draw cone edges (lines from center to arc ends)
+    Vector2 leftEdge = mPosition + Vector2(
+        Math::Cos(startAngle) * mDetectionRadius,
+        Math::Sin(startAngle) * mDetectionRadius
+    );
+    Vector2 rightEdge = mPosition + Vector2(
+        Math::Cos(startAngle + mDetectionAngle) * mDetectionRadius,
+        Math::Sin(startAngle + mDetectionAngle) * mDetectionRadius
+    );
+    
+    // Draw points along the edges
+    const int edgePoints = 8;
+    for (int i = 0; i <= edgePoints; i++)
+    {
+        float t = i / (float)edgePoints;
+        Vector2 leftPoint = mPosition + (leftEdge - mPosition) * t;
+        Vector2 rightPoint = mPosition + (rightEdge - mPosition) * t;
+        
+        renderer->DrawRect(leftPoint, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
+        renderer->DrawRect(rightPoint, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
     }
 }
 

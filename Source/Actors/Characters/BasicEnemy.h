@@ -45,10 +45,12 @@ private:
     
     // Player detection
     float mDetectionRadius;
+    float mDetectionAngle;  // Cone angle in radians
     bool mPlayerDetected;
     
     bool IsPlayerInRange() const;
     bool IsPlayerInAttackRange() const;
+    Vector2 GetForwardDirection() const;
     void UpdatePatrol(float deltaTime);
     void UpdateChase(float deltaTime);
     void UpdateAttack(float deltaTime);
