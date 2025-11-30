@@ -249,6 +249,18 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto dummy = new Dummy(this);
 				dummy->SetPosition(position);
 			}
+			// BasicEnemy (WhiteCat)
+			else if (tileID == 12)
+			{
+				auto enemy = new BasicEnemy(this, 0.0f, 200.0f);
+				enemy->SetPosition(position);
+			}
+			// BasicEnemy with larger patrol (WhiteCat2)
+			else if (tileID == 13)
+			{
+				auto enemy = new BasicEnemy(this, 0.0f, 400.0f);
+				enemy->SetPosition(position);
+			}
 		}
 	}
 }
