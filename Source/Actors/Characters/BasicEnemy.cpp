@@ -14,6 +14,7 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mIsPlayingDeathAnim(false)
     , mCurrentState(AIState::Patrol)
     , mPatrolDistance(patrolDistance)
+    , mPreviousPosition(Vector2::Zero)
     , mPatrolDirection(1)
     , mPatrolSpeed(50.0f)
     , mChaseSpeed(80.0f)
@@ -156,16 +157,31 @@ void BasicEnemy::UpdatePatrol(float deltaTime)
     if (mPatrolStartPos.x == 0.0f && mPatrolStartPos.y == 0.0f)
     {
         mPatrolStartPos = mPosition;
+        mPreviousPosition = mPosition;
         if (mGame->IsDebugging())
         {
             SDL_Log("BasicEnemy patrol starting at: (%.2f, %.2f)", mPatrolStartPos.x, mPatrolStartPos.y);
         }
     }
     
+    // Check if enemy hit a wall (position didn't change despite velocity)
+    float positionChange = Math::Abs(mPosition.x - mPreviousPosition.x);
+    if (positionChange < 0.1f && deltaTime > 0.0f)
+    {
+        // We're stuck, turn around
+        mPatrolDirection *= -1;
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy hit wall, turning around");
+        }
+    }
+    
+    mPreviousPosition = mPosition;
+    
     // Patrol movement
     float distanceFromStart = mPosition.x - mPatrolStartPos.x;
     
-    // Check if we need to turn around
+    // Check if we need to turn around based on patrol distance
     if (mPatrolDirection == 1 && distanceFromStart >= mPatrolDistance)
     {
         mPatrolDirection = -1;

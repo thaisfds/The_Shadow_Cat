@@ -28,6 +28,7 @@ private:
     
     // Patrol movement
     Vector2 mPatrolStartPos;
+    Vector2 mPreviousPosition;
     float mPatrolDistance;
     int mPatrolDirection;  // 1 for right, -1 for left
     float mPatrolSpeed;
