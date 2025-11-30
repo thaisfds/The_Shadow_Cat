@@ -119,6 +119,13 @@ void BasicEnemy::TakeDamage(int damage)
         SDL_Log("HP after: %d", hp);
     }
     
+    hp = Math::Max(hp - damage, 0);
+    
+    if (mGame->IsDebugging())
+    {
+        SDL_Log("HP after: %d", hp);
+    }
+    
     if (hp <= 0)
     {
         Kill();
