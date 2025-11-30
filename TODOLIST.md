@@ -20,7 +20,7 @@
     - [x] (maybe) Detection radius smaller than give-up-from-persuit radius
     - [x] (maybe) Waits for a while before turning on patrol
     - [x] (maybe) Memory of last seen player position
-    - [ ] (maybe) Return to original patrol area
+    - [x] (maybe) Return to original patrol area
 - [ ] [Juan] Player basic combat 
     - [ ] basic
     - [ ] charged
