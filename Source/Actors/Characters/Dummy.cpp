@@ -3,7 +3,7 @@
 #include "../../GameConstants.h"
 #include "../../Components/Drawing/AnimatorComponent.h"
 #include "../../Components/Physics/RigidBodyComponent.h"
-#include "../../Components/Physics/AABBColliderComponent.h"
+#include "../../Components/Physics/ColliderComponent.h"
 #include "Character.h"
 
 Dummy::Dummy(class Game* game, float forwardSpeed)
@@ -11,7 +11,9 @@ Dummy::Dummy(class Game* game, float forwardSpeed)
 {
     mAnimatorComponent = new AnimatorComponent(this, "DummyAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
-    mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, GetBaseEnemyFilter());
+    
+    Collider *collider = new AABBCollider(GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+    mColliderComponent = new ColliderComponent(this, 0, 0, collider, GetBaseEnemyFilter());
     mRigidBodyComponent->SetApplyGravity(false);
 }
 

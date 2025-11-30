@@ -59,7 +59,15 @@ bool AnimatorComponent::LoadAnimationData(const std::string &animationName)
 
 	for (const auto& [animName, frameIndices] : animData["animations"].items())
 	{
-		std::vector<int> indices = frameIndices.get<std::vector<int>>();
+		std::vector<int> indices;
+		if (frameIndices.is_array())
+			indices = frameIndices.get<std::vector<int>>();
+		else if (frameIndices.is_object() && frameIndices.contains("start") && frameIndices.contains("end")) 
+		{
+			int start = frameIndices["start"].get<int>();
+			int end = frameIndices["end"].get<int>();
+			for (int i = start; i <= end; ++i) indices.push_back(i);
+		}
 		AddAnimation(animName, indices);
 	}
 	if (mAnimations.empty())

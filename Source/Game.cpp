@@ -5,6 +5,7 @@
 #include "Actors/Characters/Dummy.h"
 #include "CSV.h"
 #include "Game.h"
+#include "Components/Skills/Stomp.h"
 #include "GameConstants.h"
 #include "Components/Drawing/DrawComponent.h"
 #include "Components/Physics/RigidBodyComponent.h"
@@ -540,12 +541,12 @@ void Game::RemoveDrawable(class DrawComponent *drawable)
 	mDrawables.erase(iter);
 }
 
-void Game::AddCollider(class AABBColliderComponent *collider)
+void Game::AddCollider(class ColliderComponent *collider)
 {
 	mColliders.emplace_back(collider);
 }
 
-void Game::RemoveCollider(AABBColliderComponent *collider)
+void Game::RemoveCollider(ColliderComponent *collider)
 {
 	auto iter = std::find(mColliders.begin(), mColliders.end(), collider);
 	mColliders.erase(iter);
@@ -671,4 +672,20 @@ Vector2 Game::GetMouseWorldPosition()
 	worldPos.y = static_cast<float>(mouseY) + mCameraPos.y;
 
 	return worldPos;
+}
+
+StompActor* Game::GetStompActor()
+{
+	StompActor *stomp = nullptr;
+	for (auto actor : mStompActors)
+		if (actor->IsDead())
+			stomp = actor;
+
+	if (!stomp)
+	{
+		stomp = new StompActor(this);
+		mStompActors.push_back(stomp);
+	}
+	
+	return stomp;
 }

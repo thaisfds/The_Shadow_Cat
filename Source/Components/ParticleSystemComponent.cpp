@@ -1,6 +1,6 @@
 #include "../Game.h"
 #include "ParticleSystemComponent.h"
-#include "Physics/AABBColliderComponent.h"
+#include "Physics/ColliderComponent.h"
 #include "Physics/RigidBodyComponent.h"
 #include "Drawing/RectComponent.h"
 
@@ -16,7 +16,8 @@ Particle::Particle(class Game *game, int width, int height, bool hasCollider)
         filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::Environment});
         filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player, CollisionGroup::Enemy, CollisionGroup::Environment});
         
-        mColliderComponent = new AABBColliderComponent(this, 0, 0, width, height, filter);
+        Collider *collider = new AABBCollider(width, height);
+        mColliderComponent = new ColliderComponent(this, 0, 0, collider, filter);
     }
 
     SetState(ActorState::Paused);

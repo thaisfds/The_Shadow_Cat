@@ -7,6 +7,7 @@
 #include "Actors/DebugActor.h"
 #include "Renderer/Renderer.h"
 #include "AudioSystem.h"
+#include "Components/Skills/Stomp.h"
 
 enum class GameScene
 {
@@ -52,9 +53,9 @@ public:
     std::vector<class DrawComponent *> &GetDrawables() { return mDrawables; }
 
     // Collider functions
-    void AddCollider(class AABBColliderComponent *collider);
-    void RemoveCollider(class AABBColliderComponent *collider);
-    std::vector<class AABBColliderComponent *> &GetColliders() { return mColliders; }
+    void AddCollider(class ColliderComponent *collider);
+    void RemoveCollider(class ColliderComponent *collider);
+    std::vector<class ColliderComponent *> &GetColliders() { return mColliders; }
 
     // Camera functions
     Vector2 &GetCameraPos() { return mCameraPos; };
@@ -78,6 +79,7 @@ public:
     DebugActor* GetDebugActor() { return mDebugActor; }
 
     Actor* GetAttackTrailActor() { return mAttackTrailActor; }
+    StompActor* GetStompActor();
 
 private:
     void ProcessInput();
@@ -104,7 +106,7 @@ private:
     std::vector<class DrawComponent *> mDrawables;
 
     // All the collision components
-    std::vector<class AABBColliderComponent *> mColliders;
+    std::vector<class ColliderComponent *> mColliders;
 
     // All UI screens in the game
     std::vector<class UIScreen*> mUIStack;
@@ -129,6 +131,8 @@ private:
     class ShadowCat *mShadowCat;
     class HUD *mHUD;
     int **mLevelData;
+
+    class std::vector<StompActor*> mStompActors;
 
     // Global particle system
     class Actor *mAttackTrailActor;

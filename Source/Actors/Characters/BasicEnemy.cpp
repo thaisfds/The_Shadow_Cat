@@ -3,8 +3,8 @@
 #include "../../GameConstants.h"
 #include "../../Components/Drawing/AnimatorComponent.h"
 #include "../../Components/Physics/RigidBodyComponent.h"
-#include "../../Components/Physics/AABBColliderComponent.h"
 #include <SDL.h>
+#include "../../Components/Physics/ColliderComponent.h"
 
 BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistance)
     : Character(game, forwardSpeed)
@@ -21,7 +21,9 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
         CollisionFilter::GroupMask({CollisionGroup::Enemy}),
         CollisionFilter::GroupMask({CollisionGroup::Environment, CollisionGroup::Enemy, CollisionGroup::PlayerSkills})
     };
-    mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, collisionFilter);
+    
+    AABBCollider* collider = new AABBCollider(GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+    mColliderComponent = new ColliderComponent(this, 0, 0, collider, collisionFilter);
     
     // Static enemy - no gravity
     mRigidBodyComponent->SetApplyGravity(false);
