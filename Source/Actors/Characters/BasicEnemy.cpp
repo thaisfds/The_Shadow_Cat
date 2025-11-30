@@ -15,7 +15,7 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mPatrolDistance(patrolDistance)
     , mPatrolDirection(1)
     , mPatrolSpeed(50.0f)
-    , mDetectionRadius(300.0f)
+    , mDetectionRadius(200.0f)
     , mPlayerDetected(false)
 {
     // Use WhiteCat sprite
