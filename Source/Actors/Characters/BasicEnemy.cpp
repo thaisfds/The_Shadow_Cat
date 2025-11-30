@@ -12,9 +12,11 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     : Character(game, forwardSpeed)
     , mDeathTimer(0.0f)
     , mIsPlayingDeathAnim(false)
+    , mCurrentState(AIState::Patrol)
     , mPatrolDistance(patrolDistance)
     , mPatrolDirection(1)
     , mPatrolSpeed(50.0f)
+    , mChaseSpeed(80.0f)
     , mDetectionRadius(200.0f)
     , mPlayerDetected(false)
 {
@@ -72,46 +74,33 @@ void BasicEnemy::OnUpdate(float deltaTime)
     // Check for player detection
     mPlayerDetected = IsPlayerInRange();
     
-    if (mGame->IsDebugging() && mPlayerDetected)
+    // State transitions
+    if (mPlayerDetected && mCurrentState == AIState::Patrol)
     {
-        SDL_Log("BasicEnemy detected player!");
-    }
-    
-    // Set patrol start position on first update (when position is valid)
-    if (mPatrolStartPos.x == 0.0f && mPatrolStartPos.y == 0.0f)
-    {
-        mPatrolStartPos = mPosition;
+        mCurrentState = AIState::Chase;
         if (mGame->IsDebugging())
         {
-            SDL_Log("BasicEnemy patrol starting at: (%.2f, %.2f)", mPatrolStartPos.x, mPatrolStartPos.y);
+            SDL_Log("BasicEnemy: Patrol -> Chase");
+        }
+    }
+    else if (!mPlayerDetected && mCurrentState == AIState::Chase)
+    {
+        mCurrentState = AIState::Patrol;
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy: Chase -> Patrol");
         }
     }
     
-    // Patrol movement
-    float distanceFromStart = mPosition.x - mPatrolStartPos.x;
-    
-    // Check if we need to turn around
-    if (mPatrolDirection == 1 && distanceFromStart >= mPatrolDistance)
+    // Execute state behavior
+    switch (mCurrentState)
     {
-        mPatrolDirection = -1;
-    }
-    else if (mPatrolDirection == -1 && distanceFromStart <= -mPatrolDistance)
-    {
-        mPatrolDirection = 1;
-    }
-    
-    // Set velocity for patrol movement
-    Vector2 velocity(mPatrolDirection * mPatrolSpeed, 0.0f);
-    mRigidBodyComponent->SetVelocity(velocity);
-    
-    // Update sprite facing direction
-    if (mPatrolDirection > 0)
-    {
-        SetScale(Vector2(1.0f, 1.0f));
-    }
-    else
-    {
-        SetScale(Vector2(-1.0f, 1.0f));
+        case AIState::Patrol:
+            UpdatePatrol(deltaTime);
+            break;
+        case AIState::Chase:
+            UpdateChase(deltaTime);
+            break;
     }
 }
 
@@ -159,6 +148,70 @@ bool BasicEnemy::IsPlayerInRange() const
     float detectionRadiusSquared = mDetectionRadius * mDetectionRadius;
     
     return distanceSquared <= detectionRadiusSquared;
+}
+
+void BasicEnemy::UpdatePatrol(float deltaTime)
+{
+    // Set patrol start position on first update (when position is valid)
+    if (mPatrolStartPos.x == 0.0f && mPatrolStartPos.y == 0.0f)
+    {
+        mPatrolStartPos = mPosition;
+        if (mGame->IsDebugging())
+        {
+            SDL_Log("BasicEnemy patrol starting at: (%.2f, %.2f)", mPatrolStartPos.x, mPatrolStartPos.y);
+        }
+    }
+    
+    // Patrol movement
+    float distanceFromStart = mPosition.x - mPatrolStartPos.x;
+    
+    // Check if we need to turn around
+    if (mPatrolDirection == 1 && distanceFromStart >= mPatrolDistance)
+    {
+        mPatrolDirection = -1;
+    }
+    else if (mPatrolDirection == -1 && distanceFromStart <= -mPatrolDistance)
+    {
+        mPatrolDirection = 1;
+    }
+    
+    // Set velocity for patrol movement
+    Vector2 velocity(mPatrolDirection * mPatrolSpeed, 0.0f);
+    mRigidBodyComponent->SetVelocity(velocity);
+    
+    // Update sprite facing direction
+    if (mPatrolDirection > 0)
+    {
+        SetScale(Vector2(1.0f, 1.0f));
+    }
+    else
+    {
+        SetScale(Vector2(-1.0f, 1.0f));
+    }
+}
+
+void BasicEnemy::UpdateChase(float deltaTime)
+{
+    const ShadowCat* player = mGame->GetPlayer();
+    if (!player) return;
+    
+    // Calculate direction to player
+    Vector2 toPlayer = player->GetPosition() - mPosition;
+    toPlayer.Normalize();
+    
+    // Move toward player
+    Vector2 velocity = toPlayer * mChaseSpeed;
+    mRigidBodyComponent->SetVelocity(velocity);
+    
+    // Update sprite facing direction based on movement
+    if (toPlayer.x > 0.0f)
+    {
+        SetScale(Vector2(1.0f, 1.0f));
+    }
+    else if (toPlayer.x < 0.0f)
+    {
+        SetScale(Vector2(-1.0f, 1.0f));
+    }
 }
 
 void BasicEnemy::OnDebugDraw(Renderer* renderer)
