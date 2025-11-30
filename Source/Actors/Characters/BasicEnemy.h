@@ -34,6 +34,7 @@ private:
     float mPatrolDistance;
     int mPatrolDirection;  // 1 for right, -1 for left
     float mPatrolSpeed;
+    Vector2 mMovementDirection;  // Actual movement direction for cone detection
     bool mIsPatrolPaused;  // Pausing before turning
     float mPatrolPauseTimer;
     float mPatrolPauseDuration;  // How long to pause before turning

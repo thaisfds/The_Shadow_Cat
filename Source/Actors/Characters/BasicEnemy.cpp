@@ -17,6 +17,7 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mPreviousPosition(Vector2::Zero)
     , mPatrolDirection(1)
     , mPatrolSpeed(50.0f)
+    , mMovementDirection(Vector2(1.0f, 0.0f))  // Start facing right
     , mIsPatrolPaused(false)
     , mPatrolPauseTimer(0.0f)
     , mPatrolPauseDuration(0.75f)  // Pause for 0.75 seconds before turning
@@ -248,6 +249,16 @@ bool BasicEnemy::IsPlayerInChaseRange() const
 
 Vector2 BasicEnemy::GetForwardDirection() const
 {
+    // Use actual movement direction if available (length > 0.1)
+    // This ensures cone follows movement direction in Patrol and Searching states
+    if (mMovementDirection.LengthSq() > 0.01f)
+    {
+        Vector2 dir = mMovementDirection;
+        dir.Normalize();
+        return dir;
+    }
+    
+    // Fallback to sprite facing direction when stationary
     // Enemy faces right when scale.x > 0, left when scale.x < 0
     if (mScale.x > 0.0f)
         return Vector2(1.0f, 0.0f);  // Facing right
@@ -287,6 +298,7 @@ void BasicEnemy::UpdatePatrol(float deltaTime)
         
         // Stop moving during pause
         mRigidBodyComponent->SetVelocity(Vector2::Zero);
+        mMovementDirection = Vector2::Zero;  // No movement direction when paused
         mIsMoving = false;  // Set to false so ManageAnimations plays Idle
         
         if (mPatrolPauseTimer <= 0.0f)
@@ -372,6 +384,7 @@ void BasicEnemy::UpdatePatrol(float deltaTime)
     // Set velocity for patrol movement
     Vector2 velocity(mPatrolDirection * mPatrolSpeed, 0.0f);
     mRigidBodyComponent->SetVelocity(velocity);
+    mMovementDirection = velocity;  // Track movement direction for cone detection
     mIsMoving = true;  // Set to true so ManageAnimations plays Run
     
     // Update sprite facing direction
@@ -400,6 +413,7 @@ void BasicEnemy::UpdateChase(float deltaTime)
     // Move toward player
     Vector2 velocity = toPlayer * mChaseSpeed;
     mRigidBodyComponent->SetVelocity(velocity);
+    mMovementDirection = velocity;  // Track movement direction
     
     // Update sprite facing direction based on movement
     if (toPlayer.x > 0.0f)
@@ -462,6 +476,7 @@ void BasicEnemy::UpdateSearching(float deltaTime)
     toLastKnown.Normalize();
     Vector2 velocity = toLastKnown * mSearchSpeed;
     mRigidBodyComponent->SetVelocity(velocity);
+    mMovementDirection = velocity;  // Track movement direction for cone detection
     
     // Update sprite facing direction based on movement
     if (toLastKnown.x > 0.0f)
@@ -481,6 +496,7 @@ void BasicEnemy::UpdateAttack(float deltaTime)
     
     // Stop moving during attack
     mRigidBodyComponent->SetVelocity(Vector2::Zero);
+    mMovementDirection = Vector2::Zero;  // No movement during attack
     
     // Face the player
     Vector2 toPlayer = player->GetPosition() - mPosition;
