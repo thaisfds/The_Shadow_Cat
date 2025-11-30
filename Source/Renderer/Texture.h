@@ -17,8 +17,6 @@ public:
 
 	void SetActive(int index = 0) const;
 
-    static GLenum SDLFormatToGL(SDL_PixelFormat* fmt);
-
 	int GetWidth() const { return mWidth; }
 	int GetHeight() const { return mHeight; }
 
