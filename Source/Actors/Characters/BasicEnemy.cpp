@@ -31,9 +31,9 @@ BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistanc
     , mAttackTimer(0.0f)
     , mAttackDamage(1)
     , mDetectionRadius(200.0f)
-    , mDetectionAngle(Math::ToRadians(120.0f))  // 120 degree cone in front
+    , mDetectionAngle(Math::ToRadians(90.0f))  // 90 degree cone in front
     , mChaseDetectionRadius(250.0f)  // 25% larger radius for chase persistence
-    , mProximityRadius(90.0f)  // Close-range detection (about 1.5 tiles)
+    , mProximityRadius(100.0f)  // Close-range detection (about 1.6 tiles)
     , mPlayerDetected(false)
 {
     // Use WhiteCat sprite
@@ -203,7 +203,10 @@ bool BasicEnemy::IsPlayerInRange() const
     
     Vector2 toPlayer = player->GetPosition() - mPosition;
     float distanceSquared = toPlayer.LengthSq();
-    float detectionRadiusSquared = mDetectionRadius * mDetectionRadius;
+    
+    // Use chase radius during Searching state, normal detection radius otherwise
+    float radius = (mCurrentState == AIState::Searching) ? mChaseDetectionRadius : mDetectionRadius;
+    float detectionRadiusSquared = radius * radius;
     
     // Check distance first
     if (distanceSquared > detectionRadiusSquared)
@@ -610,7 +613,7 @@ void BasicEnemy::OnDebugDraw(Renderer* renderer)
         const int segments = 32;
         const float angleStep = Math::TwoPi / segments;
         
-        // Draw detection cone (still active during search)
+        // Draw detection cone (still active during search) - uses chase radius for extended range
         Vector2 forward = GetForwardDirection();
         float baseAngle = Math::Atan2(forward.y, forward.x);
         
@@ -624,8 +627,8 @@ void BasicEnemy::OnDebugDraw(Renderer* renderer)
             float angle1 = startAngle + i * coneAngleStep;
             
             Vector2 p1 = mPosition + Vector2(
-                Math::Cos(angle1) * mDetectionRadius,
-                Math::Sin(angle1) * mDetectionRadius
+                Math::Cos(angle1) * mChaseDetectionRadius,
+                Math::Sin(angle1) * mChaseDetectionRadius
             );
             
             renderer->DrawRect(p1, Vector2(3.0f, 3.0f), 0.0f, searchColor, mGame->GetCameraPos(), RendererMode::LINES);
