@@ -1,0 +1,10 @@
+{
+	"image": "../Assets/Sprites/Stomp/Stomp.png",
+	"spriteSheetData": "../Assets/Sprites/Stomp/Stomp.json",
+	"animations":
+	{
+		"Invisible": [0],
+		"Stomp": { "start": 0, "end": 24}
+	},
+	"base": "Invisible"
+}

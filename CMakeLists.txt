@@ -91,6 +91,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/Dash.cpp
         Source/Components/Skills/Dash.h
         Source/Components/Physics/CollisionFilter.h
+        Source/Components/Skills/Stomp.cpp
+        Source/Components/Skills/Stomp.h
         Source/Components/Physics/Collider.cpp
         Source/Components/Physics/Collider.h
 )

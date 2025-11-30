@@ -2,13 +2,14 @@
 #include "BasicAttack.h"
 #include "Dash.h"
 #include "SkillBase.h"
+#include "Stomp.h"
 
 SkillInputHandler::SkillInputHandler(Actor* owner, int updateOrder)
     : Component(owner, updateOrder)
 {
     mKeyToSkill[SDL_SCANCODE_Q] = new BasicAttack(owner);
     mKeyToSkill[SDL_SCANCODE_E] = new Dash(owner);
-    mKeyToSkill[SDL_SCANCODE_R] = nullptr;
+    mKeyToSkill[SDL_SCANCODE_R] = new Stomp(owner);
     mKeyToSkill[SDL_SCANCODE_F] = nullptr;
 }
 
