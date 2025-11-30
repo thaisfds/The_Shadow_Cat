@@ -4,6 +4,7 @@
 #include "../../Components/Drawing/AnimatorComponent.h"
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../../Components/Physics/AABBColliderComponent.h"
+#include <SDL.h>
 
 BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed)
     : Character(game, forwardSpeed)
