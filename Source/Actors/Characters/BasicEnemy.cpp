@@ -6,20 +6,22 @@
 #include "../../Components/Physics/AABBColliderComponent.h"
 #include <SDL.h>
 
-BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed)
+BasicEnemy::BasicEnemy(class Game* game, float forwardSpeed, float patrolDistance)
     : Character(game, forwardSpeed)
     , mDeathTimer(0.0f)
     , mIsPlayingDeathAnim(false)
-    , mPatrolDistance(200.0f)
+    , mPatrolDistance(patrolDistance)
     , mPatrolDirection(1)
     , mPatrolSpeed(50.0f)
 {
     // Use WhiteCat sprite
-    mAnimatorComponent = new AnimatorComponent(this, "../Assets/Sprites/WhiteCat/WhiteCat.png", 
-                                               "../Assets/Sprites/WhiteCat/WhiteCat.json", 
-                                               GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+    mAnimatorComponent = new AnimatorComponent(this, "ShadowCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
-    mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, ColliderLayer::Enemy);
+    CollisionFilter collisionFilter = {
+        CollisionFilter::GroupMask({CollisionGroup::Enemy}),
+        CollisionFilter::GroupMask({CollisionGroup::Environment, CollisionGroup::Enemy, CollisionGroup::PlayerSkills})
+    };
+    mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, collisionFilter);
     
     // Static enemy - no gravity
     mRigidBodyComponent->SetApplyGravity(false);

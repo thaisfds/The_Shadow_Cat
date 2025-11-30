@@ -4,7 +4,7 @@
 class BasicEnemy : public Character
 {
 public:
-    BasicEnemy(class Game* game, float forwardSpeed = 0.0f);
+    BasicEnemy(class Game* game, float forwardSpeed = 0.0f, float patrolDistance = 200.0f);
     virtual ~BasicEnemy();
 
     void OnUpdate(float deltaTime) override;

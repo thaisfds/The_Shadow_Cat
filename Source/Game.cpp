@@ -16,13 +16,14 @@
 #include "Actors/Spawner.h"
 #include "Actors/Characters/ShadowCat.h"
 #include "Components/AnimatedParticleSystemComponent.h"
+#include "Actors/Characters/BasicEnemy.h"
 
 Game::Game()
 	: mWindow(nullptr),
 	mRenderer(nullptr),
 	mTicksCount(0),
 	mIsRunning(true),
-	mIsDebugging(false),
+	mIsDebugging(true),
 	mUpdatingActors(false),
 	mCameraPos(Vector2::Zero),
 	mLevelData(nullptr),
@@ -174,11 +175,6 @@ int **Game::LoadLevel(const std::string &fileName, int width, int height)
 	if (!levelFile.is_open())
 	{
 		SDL_Log("Failed to open level file: %s", fileName.c_str());
-		for (int i = 0; i < height; ++i)
-		{
-			delete[] levelData[i];
-		}
-		delete[] levelData;
 		return nullptr;
 	}
 
@@ -252,7 +248,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			// BasicEnemy (WhiteCat)
 			else if (tileID == 12)
 			{
-				auto enemy = new BasicEnemy(this, 0.0f, 200.0f);
+				auto enemy = new BasicEnemy(this);
 				enemy->SetPosition(position);
 			}
 			// BasicEnemy with larger patrol (WhiteCat2)

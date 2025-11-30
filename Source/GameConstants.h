@@ -8,8 +8,8 @@ namespace GameConstants
     constexpr int FPS = 60;
 
     // Level settings
-    constexpr int LEVEL_WIDTH = 11;
-    constexpr int LEVEL_HEIGHT = 11;
+    constexpr int LEVEL_WIDTH = 21;
+    constexpr int LEVEL_HEIGHT = 13;
     constexpr int TILE_SIZE = 64;
     constexpr int SPAWN_DISTANCE = 700;
 
