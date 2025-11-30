@@ -9,15 +9,15 @@
     - [x] Basic static
     - [x] Patrol mode
     - [x] Detects player
-        - [ ] Dead zone (cone-like detection, ignores player if they are behind them)
+        - [x] Dead zone (cone-like detection, ignores player if they are behind them)
     - [x] Chases player
         - [ ] Test obstacle handling
-    - [ ] Attacks player
+    - [x] Attacks player
         - [ ] Test attack animation
         - [ ] Test cooldown
         - [ ] Player death
-    - [ ] Flexiblility for bosses and spawning animation
-    - [ ] (maybe) Detection radius smaller than give-up-from-persuit radius
+    - [ ] Flexiblility for bosses and spawning animation (skills vs state machine)(complex)
+    - [x] (maybe) Detection radius smaller than give-up-from-persuit radius
     - [ ] (maybe) Memory of last seen player position
     - [ ] (maybe) Return to original patrol area
 - [ ] [Juan] Player basic combat 
