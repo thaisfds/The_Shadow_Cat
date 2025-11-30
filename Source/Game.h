@@ -67,6 +67,10 @@ public:
     const class ShadowCat *GetPlayer() { return mShadowCat; }
     class HUD* GetHUD() { return mHUD; }
 
+    // Level dimensions
+    int GetLevelWidth() const { return mLevelWidth; }
+    int GetLevelHeight() const { return mLevelHeight; }
+
     SDL_GameController *mController;
 
     // Debug
@@ -82,8 +86,12 @@ private:
     void GenerateOutput();
 
     // Level loading
-    int **LoadLevel(const std::string &fileName, int width, int height);
+    int **LoadLevel(const std::string &fileName, int &outWidth, int &outHeight);
     void BuildLevel(int **levelData, int width, int height);
+
+    // Current level dimensions
+    int mLevelWidth;
+    int mLevelHeight;
 
     // All the actors in the game
     std::vector<class Actor *> mActors;
