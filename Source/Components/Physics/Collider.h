@@ -14,6 +14,7 @@ public:
 
 	virtual bool CheckCollision(const Collider* other) const = 0;
 	virtual void SolveCollisions(const RigidBodyComponent* rigidBody) = 0;
+	virtual void DebugDraw(class Renderer* renderer) = 0;
 
 protected:
 	ColliderComponent *mComponent;
@@ -31,6 +32,8 @@ public:
 	Vector2 GetMax() const;
 
 	Vector2 GetHalfDimensions() const { return mHalfDimensions; }
+
+	void DebugDraw(class Renderer* renderer) override;
 
 private:
 	float GetMinVerticalOverlap(AABBCollider *b) const;

@@ -4,7 +4,7 @@
 	"animations":
 	{
 		"Invisible": [0],
-		"Stomp": { "start": 0, "end": 24}
+		"Stomp": { "start": 0, "end": 23}
 	},
 	"base": "Invisible"
 }
