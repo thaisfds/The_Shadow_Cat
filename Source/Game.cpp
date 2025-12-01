@@ -159,12 +159,17 @@ void Game::SetScene(GameScene nextScene)
         case GameScene::Level1:
             mCurrentScene = GameScene::Level1;
 
-			// // Always shown
-			// mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf"); 
+            InitializeActors();
+            break;
 
-			// // Toggleable tutorial HUD
-			// mTutorialHUD = new TutorialHUD(this, "../Assets/Fonts/Pixellari.ttf");
+        case GameScene::Level2:
+            mCurrentScene = GameScene::Level2;
 
+            InitializeActors();
+            break;
+
+        case GameScene::Level3:
+            mCurrentScene = GameScene::Level3;
 
             InitializeActors();
             break;
@@ -186,6 +191,10 @@ void Game::InitializeActors()
 		levelPath = "../Assets/Levels/Lobby/Lobby.csv";
 	} else if (mCurrentScene == GameScene::Level1) {
 		levelPath = "../Assets/Levels/Level1/Level1.csv";
+	} else if (mCurrentScene == GameScene::Level2) {
+		levelPath = "../Assets/Levels/Level2/Level2.csv";
+	} else if (mCurrentScene == GameScene::Level3) {
+		levelPath = "../Assets/Levels/Level3/Level3.csv";
 	} else {
 		levelPath = "../Assets/Levels/Lobby/Lobby.csv";
 	}
@@ -408,6 +417,7 @@ void Game::ProcessInput()
 		}
 			break;
 		case SDL_KEYDOWN:
+		case SDL_MOUSEBUTTONDOWN:
 			// Handle key press for UI screens
 			if (!mUIStack.empty()) {
 				mUIStack.back()->HandleKeyPress(event.key.keysym.sym);
@@ -466,6 +476,51 @@ void Game::UpdateGame(float deltaTime)
 
 	// Update camera position
 	UpdateCamera();
+
+	if (mShadowCat)
+	{
+		Vector2 playerPos = mShadowCat->GetPosition();
+		int gridX = static_cast<int>(playerPos.x / GameConstants::TILE_SIZE);
+		int gridY = static_cast<int>(playerPos.y / GameConstants::TILE_SIZE);
+
+		int centerColumn = mLevelWidth / 2;
+		int leftColumn = centerColumn - 1;
+		int rightColumn = centerColumn + 1;
+
+		int lastRow = mLevelHeight - 1;
+		bool isInCentralColumns = (gridX == leftColumn || gridX == centerColumn || gridX == rightColumn);
+		bool isInLastRow = (gridY == lastRow);
+
+		if (isInLastRow && isInCentralColumns)
+		{
+			GameScene nextScene = GameScene::Lobby;
+
+			switch (mCurrentScene)
+			{
+			case GameScene::Lobby:
+				nextScene = GameScene::Level1;
+				SDL_Log("Transitioning: Lobby -> Level 1");
+				break;
+			case GameScene::Level1:
+				nextScene = GameScene::Level2;
+				SDL_Log("Transitioning: Level 1 -> Level 2");
+				break;
+			case GameScene::Level2:
+				nextScene = GameScene::Level3;
+				SDL_Log("Transitioning: Level 2 -> Level 3");
+				break;
+			case GameScene::Level3:
+				nextScene = GameScene::Lobby;
+				SDL_Log("Transitioning: Level 3 -> Lobby (Game Complete!)");
+				break;
+			default:
+				return;
+			}
+
+			SetScene(nextScene);
+			return;
+		}
+	}
 
 	// Audio and UI
 	if (mAudio)
@@ -628,6 +683,12 @@ void Game::GenerateOutput()
 			break;
 		case GameScene::Level1:
 			backgroundPath = "../Assets/Levels/Level1/Level1Background.png";
+			break;
+		case GameScene::Level2:
+			backgroundPath = "../Assets/Levels/Level2/Level2Background.png";
+			break;
+		case GameScene::Level3:
+			backgroundPath = "../Assets/Levels/Level3/Level3Background.png";
 			break;
 		default:
 			backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
