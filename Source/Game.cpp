@@ -689,3 +689,19 @@ StompActor* Game::GetStompActor()
 	
 	return stomp;
 }
+
+FurBallActor* Game::GetFurBallActor()
+{
+	FurBallActor *furball = nullptr;
+	for (auto actor : mFurBallActors)
+		if (actor->IsDead())
+			furball = actor;
+
+	if (!furball)
+	{
+		furball = new FurBallActor(this);
+		mFurBallActors.push_back(furball);
+	}
+	
+	return furball;
+}

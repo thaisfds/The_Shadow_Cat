@@ -20,7 +20,7 @@ ColliderComponent::~ColliderComponent()
 
 void ColliderComponent::DetectCollisions(RigidBodyComponent *rigidBody)
 {
-	if (mIsStatic) return;
+	if (mIsStatic || !mIsEnabled) return;
 
 	mCollider->SolveCollisions(rigidBody);
 }

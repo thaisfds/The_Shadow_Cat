@@ -97,6 +97,10 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/Stomp.h
         Source/Components/Physics/Collider.cpp
         Source/Components/Physics/Collider.h
+        Source/Components/Skills/ClawAttack.cpp
+        Source/Components/Skills/ClawAttack.h
+        Source/Components/Skills/FurBall.cpp
+        Source/Components/Skills/FurBall.h
 )
 
 configure_local_linking(${PROJECT_NAME})
