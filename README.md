@@ -42,7 +42,7 @@ Durante o playtest, pedimos atenção especial aos seguintes aspectos:
 
 ### Controles e movimentação
 - **Responsividade dos controles**: Testar movimentação com teclado (WASD)
-- **Precisão do combate**: Avaliar se os ataques (Q para ataque básico na direção do mouse, R para ataque especial) respondem adequadamente
+- **Precisão do combate**: Avaliar se os ataques respondem adequadamente
 - **Dash/Esquiva**: Verificar se o movimento evasivo (E) funciona como esperado
 
 ### Sistema de combate
