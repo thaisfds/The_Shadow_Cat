@@ -9,6 +9,8 @@ class TutorialHUD : public UIScreen
 public:
     TutorialHUD(class Game* game, const std::string& fontName);
 
+    bool IsControlVisible() const { return showControls; }
+
     void ToggleControlVisibility();
 private:
 

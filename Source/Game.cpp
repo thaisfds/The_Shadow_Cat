@@ -519,7 +519,7 @@ void Game::ProcessInput()
 
 			// Tutorial HUD toggle
 			if (event.key.keysym.sym == SDLK_h && event.key.repeat == 0)
-				if (mTutorialHUD)
+				if (mTutorialHUD && mCurrentScene == GameScene::Lobby)
 					mTutorialHUD->ToggleControlVisibility();
 
 			// Pass event to actors
@@ -595,6 +595,9 @@ void Game::UpdateGame(float deltaTime)
 			default:
 				return;
 			}
+
+			if (nextScene != GameScene::Lobby && mTutorialHUD->IsControlVisible())
+				mTutorialHUD->ToggleControlVisibility();
 
 			if (!mIsGameWon)
 				SetScene(nextScene);

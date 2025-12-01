@@ -24,6 +24,8 @@ TutorialHUD::TutorialHUD(class Game* game, const std::string& fontName)
     // Toggle visibility instruction
     AddText("Press H to hide/show controls guide", Vector2(0.0f, 200.0f), 0.4f);
 
+    AddText("Go to the red carpet to advance to the next level", Vector2(0.0f, 250.0f), 0.5f);
+
     for (auto &txt : mTexts) {
         txt->SetTextColor(Vector3::Zero); // Black
         txt->SetBackgroundColor(Vector4::Zero); // Transparent
