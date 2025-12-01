@@ -122,6 +122,9 @@ void Game::UnloadScene()
         actor->SetState(ActorState::Destroy);
     }
 
+	mStompActors.clear();
+	mFurBallActors.clear();
+
     // Delete UI screens
     for (auto ui : mUIStack) {
 		// Don't delete HUD or Tutorial HUD here, they persist between scenes
