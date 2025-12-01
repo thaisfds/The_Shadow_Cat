@@ -7,7 +7,7 @@ UIButton::UIButton(class Game* game, std::function<void()> onClick, const std::s
         ,mOnClick(onClick)
         ,mHighlighted(false)
 {
-
+    mNormalColor = mTextColor;
 }
 
 UIButton::~UIButton()
@@ -27,10 +27,10 @@ void UIButton::OnClick()
 void UIButton::Draw(class Shader* shader)
 {
     if(mHighlighted) {
-        mBackgroundColor.w = 1.0f;
+        SetTextColor(mTextHighlightColor);
     }
     else {
-        mBackgroundColor.w = 0.5f;
+        SetTextColor(mNormalColor);
     }
 
     UIText::Draw(shader);

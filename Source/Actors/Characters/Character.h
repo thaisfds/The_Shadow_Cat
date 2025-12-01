@@ -39,6 +39,14 @@ public:
         return filter;
     };
 
+    static CollisionFilter GetFollowerEnemyFilter()
+    {
+        CollisionFilter filter;
+        filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::Enemy});
+        filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Environment, CollisionGroup::Enemy, CollisionGroup::PlayerSkills});
+        return filter;
+    };
+
 protected:
     void ManageAnimations();
 

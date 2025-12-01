@@ -57,24 +57,27 @@ void UIText::Draw(class Shader* shader)
         return;
 
     // Draw Text Background
-    Matrix4 scaleMat = Matrix4::CreateScale((static_cast<float>(mTexture->GetWidth()) + mMargin.x) * mScale,
-                                            (static_cast<float>(mTexture->GetHeight()) + mMargin.y) * mScale, 1.0f);
+    if (mBackgroundColor.w > 0.0001f) // Skip if fully transparent
+        {
+        Matrix4 scaleMat = Matrix4::CreateScale((static_cast<float>(mTexture->GetWidth()) + mMargin.x) * mScale,
+                                                (static_cast<float>(mTexture->GetHeight()) + mMargin.y) * mScale, 1.0f);
 
-    // Translate to position on screen
-    Matrix4 transMat = Matrix4::CreateTranslation(Vector3(mOffset.x + GameConstants::WINDOW_WIDTH / 2, mOffset.y + GameConstants::WINDOW_HEIGHT / 2, 0.0f));
+        // Translate to position on screen
+        Matrix4 transMat = Matrix4::CreateTranslation(Vector3(mOffset.x + GameConstants::WINDOW_WIDTH / 2, mOffset.y + GameConstants::WINDOW_HEIGHT / 2, 0.0f));
 
-    // Set world transform
-    Matrix4 world = scaleMat * transMat;
-    shader->SetMatrixUniform("uWorldTransform", world);
-    shader->SetVectorUniform("uTexRect", Vector4::UnitRect);
-    shader->SetVectorUniform("uCameraPos", Vector2::Zero);
+        // Set world transform
+        Matrix4 world = scaleMat * transMat;
+        shader->SetMatrixUniform("uWorldTransform", world);
+        shader->SetVectorUniform("uTexRect", Vector4::UnitRect);
+        shader->SetVectorUniform("uCameraPos", Vector2::Zero);
 
-    // Set uTextureFactor and color
-    shader->SetFloatUniform("uTextureFactor", 0.0f); // add alpha later
-    shader->SetVectorUniform("uColor", Vector3(mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z   ));
+        // Set uTextureFactor and color
+        shader->SetFloatUniform("uTextureFactor", 0.0f); // add alpha later
+        shader->SetVectorUniform("uColor", Vector3(mBackgroundColor.x, mBackgroundColor.y, mBackgroundColor.z   ));
 
-    // Draw quad
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        // Draw quad
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    }
 
     // Draw text
     UIImage::Draw(shader);

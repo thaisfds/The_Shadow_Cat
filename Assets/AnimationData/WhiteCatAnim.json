@@ -1,0 +1,10 @@
+{
+  "image": "../Assets/Sprites/WhiteCat/WhiteCat.png",
+  "spriteSheetData": "../Assets/Sprites/WhiteCat/WhiteCat.json",
+  "animations": 
+  {
+    "Idle": [1],
+    "Run": [0, 2]
+  },
+  "base": "Idle"
+}

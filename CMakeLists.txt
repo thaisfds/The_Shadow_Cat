@@ -65,6 +65,8 @@ add_executable(${PROJECT_NAME}
         Source/UI/UIText.h
         Source/UI/Screens/HUD.cpp
         Source/UI/Screens/HUD.h
+        Source/UI/Screens/TutorialHUD.cpp
+        Source/UI/Screens/TutorialHUD.h
         Source/UI/UIRect.cpp
         Source/UI/UIRect.h
         Source/UI/Screens/MainMenu.cpp
@@ -77,8 +79,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/BasicAttack.h
         Source/Components/Skills/SkillInputHandler.cpp
         Source/Components/Skills/SkillInputHandler.h
-        Source/Actors/Characters/BasicEnemy.cpp
-        Source/Actors/Characters/BasicEnemy.h
+        Source/Actors/Characters/Enemy.cpp
+        Source/Actors/Characters/Enemy.h
         Source/Actors/Characters/Character.cpp
         Source/Actors/Characters/Character.h
         Source/Actors/Characters/Dummy.cpp

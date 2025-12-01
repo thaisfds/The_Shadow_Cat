@@ -18,6 +18,9 @@ public:
     void SetHighlighted(bool sel) { mHighlighted = sel; }
     bool GetHighlighted() const { return mHighlighted; }
 
+    void SetTextHighlightColor(const Vector3& color) { mTextHighlightColor = color; }
+    Vector3 GetTextHighlightColor() const { return mTextHighlightColor; }
+
     // Returns true if the point is within the button's bounds
     bool ContainsPoint(const Vector2& pt) const;
 
@@ -30,4 +33,7 @@ private:
 
     // Check if the button is highlighted
     bool mHighlighted;
+
+    Vector3 mTextHighlightColor = Vector3::Zero;
+    Vector3 mNormalColor = Vector3::One;
 };

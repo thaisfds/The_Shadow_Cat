@@ -6,8 +6,21 @@
     - [x] keyboard WASD
     - [x] gamepad 
 - [ ] [Juan] Create enemy
-    - [ ] Basic static
-    - [ ] smart
+    - [x] Basic static
+    - [x] Patrol mode
+    - [x] Detects player
+        - [x] Dead zone (cone-like detection, ignores player if they are behind them)
+    - [x] Chases player
+        - [ ] Test obstacle handling
+    - [x] Attacks player
+        - [ ] Test attack animation
+        - [ ] Test cooldown
+        - [ ] Player death
+    - [ ] Flexiblility for bosses and spawning animation (skills vs state machine)(complex)
+    - [x] (maybe) Detection radius smaller than give-up-from-persuit radius
+    - [x] (maybe) Waits for a while before turning on patrol
+    - [x] (maybe) Memory of last seen player position
+    - [x] (maybe) Return to original patrol area
 - [ ] [Juan] Player basic combat 
     - [ ] basic
     - [ ] charged
@@ -29,29 +42,29 @@
 ## Mid Priority
 
 - [ ] [Pains] Implement HUD
-    - [ ] Lives / HP display (hearts or bar)
+    - [x] Lives / HP display (hearts or bar)
     - [ ] Item slots (icons + count)
     - [ ] Active item indicator + usage key
     - [ ] Cooldown timers (visual overlays)
     - [ ] Run timer / Score display
-    - [ ] Boss HP bar (show during boss fight)
+    - [x] Boss HP bar (show during boss fight)
     - [ ] Status effect icons (poison, slow, buffs)
-    - [ ] Responsive layout (different resolutions)
+    - [x] Responsive layout (different resolutions)
 - [ ] [Filipe] Implement item pickups
     - [ ] Active
     - [ ] Passive
 - [ ] [Filipe] Implement item selection UI / loot choices
-- [ ] [Pains] Implement menus
-- [ ] [Pains] Integrate audio
+- [x] [Pains] Implement menus
+- [x] [Pains] Integrate audio
 - [ ] [_____] Implement particle systems and visual feedback
 - [ ] [_____] Integrate shaders and lighting effects
 - [ ] [Thais] Finalize sprites, tilesets and animations
 - [ ] [Pains] Main Menu (detailed)
-    - [ ] Start Run
-    - [ ] Tutorial (first-run trigger)
+    - [x] Start Run
+    - [x] Tutorial (first-run trigger)
     - [ ] Options (Audio, FullScreen, Controls?, Accessibility?)
     - [ ] Credits
-    - [ ] Exit
+    - [x] Exit
 - [ ] [Pains] In-Game Pause Menu (detailed)
     - [ ] Resume
     - [ ] Options (Audio, Controls, Accessibility)

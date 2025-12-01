@@ -2,59 +2,81 @@
 #include "../../Game.h"
 #include <string>
 
-HUD::HUD(class Game* game, const std::string& fontName)
-    :UIScreen(game, fontName)
-{
-    const Vector2 healthOffset = Vector2(-200.0f, 300.0f);
-    const Vector2 scoreOffset = Vector2(-300.0f, 230.0f); // Below health
-    const Vector2 scoreValueOffset = Vector2(-230.0f, 230.0f); // Right of Score
+HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
+    :UIScreen(game, fontName),
+    mMaxHealth(maxHealth),
+    mHealth(maxHealth)
+{   
+    mMaxHealth = std::max(2, mMaxHealth); // Ensure at least 2
+    mHealth = mMaxHealth;
 
-    const float scale = 0.75f;
+    InitHealthIcons();
+}
 
-    mHealth3 = AddImage("../Assets/HUD/ShieldBlue.png", healthOffset, scale, 0.0f, 3);
-    mHealth2 = AddImage("../Assets/HUD/ShieldOrange.png", healthOffset, scale, 0.0f, 2);
-    mHealth1 = AddImage("../Assets/HUD/ShieldRed.png", healthOffset, scale, 0.0f, 1);
-    
-    
-    AddImage("../Assets/HUD/ShieldBar.png", healthOffset, scale, 0.0f, 4);
+void HUD::InitHealthIcons() {
+    if (mMaxHealth % 2 != 0) {
+        mMaxHealth++; // Ensure max health is even for heart icons
+        mHealth++;
+    }
 
-    AddText("Score: ", scoreOffset, 0.6f);
-    mScore = AddText("0", scoreValueOffset, 0.6f);
+    // Delete any existing icons
+    for (auto img : mFullHeartIcons) delete img;
+    for (auto img : mHalfHeartIcons) delete img;
+    for (auto img : mEmptyHeartIcons) delete img;
+
+    mFullHeartIcons.clear();
+    mHalfHeartIcons.clear();
+    mEmptyHeartIcons.clear();
+
+    // Create new icons based on mMaxHealth
+    const float SCALE = 1.5f;
+    const float SPACING = 35.0f * SCALE;
+
+    for (int i = 0; i < mMaxHealth / 2; ++i) {
+        Vector2 offset(-560.0f + i * SPACING, -300.0f);
+
+        UIImage* emptyHeart = AddImage("../Assets/HUD/LifeBar_2.png", offset, SCALE, 0.0f, 1);
+        UIImage* halfHeart = AddImage("../Assets/HUD/LifeBar_1.png", offset, SCALE, 0.0f, 2);
+        UIImage* fullHeart = AddImage("../Assets/HUD/LifeBar_0.png", offset, SCALE, 0.0f, 3);
+
+        mEmptyHeartIcons.push_back(emptyHeart);
+        mHalfHeartIcons.push_back(halfHeart);
+        mFullHeartIcons.push_back(fullHeart);
+    }
+
+    SetHealth(mHealth);
 }
 
 void HUD::SetHealth(int health)
 {
-    switch (health) {
-    case 3:
-        mHealth1->SetIsVisible(true);
-        mHealth2->SetIsVisible(true);
-        mHealth3->SetIsVisible(true);
-        break;
+    mHealth = std::clamp(health, 0, mMaxHealth);
 
-    case 2:
-        mHealth1->SetIsVisible(true);
-        mHealth2->SetIsVisible(true);
-        mHealth3->SetIsVisible(false);
-        break;
+    // Update heart icons based on current health
+    for (int i = 0; i < mMaxHealth / 2; ++i) {
+        int heartHealth = (i + 1) * 2;
 
-    case 1:
-        mHealth1->SetIsVisible(true);
-        mHealth2->SetIsVisible(false);
-        mHealth3->SetIsVisible(false);
-        break;
-
-    case 0:
-        mHealth1->SetIsVisible(false);
-        mHealth2->SetIsVisible(false);
-        mHealth3->SetIsVisible(false);
-        break;
-
-    default:
-        break;
+        if (mHealth >= heartHealth) {
+            mFullHeartIcons[i]->SetIsVisible(true);
+            mHalfHeartIcons[i]->SetIsVisible(false);
+            mEmptyHeartIcons[i]->SetIsVisible(false);
+        } else if (mHealth == heartHealth - 1) {
+            mFullHeartIcons[i]->SetIsVisible(false);
+            mHalfHeartIcons[i]->SetIsVisible(true);
+            mEmptyHeartIcons[i]->SetIsVisible(false);
+        } else {
+            mFullHeartIcons[i]->SetIsVisible(false);
+            mHalfHeartIcons[i]->SetIsVisible(false);
+            mEmptyHeartIcons[i]->SetIsVisible(true);
+        }
     }
 }
 
-void HUD::SetScore(int score)
+void HUD::UpdateMaxHealth(int maxHealth, bool fill)
 {
-    mScore->SetText(std::to_string(score));
+    mMaxHealth = maxHealth;
+
+    mMaxHealth = std::max(2, mMaxHealth); // Ensure at least 2
+    mHealth = fill ? mMaxHealth : std::min(mHealth, mMaxHealth);
+
+    InitHealthIcons();
 }
