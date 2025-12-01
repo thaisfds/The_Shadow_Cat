@@ -3,8 +3,9 @@
   "spriteSheetData": "../Assets/Sprites/OrangeCat/OrangeCat.json",
   "animations": 
   {
-    "Idle": [1],
-    "Run": [0, 2]
+    "Idle": [0],
+    "Run": [0, 1, 2, 3],
+    "BasicAttack": { "start": 5, "end": 11}
   },
   "base": "Idle"
 }
