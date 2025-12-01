@@ -35,6 +35,8 @@ void AABBCollider::SolveCollisions(const RigidBodyComponent* rigidBody)
 
 bool AABBCollider::CheckCollision(const Collider* other) const
 {
+	if (this == other) return false;
+
 	if (const AABBCollider* aabb = dynamic_cast<const AABBCollider*>(other))
 		return Physics::CheckAABBAABB(this, aabb);
 	else if (const CircleCollider* circle = dynamic_cast<const CircleCollider*>(other))
@@ -45,6 +47,8 @@ bool AABBCollider::CheckCollision(const Collider* other) const
 
 bool CircleCollider::CheckCollision(const Collider* other) const
 {
+	if (this == other) return false;
+	
 	if (const CircleCollider* circle = dynamic_cast<const CircleCollider*>(other))
 		return Physics::CheckCircleCircle(this, circle);
 	else if (const AABBCollider* aabb = dynamic_cast<const AABBCollider*>(other))

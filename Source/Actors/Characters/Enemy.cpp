@@ -3,7 +3,7 @@
 #include "../../Game.h"
 #include "../../GameConstants.h"
 #include "../../Components/Drawing/AnimatorComponent.h"
-#include "../../Components/Physics/AABBColliderComponent.h"
+#include "../../Components/Physics/ColliderComponent.h"
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../../Renderer/Renderer.h"
 #include <SDL.h>
@@ -42,11 +42,9 @@ Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, float
     // Use WhiteCat sprite
     mAnimatorComponent = new AnimatorComponent(this, "WhiteCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
-    CollisionFilter collisionFilter = {
-        CollisionFilter::GroupMask({CollisionGroup::Enemy}),
-        CollisionFilter::GroupMask({CollisionGroup::Environment, CollisionGroup::Enemy, CollisionGroup::PlayerSkills})
-    };
-    mColliderComponent = new AABBColliderComponent(this, 0, 0, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE, collisionFilter);
+    
+    Collider *collider = new AABBCollider(GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+    mColliderComponent = new ColliderComponent(this, 0, 0, collider, GetFollowerEnemyFilter());
     
     // Static enemy - no gravity
     mRigidBodyComponent->SetApplyGravity(false);
