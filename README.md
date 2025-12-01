@@ -14,6 +14,12 @@ Lobby com tutorial
 Level 1 - Floresta
 ![Level 1 - Floresta](Assets/README/level1.png)
 
+Level 2 - Arredores
+![Level 2 - Arredores](Assets/README/level2.png)
+
+Level 3 - Cidade
+![Level 3 - Cidade](Assets/README/level2.png)
+
 ![Enfrentando inimigos](Assets/README/enemies.png)
 
 ![Tela de pause](Assets/README/pause.png)
