@@ -1,5 +1,7 @@
 #pragma once
 #include "Character.h"
+#include "../../Components/Physics/ColliderComponent.h"
+#include "../../Components/Skills/BasicAttack.h"
 
 class Enemy : public Character
 {
@@ -30,6 +32,9 @@ public:
     void OnDebugDraw(class Renderer* renderer);
 
 private:
+    CollisionFilter mSkillFilter;
+    BasicAttack* mBasicAttack;
+
     float mDeathTimer;
     bool mIsPlayingDeathAnim;
     

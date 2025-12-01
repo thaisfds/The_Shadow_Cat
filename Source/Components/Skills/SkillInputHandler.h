@@ -2,6 +2,7 @@
 #include "../Component.h"
 #include <unordered_map>
 #include <SDL.h>
+#include "../Physics/CollisionFilter.h"
 
 enum class InputType
 {
@@ -64,4 +65,6 @@ private:
     
     SkillInput SlotToKey(int slot) const;
     int KeyToSlot(SkillInput key) const;
+
+    CollisionFilter mSkillFilter;
 };

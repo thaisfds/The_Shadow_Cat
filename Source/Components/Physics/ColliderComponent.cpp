@@ -28,6 +28,8 @@ void ColliderComponent::DetectCollisions(RigidBodyComponent *rigidBody)
 
 void ColliderComponent::DebugDraw(class Renderer *renderer)
 {
+	if (!mIsEnabled) return;
+	
 	mCollider->DebugDraw(renderer);
 }
 

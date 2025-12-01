@@ -14,10 +14,10 @@ Stomp::Stomp(Actor* owner, int updateOrder)
 {
 	mName = "Stomp";
 	mDescription = "Bring a pawerful stomp down, damaging nearby enemies.";
-	mCooldown = 0.0f;
+	mCooldown = 5.0f;
 	mCurrentCooldown = 0.0f;
 
-	mDamage = 30;
+	mDamage = 15;
 	mStompRadius = 50.0f;
 }
 
@@ -26,7 +26,7 @@ void Stomp::Update(float deltaTime)
 	SkillBase::Update(deltaTime);
 }
 
-void Stomp::Execute()
+void Stomp::Execute(Vector2 targetPosition)
 {
 	CollisionFilter filter;
 	filter.belongsTo = CollisionFilter::GroupMask({ CollisionGroup::PlayerSkills });

@@ -10,7 +10,7 @@ ClawAttack::ClawAttack(Actor* owner, int updateOrder)
 {
 	mName = "Claw Attack";
 	mDescription = "Perform a ferocious pounce, slashing with your claws.";
-	mCooldown = 0.0f;
+	mCooldown = 3.0f;
 	mCurrentCooldown = 0.0f;
 	mIsAttacking = false;
 	mDamageDelay = 1.3f; // Hardcoded for now, want to change later
@@ -20,7 +20,7 @@ ClawAttack::ClawAttack(Actor* owner, int updateOrder)
 
 	mConeRadius = 60.0f;
 	mConeAngle = Math::ToRadians(60.0f);
-	mDamage = 15;
+	mDamage = 20;
 }
 
 void ClawAttack::Update(float deltaTime)
@@ -50,7 +50,7 @@ void ClawAttack::Update(float deltaTime)
 	if (mAttackTimer >= mAttackDuration) EndAttack();
 }
 
-void ClawAttack::Execute()
+void ClawAttack::Execute(Vector2 targetPosition)
 {
 	mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("ClawAttack");
 	mCharacter->SetMovementLock(true);

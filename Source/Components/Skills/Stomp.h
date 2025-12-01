@@ -12,7 +12,7 @@ public:
 
 	void Update(float deltaTime) override;
 
-	void Execute() override;
+	void Execute(Vector2 targetPosition) override;
 private:
 	int mDamage;
 	float mStompRadius;

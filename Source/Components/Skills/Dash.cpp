@@ -10,7 +10,7 @@ Dash::Dash(Actor* owner, int updateOrder)
 {
 	mName = "Dash";
 	mDescription = "Quickly dash in a direction to evade attacks.";
-	mCooldown = 0.0f;
+	mCooldown = 4.0f;
 	mCurrentCooldown = 0.0f;
 	mIsDashing = false;
 
@@ -36,7 +36,7 @@ void Dash::Update(float deltaTime)
 	if (mDashTimer >= mDashDuration) EndDash();
 }
 
-void Dash::Execute()
+void Dash::Execute(Vector2 targetPosition)
 {
 	mCharacter->SetAnimationLock(true);
 	AnimatorComponent* animator = mCharacter->GetComponent<AnimatorComponent>();
