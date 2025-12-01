@@ -63,6 +63,11 @@ void FurBall::Execute()
 	mDirection = mouseWorldPos - mCharacter->GetPosition();
 	mDirection.Normalize();
 
+	if (mDirection.x > 0.0f)
+		mCharacter->SetScale(Vector2(1.0f, mCharacter->GetScale().y));
+	else if (mDirection.x < 0.0f)
+		mCharacter->SetScale(Vector2(-1.0f, mCharacter->GetScale().y));
+
 	StartCooldown();
 }
 
