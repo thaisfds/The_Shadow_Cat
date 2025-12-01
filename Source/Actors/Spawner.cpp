@@ -4,10 +4,11 @@
 #include "../GameConstants.h"
 #include <SDL.h>
 
-Spawner::Spawner(Game *game, Vector2 patrolPointA, Vector2 patrolPointB, float spawnDistance)
+Spawner::Spawner(Game *game, Vector2 patrolPointA, Vector2 patrolPointB, Enemy::EnemyType enemyType, float spawnDistance)
     : Actor(game)
     , mSpawnDistance(spawnDistance)
     , mHasSpawned(false)
+    , mEnemyType(enemyType)
 {
     mPatrolWaypoints[0] = patrolPointA;
     mPatrolWaypoints[1] = patrolPointB;
@@ -55,7 +56,8 @@ void Spawner::SpawnEnemy()
     }
     
     // Create enemy at spawner position with stored patrol waypoints
-    auto enemy = new Enemy(mGame, mPatrolWaypoints[0], mPatrolWaypoints[1]);
+    // Enemy type is determined by the current level in Game.cpp
+    auto enemy = new Enemy(mGame, mPatrolWaypoints[0], mPatrolWaypoints[1], mEnemyType);
     enemy->SetPosition(mPosition);
     
     if (mGame->IsDebugging())
