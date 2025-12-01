@@ -41,9 +41,11 @@ A progressão acontece através da derrota dos inimigos que podem conceder novas
 Durante o playtest, pedimos atenção especial aos seguintes aspectos:
 
 ### Controles e movimentação
-- **Responsividade dos controles**: Testar movimentação com teclado (WASD)
-- **Precisão do combate**: Avaliar se os ataques respondem adequadamente
-- **Dash/Esquiva**: Verificar se o movimento evasivo funciona como esperado
+- **Responsividade dos controles**: Testar movimentação com teclado (W/A/S/D)
+- **Precisão do combate**: Avaliar se os ataques básicos (Botão Esquerdo do Mouse) e especiais (Botão Direito do Mouse) respondem adequadamente
+- **Ataques de habilidade**: Testar o ataque a distância Furball (E) e o ataque Stomp (Q)
+- **Dash/Esquiva**: Verificar se o movimento evasivo (Shift) funciona como esperado e oferece a mobilidade necessária
+- **Tutorial interativo**: Verificar se o sistema de ajuda (H) mostra e esconde os controles corretamente
 
 ### Sistema de combate
 - **Balanceamento de dano**: Observar se o dano causado e recebido está equilibrado
