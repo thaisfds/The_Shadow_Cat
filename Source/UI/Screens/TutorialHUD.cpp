@@ -42,3 +42,25 @@ void TutorialHUD::ToggleControlVisibility()
     for (auto &txt : mTexts)
         txt->SetIsVisible(showControls);
 }
+
+void TutorialHUD::ShowControls()
+{
+    showControls = true;
+
+    for (auto &img : mImages)
+        img->SetIsVisible(true);
+
+    for (auto &txt : mTexts)
+        txt->SetIsVisible(true);
+}
+
+void TutorialHUD::HideControls()
+{
+    showControls = false;
+
+    for (auto &img : mImages)
+        img->SetIsVisible(false);
+
+    for (auto &txt : mTexts)
+        txt->SetIsVisible(false);
+}

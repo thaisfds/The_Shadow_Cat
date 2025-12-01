@@ -175,33 +175,48 @@ void Game::SetScene(GameScene nextScene)
         case GameScene::Lobby:
             mCurrentScene = GameScene::Lobby;
 
-			// Always shown
-			mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf"); 
+		// Always shown
+		mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf"); 
 
-			// Toggleable tutorial HUD
+		// Toggleable tutorial HUD
+		if (!mTutorialHUD)
 			mTutorialHUD = new TutorialHUD(this, "../Assets/Fonts/Pixellari.ttf");
+		
+		// Show tutorial in Lobby
+		if (mTutorialHUD)
+			mTutorialHUD->ShowControls();
 
-			InitializeActors();
-
-			break;
+		InitializeActors();			break;
 
         case GameScene::Level1:
-            mCurrentScene = GameScene::Level1;
+        mCurrentScene = GameScene::Level1;
 
-            InitializeActors();
-            break;
+        // Hide tutorial when entering levels
+        if (mTutorialHUD)
+            mTutorialHUD->HideControls();
 
-        case GameScene::Level2:
-            mCurrentScene = GameScene::Level2;
+        InitializeActors();
+        break;
 
-            InitializeActors();
-            break;
+    case GameScene::Level2:
+        mCurrentScene = GameScene::Level2;
 
-        case GameScene::Level3:
-            mCurrentScene = GameScene::Level3;
+        // Hide tutorial when entering levels
+        if (mTutorialHUD)
+            mTutorialHUD->HideControls();
 
-            InitializeActors();
-            break;
+        InitializeActors();
+        break;
+
+    case GameScene::Level3:
+        mCurrentScene = GameScene::Level3;
+
+        // Hide tutorial when entering levels
+        if (mTutorialHUD)
+            mTutorialHUD->HideControls();
+
+        InitializeActors();
+        break;
     }
 }
 
@@ -520,12 +535,10 @@ void Game::ProcessInput()
 			if (event.key.keysym.sym == SDLK_F1 && event.key.repeat == 0)
 				mIsDebugging = !mIsDebugging;
 
-			// Tutorial HUD toggle
-			if (event.key.keysym.sym == SDLK_h && event.key.repeat == 0)
-				if (mTutorialHUD && mCurrentScene == GameScene::Lobby)
-					mTutorialHUD->ToggleControlVisibility();
-
-			// Pass event to actors
+		// Tutorial HUD toggle
+		if (event.key.keysym.sym == SDLK_h && event.key.repeat == 0)
+			if (mTutorialHUD)
+				mTutorialHUD->ToggleControlVisibility();			// Pass event to actors
 			for (auto actor : mActors) actor->OnHandleEvent(event);
 			break;
 		}
@@ -592,17 +605,12 @@ void Game::UpdateGame(float deltaTime)
 				break;
 			case GameScene::Level3:
 				SetGameWon(true);
-				break;
-				
-				break;
-			default:
-				return;
-			}
-
-			if (nextScene != GameScene::Lobby && mTutorialHUD->IsControlVisible())
-				mTutorialHUD->ToggleControlVisibility();
-
-			if (!mIsGameWon)
+			break;
+			
+			break;
+		default:
+			return;
+		}			if (!mIsGameWon)
 				SetScene(nextScene);
 		}
 	}

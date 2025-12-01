@@ -12,8 +12,10 @@ public:
     bool IsControlVisible() const { return showControls; }
 
     void ToggleControlVisibility();
+    void ShowControls();
+    void HideControls();
 private:
 
     // TutorialHUD elements
-    bool showControls = true;
+    bool showControls = false;
 };
