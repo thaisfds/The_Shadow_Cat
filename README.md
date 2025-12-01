@@ -5,8 +5,8 @@
 Tela do menu principal
 ![Tela do menu principal](Assets/README/MainMenu.png)
 
-Gameplay mostrando combate
-![Gameplay mostrando combate](Assets/README/combat.png)
+Gameplay mostrando sprites
+![Gameplay mostrando sprites](Assets/README/sprites.jpeg)
 
 Lobby com tutorial
 ![Lobby com tutorial](Assets/README/lobby.png)
