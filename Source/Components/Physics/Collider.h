@@ -34,8 +34,6 @@ public:
 
 	Vector2 GetHalfDimensions() const { return mHalfDimensions; }
 
-	void DebugDraw(class Renderer* renderer) override;
-
 private:
 	float GetMinVerticalOverlap(AABBCollider *b) const;
 	float GetMinHorizontalOverlap(AABBCollider *b) const;
