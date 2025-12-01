@@ -65,9 +65,11 @@ Durante o playtest, pedimos atenção especial aos seguintes aspectos:
 
 ### Teclado
 - **Movimentação**: W / A / S / D
-- **Ataque básico**: Q
-- **Dash**: E
-- **Ataque especial (Paw Smash)**: R
+- **Ataque básico**: Botão Esquerdo do Mouse
+- **Ataque especial (Clow Attack)**: Botão Direito do Mouse
+- **Ataque a distância (Furball)**: E
+- **Ataque pisada (Stomp)**: Q
+- **Dash**: Shift
 - **Mostrar/Esconder controles (tutorial)**: H
 - **Debug (desenvolvedores)**: F1
 
@@ -122,6 +124,6 @@ Durante o playtest, pedimos atenção especial aos seguintes aspectos:
 ---
 
 **Curso**: Introdução ao Desenvolvimento de Jogos - UFMG  
-**Data**: Dezembro de 2025
+**Data**: Novembro de 2025
 
 
