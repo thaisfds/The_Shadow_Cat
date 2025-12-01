@@ -18,9 +18,7 @@ Level 2 - Arredores
 ![Level 2 - Arredores](Assets/README/level2.png)
 
 Level 3 - Cidade
-![Level 3 - Cidade](Assets/README/level2.png)
-
-![Enfrentando inimigos](Assets/README/enemies.png)
+![Level 3 - Cidade](Assets/README/level3.png)
 
 ![Tela de pause](Assets/README/pause.png)
 
