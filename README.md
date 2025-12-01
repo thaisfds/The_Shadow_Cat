@@ -1,7 +1,5 @@
 # The Shadow Cat
 
-![Banner do jogo](Assets/README/MainMenuBackground.png)
-
 ## Capturas de tela
 
 ![Tela do menu principal](Assets/README/MainMenu.png)
