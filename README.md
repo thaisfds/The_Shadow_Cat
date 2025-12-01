@@ -2,11 +2,17 @@
 
 ## Capturas de tela
 
+Tela do menu principal
 ![Tela do menu principal](Assets/README/MainMenu.png)
 
+Gameplay mostrando combate
 ![Gameplay mostrando combate](Assets/README/combat.png)
 
+Lobby com tutorial
 ![Lobby com tutorial](Assets/README/lobby.png)
+
+Level 1 - Floresta
+![Level 1 - Floresta](Assets/README/level1.png)
 
 ![Enfrentando inimigos](Assets/README/enemies.png)
 
