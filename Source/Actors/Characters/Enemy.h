@@ -6,6 +6,13 @@
 class Enemy : public Character
 {
 public:
+    enum class EnemyType
+    {
+        WhiteCat,
+        OrangeCat,
+        SylvesterCat
+    };
+
     enum class AIState
     {
         Patrol,
@@ -15,7 +22,7 @@ public:
         Attack
     };
 
-    Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, float forwardSpeed = 0.0f);
+    Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, EnemyType type = EnemyType::WhiteCat, float forwardSpeed = 0.0f);
     virtual ~Enemy();
 
     void OnUpdate(float deltaTime) override;

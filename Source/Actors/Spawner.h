@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Actor.h"
+#include "Characters/Enemy.h"
 #include "../Math.h"
 
 /**
@@ -28,9 +29,10 @@ public:
      * @param game Game instance
      * @param patrolPointA First patrol waypoint for spawned enemy
      * @param patrolPointB Second patrol waypoint for spawned enemy
+     * @param enemyType Type of enemy to spawn
      * @param spawnDistance Distance from camera viewport to trigger spawn (default: 700px)
      */
-    Spawner(Game *game, Vector2 patrolPointA, Vector2 patrolPointB, float spawnDistance = 700.0f);
+    Spawner(Game *game, Vector2 patrolPointA, Vector2 patrolPointB, Enemy::EnemyType enemyType = Enemy::EnemyType::WhiteCat, float spawnDistance = 700.0f);
 
     void OnUpdate(float deltaTime) override;
     
@@ -55,4 +57,5 @@ private:
     float mSpawnDistance;
     Vector2 mPatrolWaypoints[2];
     bool mHasSpawned;
+    Enemy::EnemyType mEnemyType;
 };

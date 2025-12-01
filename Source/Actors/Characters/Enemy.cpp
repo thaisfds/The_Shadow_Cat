@@ -8,7 +8,7 @@
 #include "../../Renderer/Renderer.h"
 #include <SDL.h>
 
-Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, float forwardSpeed)
+Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, EnemyType type, float forwardSpeed)
     : Character(game, forwardSpeed)
     , mDeathTimer(0.0f)
     , mIsPlayingDeathAnim(false)
@@ -39,8 +39,23 @@ Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, float
     mPatrolWaypoints[0] = patrolPointA;
     mPatrolWaypoints[1] = patrolPointB;
     
-    // Use WhiteCat sprite
-    mAnimatorComponent = new AnimatorComponent(this, "WhiteCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+    // Select sprite based on enemy type
+    const char* animName = "WhiteCatAnim";
+    switch (type)
+    {
+        case EnemyType::OrangeCat:
+            animName = "OrangeCatAnim";
+            break;
+        case EnemyType::SylvesterCat:
+            animName = "SylvesterCatAnim";
+            break;
+        case EnemyType::WhiteCat:
+        default:
+            animName = "WhiteCatAnim";
+            break;
+    }
+    
+    mAnimatorComponent = new AnimatorComponent(this, animName, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
     
     Collider *collider = new AABBCollider(48, 32);
