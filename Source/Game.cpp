@@ -517,7 +517,7 @@ void Game::UpdateGame(float deltaTime)
 			new WinScreen(this, "../Assets/Fonts/Pixellari.ttf");
 		}
 	}
-	
+
 	// Update all actors and pending actors
 	UpdateActors(deltaTime);
 
@@ -557,15 +557,16 @@ void Game::UpdateGame(float deltaTime)
 				SDL_Log("Transitioning: Level 2 -> Level 3");
 				break;
 			case GameScene::Level3:
-				nextScene = GameScene::Lobby;
-				SDL_Log("Transitioning: Level 3 -> Lobby (Game Complete!)");
+				SetGameWon(true);
+				break;
+				
 				break;
 			default:
 				return;
 			}
 
-			SetScene(nextScene);
-			return;
+			if (!mIsGameWon)
+				SetScene(nextScene);
 		}
 	}
 
