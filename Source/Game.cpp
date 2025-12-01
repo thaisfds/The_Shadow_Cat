@@ -311,6 +311,24 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto enemy = new Enemy(this, waypointA, waypointB);
 				enemy->SetPosition(position);
 			}
+			// Spawner - small patrol (spawns when player gets close)
+			else if (tileID == 14)
+			{
+				// Create waypoints 100 pixels to left and right of spawn position
+				Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
+				Vector2 waypointB = position + Vector2(100.0f, 0.0f);
+				auto spawner = new Spawner(this, waypointA, waypointB);
+				spawner->SetPosition(position);
+			}
+			// Spawner - large patrol (spawns when player gets close)
+			else if (tileID == 15)
+			{
+				// Create waypoints 200 pixels to left and right of spawn position
+				Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
+				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
+				auto spawner = new Spawner(this, waypointA, waypointB);
+				spawner->SetPosition(position);
+			}
 		}
 	}
 }
