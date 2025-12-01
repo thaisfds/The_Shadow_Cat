@@ -20,8 +20,6 @@ Level 2 - Arredores
 Level 3 - Cidade
 ![Level 3 - Cidade](Assets/README/level3.png)
 
-![Tela de pause](Assets/README/pause.png)
-
 ![Game over](Assets/README/gameover.png)
 
 ![Fim de jogo - Vitória](Assets/README/victory.png)
