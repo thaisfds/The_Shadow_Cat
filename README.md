@@ -1,5 +1,15 @@
 # The Shadow Cat
 
+## Descrição
+
+**The Shadow Cat** é um action roguelike em perspectiva top-down, onde você controla um jovem gato preto ágil e determinado em sua missão de desafiar as facções felinas rivais e restaurar o equilíbrio do reino. O jogo combina um visual fofo em pixel art com mecânicas de combate que recompensam habilidade e aprendizado.
+
+Cada run apresenta salas construídas manualmente, mas povoadas com inimigos e obstáculos. O jogador começa cada tentativa com um número limitado de vidas e precisa atravessar diferentes fases até enfrentar os chefes finais de cada região. Quando todas as vidas se esgotam, a run termina e o jogador recomeça do início, mas com a possibilidade de encontrar itens e habilidades diferentes a cada nova tentativa.
+
+A progressão acontece através da derrota dos inimigos que podem conceder novas habilidades ao jogador, e do avanço para outras fases que é permitido ao derrotar todos eles. O sistema de habilidades permite diferentes estilos de combate, com ataques básicos, ataques carregados, habilidades especiais e movimentos evasivos. A combinação desses elementos garante que nenhuma run seja igual à outra, mantendo o jogo desafiador e interessante mesmo após várias tentativas.
+
+---
+
 ## Capturas de tela
 
 Tela do menu principal
@@ -20,19 +30,11 @@ Level 2 - Arredores
 Level 3 - Cidade
 ![Level 3 - Cidade](Assets/README/level3.png)
 
+Tela de Game over
 ![Game over](Assets/README/gameover.png)
 
+Fim de jogo - Vitória
 ![Fim de jogo - Vitória](Assets/README/victory.png)
-
----
-
-## Descrição
-
-**The Shadow Cat** é um action roguelike em perspectiva top-down, onde você controla um jovem gato preto ágil e determinado em sua missão de desafiar as facções felinas rivais e restaurar o equilíbrio do reino. O jogo combina um visual fofo em pixel art com mecânicas de combate que recompensam habilidade e aprendizado.
-
-Cada run apresenta salas construídas manualmente, mas povoadas com inimigos e obstáculos. O jogador começa cada tentativa com um número limitado de vidas e precisa atravessar diferentes fases até enfrentar os chefes finais de cada região. Quando todas as vidas se esgotam, a run termina e o jogador recomeça do início, mas com a possibilidade de encontrar itens e habilidades diferentes a cada nova tentativa.
-
-A progressão acontece através da derrota dos inimigos que podem conceder novas habilidades ao jogador, e do avanço para outras fases que é permitido ao derrotar todos eles. O sistema de habilidades permite diferentes estilos de combate, com ataques básicos, ataques carregados, habilidades especiais e movimentos evasivos. A combinação desses elementos garante que nenhuma run seja igual à outra, mantendo o jogo desafiador e interessante mesmo após várias tentativas.
 
 ---
 
