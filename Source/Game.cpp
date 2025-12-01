@@ -300,6 +300,16 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				mShadowCat = new ShadowCat(this);
 				mShadowCat->SetPosition(position);
 			}
+			// Tile ID 2: Spawner - medium patrol (150px)
+			// Spawns enemy when player camera comes within ~700px of this position
+			else if (tileID == 2)
+			{
+				// Create waypoints 150 pixels to left and right of spawn position
+				Vector2 waypointA = position + Vector2(-150.0f, 0.0f);
+				Vector2 waypointB = position + Vector2(150.0f, 0.0f);
+				auto spawner = new Spawner(this, waypointA, waypointB);
+				spawner->SetPosition(position);
+			}
 			// Blocks
 			else if (tileID >= 4 && tileID <= 10)
 			{
