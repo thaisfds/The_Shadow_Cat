@@ -28,8 +28,7 @@ void ColliderComponent::DetectCollisions(RigidBodyComponent *rigidBody)
 
 void ColliderComponent::DebugDraw(class Renderer *renderer)
 {
-	// renderer->DrawRect(mOwner->GetPosition() + mOffset, Vector2((float) mWidth, (float) mHeight), mOwner->GetRotation(),
-	// 				   Color::Green, mOwner->GetGame()->GetCameraPos(), RendererMode::LINES);
+	mCollider->DebugDraw(renderer);
 }
 
 
