@@ -1,13 +1,22 @@
 # The Shadow Cat
 
-![Placeholder: Banner do jogo]
+![Banner do jogo](Assets/README/MainMenuBackground.png)
 
 ## Capturas de tela
 
-![Placeholder: Tela do menu principal]
-![Placeholder: Gameplay mostrando combate]
-![Placeholder: Lobby com tutorial]
-![Placeholder: Enfrentando inimigos]
+![Tela do menu principal](Assets/README/MainMenu.png)
+
+![Gameplay mostrando combate](Assets/README/combat.png)
+
+![Lobby com tutorial](Assets/README/lobby.png)
+
+![Enfrentando inimigos](Assets/README/enemies.png)
+
+![Tela de pause](Assets/README/pause.png)
+
+![Game over](Assets/README/gameover.png)
+
+![Fim de jogo - Vitória](Assets/README/victory.png)
 
 ---
 
@@ -56,15 +65,13 @@ Durante o playtest, pedimos atenção especial aos seguintes aspectos:
 
 ## Controles
 
-### Teclado e Mouse
+### Teclado
 - **Movimentação**: W / A / S / D
-- **Interação**: F
-- **Ataque básico**: Botão esquerdo do mouse
-- **Ataque carregado**: Segurar botão esquerdo do mouse
-- **Ataque especial**: Botão direito do mouse
-- **Dash**: Shift
-- **Pausar**: Esc
+- **Ataque básico**: Q
+- **Dash**: E
+- **Ataque especial (Paw Smash)**: R
 - **Mostrar/Esconder controles (tutorial)**: H
+- **Debug (desenvolvedores)**: F1
 
 ---
 
