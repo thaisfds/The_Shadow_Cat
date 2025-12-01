@@ -146,4 +146,5 @@ void ShadowCat::TakeDamage(int damage)
 }
 void ShadowCat::Kill()
 {
+    mGame->SetGameOver(true);
 }
