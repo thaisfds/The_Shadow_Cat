@@ -27,6 +27,7 @@ public:
 
 	bool CheckCollision(const Collider* other) const override;
 	void SolveCollisions(const RigidBodyComponent* rigidBody) override;
+	void DebugDraw(class Renderer* renderer) override;
 
 	Vector2 GetMin() const;
 	Vector2 GetMax() const;

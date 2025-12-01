@@ -118,6 +118,9 @@ void Game::UnloadScene()
 
     // Delete UI screens
     for (auto ui : mUIStack) {
+		// Don't delete HUD or Tutorial HUD here, they persist between scenes
+		if (ui == mHUD || ui == mTutorialHUD) continue;
+
         delete ui;
     }
     mUIStack.clear();
@@ -158,6 +161,18 @@ void Game::SetScene(GameScene nextScene)
 
             InitializeActors();
             break;
+
+        case GameScene::Level2:
+            mCurrentScene = GameScene::Level2;
+
+            InitializeActors();
+            break;
+
+        case GameScene::Level3:
+            mCurrentScene = GameScene::Level3;
+
+            InitializeActors();
+            break;
     }
 }
 
@@ -176,6 +191,10 @@ void Game::InitializeActors()
 		levelPath = "../Assets/Levels/Lobby/Lobby.csv";
 	} else if (mCurrentScene == GameScene::Level1) {
 		levelPath = "../Assets/Levels/Level1/Level1.csv";
+	} else if (mCurrentScene == GameScene::Level2) {
+		levelPath = "../Assets/Levels/Level2/Level2.csv";
+	} else if (mCurrentScene == GameScene::Level3) {
+		levelPath = "../Assets/Levels/Level3/Level3.csv";
 	} else {
 		levelPath = "../Assets/Levels/Lobby/Lobby.csv";
 	}
@@ -293,7 +312,8 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto dummy = new Dummy(this);
 				dummy->SetPosition(position);
 			}
-			// Enemy (WhiteCat) - small patrol
+			// ========== IMMEDIATE ENEMY SPAWNS (spawn when level loads) ==========
+			// Tile ID 12: Enemy (WhiteCat) - small patrol (100px)
 			else if (tileID == 12)
 			{
 				// Create waypoints 100 pixels to left and right of spawn position
@@ -302,7 +322,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto enemy = new Enemy(this, waypointA, waypointB);
 				enemy->SetPosition(position);
 			}
-			// Enemy with larger patrol (WhiteCat2)
+			// Tile ID 13: Enemy with larger patrol (200px)
 			else if (tileID == 13)
 			{
 				// Create waypoints 200 pixels to left and right of spawn position
@@ -310,6 +330,27 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
 				auto enemy = new Enemy(this, waypointA, waypointB);
 				enemy->SetPosition(position);
+			}
+			// ========== DELAYED SPAWNERS (spawn when player approaches) ==========
+			// Tile ID 14: Spawner - small patrol (100px)
+			// Spawns enemy when player camera comes within ~700px of this position
+			else if (tileID == 14)
+			{
+				// Create waypoints 100 pixels to left and right of spawn position
+				Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
+				Vector2 waypointB = position + Vector2(100.0f, 0.0f);
+				auto spawner = new Spawner(this, waypointA, waypointB);
+				spawner->SetPosition(position);
+			}
+			// Tile ID 15: Spawner - large patrol (200px)
+			// Spawns enemy when player camera comes within ~700px of this position
+			else if (tileID == 15)
+			{
+				// Create waypoints 200 pixels to left and right of spawn position
+				Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
+				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
+				auto spawner = new Spawner(this, waypointA, waypointB);
+				spawner->SetPosition(position);
 			}
 		}
 	}
@@ -382,6 +423,10 @@ void Game::ProcessInput()
 				mUIStack.back()->HandleKeyPress(event.key.keysym.sym);
 			}
 
+			if (event.key.keysym.sym == SDLK_n && event.key.repeat == 0) {
+				SetScene(GameScene::Level1);
+			}
+
 			// Fullscreen toggle
 			if (event.key.keysym.sym == SDLK_F11 && event.key.repeat == 0) {
 				mIsFullscreen = !mIsFullscreen;
@@ -431,6 +476,51 @@ void Game::UpdateGame(float deltaTime)
 
 	// Update camera position
 	UpdateCamera();
+
+	if (mShadowCat)
+	{
+		Vector2 playerPos = mShadowCat->GetPosition();
+		int gridX = static_cast<int>(playerPos.x / GameConstants::TILE_SIZE);
+		int gridY = static_cast<int>(playerPos.y / GameConstants::TILE_SIZE);
+
+		int centerColumn = mLevelWidth / 2;
+		int leftColumn = centerColumn - 1;
+		int rightColumn = centerColumn + 1;
+
+		int lastRow = mLevelHeight - 1;
+		bool isInCentralColumns = (gridX == leftColumn || gridX == centerColumn || gridX == rightColumn);
+		bool isInLastRow = (gridY == lastRow);
+
+		if (isInLastRow && isInCentralColumns)
+		{
+			GameScene nextScene = GameScene::Lobby;
+
+			switch (mCurrentScene)
+			{
+			case GameScene::Lobby:
+				nextScene = GameScene::Level1;
+				SDL_Log("Transitioning: Lobby -> Level 1");
+				break;
+			case GameScene::Level1:
+				nextScene = GameScene::Level2;
+				SDL_Log("Transitioning: Level 1 -> Level 2");
+				break;
+			case GameScene::Level2:
+				nextScene = GameScene::Level3;
+				SDL_Log("Transitioning: Level 2 -> Level 3");
+				break;
+			case GameScene::Level3:
+				nextScene = GameScene::Lobby;
+				SDL_Log("Transitioning: Level 3 -> Lobby (Game Complete!)");
+				break;
+			default:
+				return;
+			}
+
+			SetScene(nextScene);
+			return;
+		}
+	}
 
 	// Audio and UI
 	if (mAudio)
@@ -593,6 +683,12 @@ void Game::GenerateOutput()
 			break;
 		case GameScene::Level1:
 			backgroundPath = "../Assets/Levels/Level1/Level1Background.png";
+			break;
+		case GameScene::Level2:
+			backgroundPath = "../Assets/Levels/Level2/Level2Background.png";
+			break;
+		case GameScene::Level3:
+			backgroundPath = "../Assets/Levels/Level3/Level3Background.png";
 			break;
 		default:
 			backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";

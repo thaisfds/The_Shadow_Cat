@@ -33,7 +33,9 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     mAnimatorComponent->LoopAnimation("Idle");
 
     hp = 10;
-    mGame->GetHUD()->UpdateMaxHealth(hp, true);
+
+    if (mGame->GetHUD())
+        mGame->GetHUD()->UpdateMaxHealth(hp, true);
 }
 
 void ShadowCat::OnProcessInput(const uint8_t *state)
@@ -137,7 +139,8 @@ void ShadowCat::TakeDamage(int damage)
 {
     hp -= damage;
 
-    mGame->GetHUD()->SetHealth(hp);
+    if (mGame->GetHUD())
+        mGame->GetHUD()->SetHealth(hp);
 
     if (hp <= 0) Kill();
 }

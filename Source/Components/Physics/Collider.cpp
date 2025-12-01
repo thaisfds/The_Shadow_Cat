@@ -2,6 +2,7 @@
 #include "ColliderComponent.h"
 #include "Physics.h"
 #include "../../Game.h"
+#include "../../Game.h"
 
 Vector2 AABBCollider::GetMin() const
 {
@@ -110,12 +111,4 @@ void AABBCollider::ResolveVerticalCollisions(RigidBodyComponent *rigidBody, cons
 	Vector2 velocity = rigidBody->GetVelocity();
 	velocity.y = 0.0f;
 	rigidBody->SetVelocity(velocity);
-}
-
-void AABBCollider::DebugDraw(class Renderer* renderer)
-{
-	Vector2 center = mComponent->GetOwner()->GetPosition();
-	Vector2 halfSize = mHalfDimensions;
-	renderer->DrawRect(center, halfSize * 2.0f, mComponent->GetOwner()->GetRotation(),
-					   Color::Green, mComponent->GetOwner()->GetGame()->GetCameraPos(), RendererMode::LINES);
 }
