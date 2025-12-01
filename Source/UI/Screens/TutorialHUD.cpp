@@ -11,13 +11,15 @@ TutorialHUD::TutorialHUD(class Game* game, const std::string& fontName)
     AddText("Move", Vector2(-100.0f, 40.0f), 0.4f);
 
     // Skills
-    AddImage("../Assets/HUD/q.png", Vector2(100.0f, -20.0f), 0.15f, 0.0f, 1);
-    AddImage("../Assets/HUD/e.png", Vector2(100.0f, 10.0f), 0.15f, 0.0f, 1);
-    AddImage("../Assets/HUD/r.png", Vector2(100.0f, 40.0f), 0.15f, 0.0f, 1);
+    // AddImage("../Assets/HUD/q.png", Vector2(100.0f, -20.0f), 0.15f, 0.0f, 1);
+    // AddImage("../Assets/HUD/e.png", Vector2(100.0f, 10.0f), 0.15f, 0.0f, 1);
+    // AddImage("../Assets/HUD/r.png", Vector2(100.0f, 40.0f), 0.15f, 0.0f, 1);
 
-    AddText("Attack", Vector2(140.0f, -20.0f), 0.4f);
-    AddText("Dash", Vector2(135.0f, 10.0f), 0.4f);
-    AddText("Paw Smash", Vector2(160.0f, 40.0f), 0.4f);
+    AddText("Left Mouse: Basic Attack", Vector2(200.0f, -20.0f), 0.4f);
+    AddText("Right Mouse: Claw Attack", Vector2(200.0f, 10.0f), 0.4f);
+    AddText("E: Furball", Vector2(160.0f, 40.0f), 0.4f);
+    AddText("Q: Stomp", Vector2(160.0f, 70.0f), 0.4f);
+    AddText("Shift: Dash", Vector2(160.0f, 100.0f), 0.4f);
 
     // Toggle visibility instruction
     AddText("Press H to hide/show controls guide", Vector2(0.0f, 200.0f), 0.4f);
