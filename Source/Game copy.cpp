@@ -27,7 +27,7 @@ Game::Game()
 	mRenderer(nullptr),
 	mTicksCount(0),
 	mIsRunning(true),
-	mIsDebugging(false),
+	mIsDebugging(true),
 	mUpdatingActors(false),
 	mCameraPos(Vector2::Zero),
 	mLevelData(nullptr),
@@ -115,26 +115,6 @@ bool Game::Initialize()
 	return true;
 }
 
-void Game::UnloadScene()
-{
-    // Use state so we can call this from within an actor update
-    for(auto *actor : mActors) {
-        actor->SetState(ActorState::Destroy);
-    }
-
-    // Delete UI screens
-    for (auto ui : mUIStack) {
-		// Don't delete HUD or Tutorial HUD here, they persist between scenes
-		if (ui == mHUD || ui == mTutorialHUD) continue;
-
-        delete ui;
-    }
-    mUIStack.clear();
-
-    // Reset states
-	mShadowCat = nullptr;
-}
-
 void Game::PauseGame() {
 	// Pause all actors
 	mIsPaused = true;
@@ -153,6 +133,26 @@ void Game::ResumeGame() {
 void Game::ResetGame() {
 	// Bugged so return for now
 	return;
+}
+
+void Game::UnloadScene()
+{
+    // Use state so we can call this from within an actor update
+    for(auto *actor : mActors) {
+        actor->SetState(ActorState::Destroy);
+    }
+
+    // Delete UI screens
+    for (auto ui : mUIStack) {
+		// Don't delete HUD or Tutorial HUD here, they persist between scenes
+		if (ui == mHUD || ui == mTutorialHUD) continue;
+
+        delete ui;
+    }
+    mUIStack.clear();
+
+    // Reset states
+	mShadowCat = nullptr;
 }
 
 void Game::SetScene(GameScene nextScene)
@@ -326,16 +326,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				mShadowCat = new ShadowCat(this);
 				mShadowCat->SetPosition(position);
 			}
-			// Tile ID 2: Spawner - medium patrol (150px)
-			// Spawns enemy when player camera comes within ~700px of this position
-			else if (tileID == 2)
-			{
-				// Create waypoints 150 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-150.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(150.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB);
-				spawner->SetPosition(position);
-			}
 			// Blocks
 			else if (tileID >= 4 && tileID <= 10)
 			{
@@ -348,8 +338,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto dummy = new Dummy(this);
 				dummy->SetPosition(position);
 			}
-			// ========== IMMEDIATE ENEMY SPAWNS (spawn when level loads) ==========
-			// Tile ID 12: Enemy (WhiteCat) - small patrol (100px)
+			// Enemy (WhiteCat) - small patrol
 			else if (tileID == 12)
 			{
 				// Create waypoints 100 pixels to left and right of spawn position
@@ -358,7 +347,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto enemy = new Enemy(this, waypointA, waypointB);
 				enemy->SetPosition(position);
 			}
-			// Tile ID 13: Enemy with larger patrol (200px)
+			// Enemy with larger patrol (WhiteCat2)
 			else if (tileID == 13)
 			{
 				// Create waypoints 200 pixels to left and right of spawn position
@@ -366,27 +355,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
 				auto enemy = new Enemy(this, waypointA, waypointB);
 				enemy->SetPosition(position);
-			}
-			// ========== DELAYED SPAWNERS (spawn when player approaches) ==========
-			// Tile ID 14: Spawner - small patrol (100px)
-			// Spawns enemy when player camera comes within ~700px of this position
-			else if (tileID == 14)
-			{
-				// Create waypoints 100 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(100.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB);
-				spawner->SetPosition(position);
-			}
-			// Tile ID 15: Spawner - large patrol (200px)
-			// Spawns enemy when player camera comes within ~700px of this position
-			else if (tileID == 15)
-			{
-				// Create waypoints 200 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB);
-				spawner->SetPosition(position);
 			}
 		}
 	}
@@ -517,7 +485,7 @@ void Game::UpdateGame(float deltaTime)
 			new WinScreen(this, "../Assets/Fonts/Pixellari.ttf");
 		}
 	}
-	
+
 	// Update all actors and pending actors
 	UpdateActors(deltaTime);
 

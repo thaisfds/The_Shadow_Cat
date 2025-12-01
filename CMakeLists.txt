@@ -71,6 +71,10 @@ add_executable(${PROJECT_NAME}
         Source/UI/UIRect.h
         Source/UI/Screens/MainMenu.cpp
         Source/UI/Screens/MainMenu.h
+        Source/UI/Screens/GameOver.cpp
+        Source/UI/Screens/GameOver.h
+        Source/UI/Screens/WinScreen.cpp
+        Source/UI/Screens/WinScreen.h
         Source/Actors/Characters/ShadowCat.cpp
         Source/Actors/Characters/ShadowCat.h
         Source/Components/Skills/SkillBase.cpp
