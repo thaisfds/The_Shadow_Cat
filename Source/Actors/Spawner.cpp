@@ -2,6 +2,7 @@
 #include "Characters/Enemy.h"
 #include "../Game.h"
 #include "../GameConstants.h"
+#include <SDL.h>
 
 Spawner::Spawner(Game *game, Vector2 patrolPointA, Vector2 patrolPointB, float spawnDistance)
     : Actor(game)
@@ -10,6 +11,12 @@ Spawner::Spawner(Game *game, Vector2 patrolPointA, Vector2 patrolPointB, float s
 {
     mPatrolWaypoints[0] = patrolPointA;
     mPatrolWaypoints[1] = patrolPointB;
+    
+    if (mGame->IsDebugging())
+    {
+        SDL_Log("Spawner created at position (%.2f, %.2f) with spawn distance %.2f", 
+                mPosition.x, mPosition.y, mSpawnDistance);
+    }
 }
 
 void Spawner::OnUpdate(float deltaTime)
@@ -42,7 +49,20 @@ bool Spawner::IsPlayerNearby() const
 
 void Spawner::SpawnEnemy()
 {
+    if (mGame->IsDebugging())
+    {
+        SDL_Log("Spawner at (%.2f, %.2f) triggering enemy spawn!", mPosition.x, mPosition.y);
+    }
+    
     // Create enemy at spawner position with stored patrol waypoints
     auto enemy = new Enemy(mGame, mPatrolWaypoints[0], mPatrolWaypoints[1]);
     enemy->SetPosition(mPosition);
+    
+    if (mGame->IsDebugging())
+    {
+        SDL_Log("Enemy spawned at (%.2f, %.2f) with waypoints: (%.2f, %.2f) to (%.2f, %.2f)",
+                mPosition.x, mPosition.y,
+                mPatrolWaypoints[0].x, mPatrolWaypoints[0].y,
+                mPatrolWaypoints[1].x, mPatrolWaypoints[1].y);
+    }
 }
