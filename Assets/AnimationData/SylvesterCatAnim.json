@@ -1,0 +1,10 @@
+{
+  "image": "../Assets/Sprites/SylvesterCat/SylvesterCat.png",
+  "spriteSheetData": "../Assets/Sprites/SylvesterCat/SylvesterCat.json",
+  "animations": 
+  {
+    "Idle": [1],
+    "Run": [0, 2]
+  },
+  "base": "Idle"
+}

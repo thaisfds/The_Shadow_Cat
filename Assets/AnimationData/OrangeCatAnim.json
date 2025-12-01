@@ -1,0 +1,10 @@
+{
+  "image": "../Assets/Sprites/OrangeCat/OrangeCat.png",
+  "spriteSheetData": "../Assets/Sprites/OrangeCat/OrangeCat.json",
+  "animations": 
+  {
+    "Idle": [1],
+    "Run": [0, 2]
+  },
+  "base": "Idle"
+}

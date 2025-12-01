@@ -309,6 +309,17 @@ int **Game::LoadLevel(const std::string &fileName, int &outWidth, int &outHeight
 
 void Game::BuildLevel(int **levelData, int width, int height)
 {
+	// Determine enemy type based on current level
+	Enemy::EnemyType currentEnemyType = Enemy::EnemyType::WhiteCat;
+	if (mCurrentScene == GameScene::Level2)
+	{
+		currentEnemyType = Enemy::EnemyType::OrangeCat;
+	}
+	else if (mCurrentScene == GameScene::Level3)
+	{
+		currentEnemyType = Enemy::EnemyType::SylvesterCat;
+	}
+	
 	for (int i = 0; i < height; ++i)
 	{
 		for (int j = 0; j < width; ++j)
@@ -326,6 +337,16 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				mShadowCat = new ShadowCat(this);
 				mShadowCat->SetPosition(position);
 			}
+			// Tile ID 1: Spawner - small patrol (100px)
+			// Spawns enemy when player camera comes within ~700px of this position
+			else if (tileID == 1)
+			{
+				// Create waypoints 100 pixels to left and right of spawn position
+				Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
+				Vector2 waypointB = position + Vector2(100.0f, 0.0f);
+				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
+				spawner->SetPosition(position);
+			}
 			// Tile ID 2: Spawner - medium patrol (150px)
 			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 2)
@@ -333,7 +354,17 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				// Create waypoints 150 pixels to left and right of spawn position
 				Vector2 waypointA = position + Vector2(-150.0f, 0.0f);
 				Vector2 waypointB = position + Vector2(150.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB);
+				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
+				spawner->SetPosition(position);
+			}
+			// Tile ID 3: Spawner - large patrol (200px)
+			// Spawns enemy when player camera comes within ~700px of this position
+			else if (tileID == 3)
+			{
+				// Create waypoints 200 pixels to left and right of spawn position
+				Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
+				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
+				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
 				spawner->SetPosition(position);
 			}
 			// Blocks
@@ -349,13 +380,13 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				dummy->SetPosition(position);
 			}
 			// ========== IMMEDIATE ENEMY SPAWNS (spawn when level loads) ==========
-			// Tile ID 12: Enemy (WhiteCat) - small patrol (100px)
+			// Tile ID 12: Enemy - small patrol (100px)
 			else if (tileID == 12)
 			{
 				// Create waypoints 100 pixels to left and right of spawn position
 				Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
 				Vector2 waypointB = position + Vector2(100.0f, 0.0f);
-				auto enemy = new Enemy(this, waypointA, waypointB);
+				auto enemy = new Enemy(this, waypointA, waypointB, currentEnemyType);
 				enemy->SetPosition(position);
 			}
 			// Tile ID 13: Enemy with larger patrol (200px)
@@ -364,7 +395,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				// Create waypoints 200 pixels to left and right of spawn position
 				Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
 				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
-				auto enemy = new Enemy(this, waypointA, waypointB);
+				auto enemy = new Enemy(this, waypointA, waypointB, currentEnemyType);
 				enemy->SetPosition(position);
 			}
 			// ========== DELAYED SPAWNERS (spawn when player approaches) ==========
@@ -375,7 +406,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				// Create waypoints 100 pixels to left and right of spawn position
 				Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
 				Vector2 waypointB = position + Vector2(100.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB);
+				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
 				spawner->SetPosition(position);
 			}
 			// Tile ID 15: Spawner - large patrol (200px)
@@ -385,7 +416,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				// Create waypoints 200 pixels to left and right of spawn position
 				Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
 				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB);
+				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
 				spawner->SetPosition(position);
 			}
 		}
