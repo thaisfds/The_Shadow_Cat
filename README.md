@@ -24,7 +24,7 @@
 
 Cada run apresenta salas construídas manualmente, mas povoadas com inimigos e obstáculos. O jogador começa cada tentativa com um número limitado de vidas e precisa atravessar diferentes fases até enfrentar os chefes finais de cada região. Quando todas as vidas se esgotam, a run termina e o jogador recomeça do início, mas com a possibilidade de encontrar itens e habilidades diferentes a cada nova tentativa.
 
-A progressão acontece através da derrota dos inimigos que podem conceder novas habilidades ao jogador. O sistema de habilidades permite diferentes estilos de combate, com ataques básicos, ataques carregados, habilidades especiais e movimentos evasivos. A combinação desses elementos garante que nenhuma run seja igual à outra, mantendo o jogo desafiador e interessante mesmo após várias tentativas.
+A progressão acontece através da derrota dos inimigos que podem conceder novas habilidades ao jogador, e do avanço para outras fases que é permitido ao derrotar todos eles. O sistema de habilidades permite diferentes estilos de combate, com ataques básicos, ataques carregados, habilidades especiais e movimentos evasivos. A combinação desses elementos garante que nenhuma run seja igual à outra, mantendo o jogo desafiador e interessante mesmo após várias tentativas.
 
 ---
 
@@ -118,12 +118,10 @@ Durante o playtest, pedimos atenção especial aos seguintes aspectos:
 - Sistema operacional: Windows 10+ ou Linux
 - OpenGL 3.3+
 - SDL2 instalado
-- Controle Xbox (opcional, mas recomendado)
 
 ---
 
-**Versão**: 0.8-playtest  
 **Curso**: Introdução ao Desenvolvimento de Jogos - UFMG  
-**Data**: Dezembro de 2024
+**Data**: Dezembro de 2025
 
 
