@@ -2,15 +2,23 @@
 
 ## Capturas de tela
 
+Tela do menu principal
 ![Tela do menu principal](Assets/README/MainMenu.png)
 
-![Gameplay mostrando combate](Assets/README/combat.png)
+Gameplay mostrando sprites
+![Gameplay mostrando sprites](Assets/README/sprites.jpeg)
 
+Lobby com tutorial
 ![Lobby com tutorial](Assets/README/lobby.png)
 
-![Enfrentando inimigos](Assets/README/enemies.png)
+Level 1 - Floresta
+![Level 1 - Floresta](Assets/README/level1.png)
 
-![Tela de pause](Assets/README/pause.png)
+Level 2 - Arredores
+![Level 2 - Arredores](Assets/README/level2.png)
+
+Level 3 - Cidade
+![Level 3 - Cidade](Assets/README/level3.png)
 
 ![Game over](Assets/README/gameover.png)
 
@@ -33,9 +41,11 @@ A progressão acontece através da derrota dos inimigos que podem conceder novas
 Durante o playtest, pedimos atenção especial aos seguintes aspectos:
 
 ### Controles e movimentação
-- **Responsividade dos controles**: Testar movimentação com teclado (WASD)
-- **Precisão do combate**: Avaliar se os ataques (Q para ataque básico na direção do mouse, R para ataque especial) respondem adequadamente
-- **Dash/Esquiva**: Verificar se o movimento evasivo (E) funciona como esperado
+- **Responsividade dos controles**: Testar movimentação com teclado (W/A/S/D)
+- **Precisão do combate**: Avaliar se os ataques básicos (Botão Esquerdo do Mouse) e especiais (Botão Direito do Mouse) respondem adequadamente
+- **Ataques de habilidade**: Testar o ataque a distância Furball (E) e o ataque Stomp (Q)
+- **Dash/Esquiva**: Verificar se o movimento evasivo (Shift) funciona como esperado e oferece a mobilidade necessária
+- **Tutorial interativo**: Verificar se o sistema de ajuda (H) mostra e esconde os controles corretamente
 
 ### Sistema de combate
 - **Balanceamento de dano**: Observar se o dano causado e recebido está equilibrado
@@ -65,9 +75,11 @@ Durante o playtest, pedimos atenção especial aos seguintes aspectos:
 
 ### Teclado
 - **Movimentação**: W / A / S / D
-- **Ataque básico**: Q
-- **Dash**: E
-- **Ataque especial (Paw Smash)**: R
+- **Ataque básico**: Botão Esquerdo do Mouse
+- **Ataque especial (Clow Attack)**: Botão Direito do Mouse
+- **Ataque a distância (Furball)**: E
+- **Ataque pisada (Stomp)**: Q
+- **Dash**: Shift
 - **Mostrar/Esconder controles (tutorial)**: H
 - **Debug (desenvolvedores)**: F1
 
@@ -122,6 +134,6 @@ Durante o playtest, pedimos atenção especial aos seguintes aspectos:
 ---
 
 **Curso**: Introdução ao Desenvolvimento de Jogos - UFMG  
-**Data**: Dezembro de 2025
+**Data**: Novembro de 2025
 
 

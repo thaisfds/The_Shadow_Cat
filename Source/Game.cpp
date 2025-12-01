@@ -13,6 +13,8 @@
 #include "UI/Screens/MainMenu.h"
 #include "UI/Screens/HUD.h"
 #include "UI/Screens/TutorialHUD.h"
+#include "UI/Screens/GameOver.h"
+#include "UI/Screens/WinScreen.h"
 #include "Actors/Actor.h"
 #include "Actors/Block.h"
 #include "Actors/Spawner.h"
@@ -25,12 +27,16 @@ Game::Game()
 	mRenderer(nullptr),
 	mTicksCount(0),
 	mIsRunning(true),
-	mIsDebugging(true),
+	mIsDebugging(false),
 	mUpdatingActors(false),
 	mCameraPos(Vector2::Zero),
 	mLevelData(nullptr),
 	mAudio(nullptr),
     mHUD(nullptr),
+	mTutorialHUD(nullptr),
+	mIsPaused(false),
+	mIsGameOver(false),
+	mIsGameWon(false),
 	mShadowCat(nullptr),
 	mController(nullptr),
 	mLevelWidth(0),
@@ -127,6 +133,26 @@ void Game::UnloadScene()
 
     // Reset states
 	mShadowCat = nullptr;
+}
+
+void Game::PauseGame() {
+	// Pause all actors
+	mIsPaused = true;
+
+	for (auto *actor : mActors)
+		actor->SetState(ActorState::Paused);
+}
+
+void Game::ResumeGame() {
+	mIsPaused = false;
+
+	for (auto *actor : mActors)
+		actor->SetState(ActorState::Active);
+}
+
+void Game::ResetGame() {
+	// Bugged so return for now
+	return;
 }
 
 void Game::SetScene(GameScene nextScene)
@@ -300,6 +326,16 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				mShadowCat = new ShadowCat(this);
 				mShadowCat->SetPosition(position);
 			}
+			// Tile ID 2: Spawner - medium patrol (150px)
+			// Spawns enemy when player camera comes within ~700px of this position
+			else if (tileID == 2)
+			{
+				// Create waypoints 150 pixels to left and right of spawn position
+				Vector2 waypointA = position + Vector2(-150.0f, 0.0f);
+				Vector2 waypointB = position + Vector2(150.0f, 0.0f);
+				auto spawner = new Spawner(this, waypointA, waypointB);
+				spawner->SetPosition(position);
+			}
 			// Blocks
 			else if (tileID >= 4 && tileID <= 10)
 			{
@@ -471,6 +507,17 @@ void Game::ProcessInput()
 
 void Game::UpdateGame(float deltaTime)
 {
+	// End conditions check
+	if (mIsGameOver || mIsGameWon) {
+		PauseGame();
+
+		if (mIsGameOver) {
+			new GameOver(this, "../Assets/Fonts/Pixellari.ttf");
+		} else {
+			new WinScreen(this, "../Assets/Fonts/Pixellari.ttf");
+		}
+	}
+
 	// Update all actors and pending actors
 	UpdateActors(deltaTime);
 
@@ -510,15 +557,16 @@ void Game::UpdateGame(float deltaTime)
 				SDL_Log("Transitioning: Level 2 -> Level 3");
 				break;
 			case GameScene::Level3:
-				nextScene = GameScene::Lobby;
-				SDL_Log("Transitioning: Level 3 -> Lobby (Game Complete!)");
+				SetGameWon(true);
+				break;
+				
 				break;
 			default:
 				return;
 			}
 
-			SetScene(nextScene);
-			return;
+			if (!mIsGameWon)
+				SetScene(nextScene);
 		}
 	}
 
