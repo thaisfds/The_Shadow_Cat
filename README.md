@@ -22,9 +22,9 @@
 
 **The Shadow Cat** é um action roguelike em perspectiva top-down, onde você controla um jovem gato preto ágil e determinado em sua missão de desafiar as facções felinas rivais e restaurar o equilíbrio do reino. O jogo combina um visual fofo em pixel art com mecânicas de combate que recompensam habilidade e aprendizado.
 
-Cada run apresenta salas construídas manualmente, mas povoadas com inimigos, obstáculos e itens posicionados de forma procedural. O jogador começa cada tentativa com um número limitado de vidas e precisa atravessar diferentes fases até enfrentar os chefes finais de cada região. Quando todas as vidas se esgotam, a run termina e o jogador recomeça do início, mas com a possibilidade de encontrar itens e habilidades diferentes a cada nova tentativa.
+Cada run apresenta salas construídas manualmente, mas povoadas com inimigos e obstáculos. O jogador começa cada tentativa com um número limitado de vidas e precisa atravessar diferentes fases até enfrentar os chefes finais de cada região. Quando todas as vidas se esgotam, a run termina e o jogador recomeça do início, mas com a possibilidade de encontrar itens e habilidades diferentes a cada nova tentativa.
 
-A progressão acontece através da coleta de itens que os inimigos deixam ao serem derrotados. Esses itens podem ser ativos (com efeitos específicos quando utilizados) ou passivos (que modificam permanentemente os atributos do jogador durante aquela run). O sistema de habilidades permite diferentes estilos de combate, com ataques básicos, ataques carregados, habilidades especiais e movimentos evasivos. A combinação desses elementos garante que nenhuma run seja igual à outra, mantendo o jogo desafiador e interessante mesmo após várias tentativas.
+A progressão acontece através da derrota dos inimigos que podem conceder novas habilidades ao jogador. O sistema de habilidades permite diferentes estilos de combate, com ataques básicos, ataques carregados, habilidades especiais e movimentos evasivos. A combinação desses elementos garante que nenhuma run seja igual à outra, mantendo o jogo desafiador e interessante mesmo após várias tentativas.
 
 ---
 
@@ -33,9 +33,9 @@ A progressão acontece através da coleta de itens que os inimigos deixam ao ser
 Durante o playtest, pedimos atenção especial aos seguintes aspectos:
 
 ### Controles e movimentação
-- **Responsividade dos controles**: Testar movimentação com teclado (WASD).
-- **Precisão do combate**: Avaliar se os ataques (básico, carregado e especial) respondem adequadamente
-- **Dash/Esquiva**: Verificar se o movimento evasivo (Shift/RT) funciona como esperado
+- **Responsividade dos controles**: Testar movimentação com teclado (WASD)
+- **Precisão do combate**: Avaliar se os ataques (Q para ataque básico na direção do mouse, R para ataque especial) respondem adequadamente
+- **Dash/Esquiva**: Verificar se o movimento evasivo (E) funciona como esperado
 
 ### Sistema de combate
 - **Balanceamento de dano**: Observar se o dano causado e recebido está equilibrado
