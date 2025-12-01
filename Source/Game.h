@@ -7,6 +7,7 @@
 #include "Actors/DebugActor.h"
 #include "Renderer/Renderer.h"
 #include "AudioSystem.h"
+#include "Components/Skills/FurBall.h"
 #include "Components/Skills/Stomp.h"
 
 enum class GameScene
@@ -80,6 +81,7 @@ public:
 
     Actor* GetAttackTrailActor() { return mAttackTrailActor; }
     StompActor* GetStompActor();
+    FurBallActor* GetFurBallActor();
 
 private:
     void ProcessInput();
@@ -134,6 +136,7 @@ private:
     int **mLevelData;
 
     class std::vector<StompActor*> mStompActors;
+    class std::vector<FurBallActor*> mFurBallActors;
 
     // Global particle system
     class Actor *mAttackTrailActor;

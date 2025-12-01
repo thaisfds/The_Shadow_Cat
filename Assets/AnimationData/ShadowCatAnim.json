@@ -4,11 +4,13 @@
   "animations": 
   {
     "Idle": [0],
-    "Run": [0, 1, 2, 3],
-    "BasicAttack": [4, 5, 6, 7, 8, 0],
-    "DashBegin": [9, 10, 11],
-    "DashMid": [12],
-    "DashEnd": [11, 10, 9, 0]
+    "Run": { "start": 1, "end": 4 },
+    "BasicAttack": { "start": 5, "end": 11 },
+    "DashBegin": { "start": 12, "end": 15 },
+    "DashMid": [16],
+    "DashEnd": { "start": 15, "end": 12 },
+    "ClawAttack": { "start": 17, "end": 32 },
+    "FurBall": { "start": 33, "end": 38 }
   },
   "base": "Idle"
 }

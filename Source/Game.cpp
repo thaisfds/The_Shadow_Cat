@@ -118,6 +118,9 @@ void Game::UnloadScene()
 
     // Delete UI screens
     for (auto ui : mUIStack) {
+		// Don't delete HUD or Tutorial HUD here, they persist between scenes
+		if (ui == mHUD || ui == mTutorialHUD) continue;
+
         delete ui;
     }
     mUIStack.clear();
@@ -155,6 +158,13 @@ void Game::SetScene(GameScene nextScene)
 
         case GameScene::Level1:
             mCurrentScene = GameScene::Level1;
+
+			// // Always shown
+			// mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf"); 
+
+			// // Toggleable tutorial HUD
+			// mTutorialHUD = new TutorialHUD(this, "../Assets/Fonts/Pixellari.ttf");
+
 
             InitializeActors();
             break;
@@ -397,6 +407,10 @@ void Game::ProcessInput()
 			// Handle key press for UI screens
 			if (!mUIStack.empty()) {
 				mUIStack.back()->HandleKeyPress(event.key.keysym.sym);
+			}
+
+			if (event.key.keysym.sym == SDLK_n && event.key.repeat == 0) {
+				SetScene(GameScene::Level1);
 			}
 
 			// Fullscreen toggle
@@ -757,4 +771,20 @@ StompActor* Game::GetStompActor()
 	}
 	
 	return stomp;
+}
+
+FurBallActor* Game::GetFurBallActor()
+{
+	FurBallActor *furball = nullptr;
+	for (auto actor : mFurBallActors)
+		if (actor->IsDead())
+			furball = actor;
+
+	if (!furball)
+	{
+		furball = new FurBallActor(this);
+		mFurBallActors.push_back(furball);
+	}
+	
+	return furball;
 }
