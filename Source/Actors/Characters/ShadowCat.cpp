@@ -31,6 +31,8 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     mAnimatorComponent->AddAnimation("BasicAttack", {4, 5, 6, 7, 8, 0});
     
     mAnimatorComponent->LoopAnimation("Idle");
+
+    mGame->GetHUD()->UpdateMaxHealth(hp, true);
 }
 
 void ShadowCat::OnProcessInput(const uint8_t *state)
@@ -130,6 +132,14 @@ void ShadowCat::OnUpdate(float deltaTime)
     Character::OnUpdate(deltaTime);
 }
 
+void ShadowCat::TakeDamage(int damage)
+{
+    hp -= damage;
+
+    mGame->GetHUD()->SetHealth(hp);
+
+    if (hp <= 0) Kill();
+}
 void ShadowCat::Kill()
 {
 }

@@ -143,13 +143,13 @@ void Game::SetScene(GameScene nextScene)
         case GameScene::Lobby:
             mCurrentScene = GameScene::Lobby;
 
-			InitializeActors();
-
 			// Always shown
-			mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf", 6); 
+			mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf"); 
 
 			// Toggleable tutorial HUD
 			mTutorialHUD = new TutorialHUD(this, "../Assets/Fonts/Pixellari.ttf");
+
+			InitializeActors();
 
 			break;
 

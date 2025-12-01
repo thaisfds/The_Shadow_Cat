@@ -4,6 +4,7 @@
 
 #pragma once
 #include "Character.h"
+#include "../../UI/Screens/HUD.h"
 
 class ShadowCat : public Character
 {
@@ -14,6 +15,7 @@ public:
     void OnHandleEvent(const SDL_Event& event) override;
     void OnUpdate(float deltaTime) override;
 
+    void TakeDamage(int damage) override;
     void Kill() override;
 
 private:
