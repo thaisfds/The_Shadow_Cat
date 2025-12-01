@@ -303,7 +303,8 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto dummy = new Dummy(this);
 				dummy->SetPosition(position);
 			}
-			// Enemy (WhiteCat) - small patrol
+			// ========== IMMEDIATE ENEMY SPAWNS (spawn when level loads) ==========
+			// Tile ID 12: Enemy (WhiteCat) - small patrol (100px)
 			else if (tileID == 12)
 			{
 				// Create waypoints 100 pixels to left and right of spawn position
@@ -312,7 +313,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto enemy = new Enemy(this, waypointA, waypointB);
 				enemy->SetPosition(position);
 			}
-			// Enemy with larger patrol (WhiteCat2)
+			// Tile ID 13: Enemy with larger patrol (200px)
 			else if (tileID == 13)
 			{
 				// Create waypoints 200 pixels to left and right of spawn position
@@ -321,7 +322,9 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto enemy = new Enemy(this, waypointA, waypointB);
 				enemy->SetPosition(position);
 			}
-			// Spawner - small patrol (spawns when player gets close)
+			// ========== DELAYED SPAWNERS (spawn when player approaches) ==========
+			// Tile ID 14: Spawner - small patrol (100px)
+			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 14)
 			{
 				// Create waypoints 100 pixels to left and right of spawn position
@@ -330,7 +333,8 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto spawner = new Spawner(this, waypointA, waypointB);
 				spawner->SetPosition(position);
 			}
-			// Spawner - large patrol (spawns when player gets close)
+			// Tile ID 15: Spawner - large patrol (200px)
+			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 15)
 			{
 				// Create waypoints 200 pixels to left and right of spawn position
