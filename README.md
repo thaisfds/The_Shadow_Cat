@@ -63,6 +63,7 @@ Durante o playtest, pedimos atenção especial aos seguintes aspectos:
 - **Indicador de vida**: Verificar se os corações/barra de vida atualizam corretamente ao receber dano
 - **Visibilidade do HUD**: Avaliar se todos os elementos da interface são visíveis e legíveis
 - **Tutorial**: Observar se as instruções do tutorial (tecla H para mostrar/esconder) são claras
+- **Telas de vitória e _Fim de Jogo_**: Conferir se o jogo é interrompido e a tela de _Game Over_ aparece quando a vida do player acaba, e se ao chegar no fim da Fase 3 o jogo declara a vistória do jogador.
 
 ### Performance e bugs
 - **Taxa de quadros**: Reportar qualquer queda de desempenho ou travamentos
