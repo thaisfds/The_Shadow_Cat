@@ -1,16 +1,18 @@
 #include "SkillInputHandler.h"
 #include "BasicAttack.h"
+#include "ClawAttack.h"
 #include "Dash.h"
+#include "FurBall.h"
 #include "SkillBase.h"
 #include "Stomp.h"
 
 SkillInputHandler::SkillInputHandler(Actor* owner, int updateOrder)
     : Component(owner, updateOrder)
 {
-    mKeyToSkill[SDL_SCANCODE_Q] = new BasicAttack(owner);
+    mKeyToSkill[SDL_SCANCODE_Q] = new ClawAttack(owner);
     mKeyToSkill[SDL_SCANCODE_E] = new Dash(owner);
     mKeyToSkill[SDL_SCANCODE_R] = new Stomp(owner);
-    mKeyToSkill[SDL_SCANCODE_F] = nullptr;
+    mKeyToSkill[SDL_SCANCODE_F] = new FurBall(owner);
 }
 
 void SkillInputHandler::HandleEvent(const SDL_Event& event)

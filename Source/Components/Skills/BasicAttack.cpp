@@ -18,7 +18,7 @@ BasicAttack::BasicAttack(Actor* owner, int updateOrder)
     mCooldown = 0.0f;
     mCurrentCooldown = 0.0f;
     mIsAttacking = false;
-    mDamageDelay = 0.3f; // Hardcoded for now, want to change later
+    mDamageDelay = 0.53f; // Hardcoded for now, want to change later
 
     mAttackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("BasicAttack");
     if (mAttackDuration == 0.0f) mAttackDuration = 1.0f;
@@ -66,6 +66,7 @@ void BasicAttack::Update(float deltaTime)
 void BasicAttack::Execute()
 {
     mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("BasicAttack");
+    mCharacter->SetMovementLock(true);
     
     mIsAttacking = true;
     mAttackTimer = 0.0f;
@@ -80,12 +81,11 @@ void BasicAttack::Execute()
     else if (mAttackDirection.x < 0.0f)
         mCharacter->SetScale(Vector2(-1.0f, mCharacter->GetScale().y));
     
-    mCharacter->SetMovementLock(true);
+    StartCooldown();
 }
 
 void BasicAttack::EndAttack()
 {
     mIsAttacking = false;
     mCharacter->SetMovementLock(false);
-    StartCooldown();
 }
