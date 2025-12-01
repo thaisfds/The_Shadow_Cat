@@ -32,6 +32,7 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     
     mAnimatorComponent->LoopAnimation("Idle");
 
+    hp = 10;
     mGame->GetHUD()->UpdateMaxHealth(hp, true);
 }
 
