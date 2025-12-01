@@ -376,6 +376,7 @@ void Game::ProcessInput()
 		}
 			break;
 		case SDL_KEYDOWN:
+		case SDL_MOUSEBUTTONDOWN:
 			// Handle key press for UI screens
 			if (!mUIStack.empty()) {
 				mUIStack.back()->HandleKeyPress(event.key.keysym.sym);
