@@ -1,6 +1,7 @@
 #pragma once
 #include "../Component.h"
 #include <string>
+#include "../../Math.h"
 
 class Character;
 
@@ -13,7 +14,7 @@ public:
     void Update(float deltaTime) override;
     virtual void ProcessInput(const uint8_t* keyState) override;
     
-    virtual void Execute() = 0;
+    virtual void Execute(Vector2 targetPosition) = 0;
     virtual bool CanUse() const;
     
     void StartCooldown() { mCurrentCooldown = mCooldown; }

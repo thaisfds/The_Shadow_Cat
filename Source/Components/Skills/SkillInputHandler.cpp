@@ -5,17 +5,21 @@
 #include "FurBall.h"
 #include "SkillBase.h"
 #include "Stomp.h"
+#include "../../Game.h"
 
 SkillInputHandler::SkillInputHandler(Actor* owner, int updateOrder)
     : Component(owner, updateOrder)
 {
+    mSkillFilter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::PlayerSkills});
+    mSkillFilter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Enemy});
+
     SkillInput leftMouseInput{InputType::Mouse, SDL_BUTTON_LEFT};
     SkillInput rightMouseInput{InputType::Mouse, SDL_BUTTON_RIGHT};
     SkillInput keyQInput{InputType::Keyboard, SDL_SCANCODE_Q};
     SkillInput keyEInput{InputType::Keyboard, SDL_SCANCODE_E};
     SkillInput keyShiftInput{InputType::Keyboard, SDL_SCANCODE_LSHIFT};
 
-    mKeyToSkill[leftMouseInput] = new BasicAttack(owner);
+    mKeyToSkill[leftMouseInput] = new BasicAttack(owner, mSkillFilter, 10);
     mKeyToSkill[rightMouseInput] = new ClawAttack(owner);
     mKeyToSkill[keyEInput] = new FurBall(owner);
     mKeyToSkill[keyQInput] = new Stomp(owner);
@@ -31,16 +35,11 @@ void SkillInputHandler::HandleEvent(const SDL_Event& event)
         mKeyToSkill[SkillInput{InputType::Keyboard, event.key.keysym.scancode}] :
         mKeyToSkill[SkillInput{InputType::Mouse, static_cast<Uint8>(event.button.button)}];
     
-    // SDL_Scancode pressedKey = event.key.keysym.scancode;
-    
-    // auto it = mKeyToSkill.find(pressedKey);
-    // if (it == mKeyToSkill.end()) return;
-
-    // SkillBase* skill = it->second;
     if (skill && skill->CanUse())
     {
         SDL_Log("Skill used: %s", skill->GetName().c_str());
-        skill->Execute();
+        Vector2 targetPosition = mOwner->GetGame()->GetMouseWorldPosition();
+        skill->Execute(targetPosition);
     }
 }
 

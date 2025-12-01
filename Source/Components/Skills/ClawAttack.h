@@ -12,7 +12,7 @@ public:
 
 	bool CanUse() const override { return !mIsAttacking && SkillBase::CanUse(); }
 	
-	void Execute() override;
+	void Execute(Vector2 targetPosition) override;
 	void EndAttack();
 	
 private:

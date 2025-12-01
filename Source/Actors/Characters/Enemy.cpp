@@ -43,8 +43,8 @@ Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, float
     mAnimatorComponent = new AnimatorComponent(this, "WhiteCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
     
-    Collider *collider = new AABBCollider(GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
-    mColliderComponent = new ColliderComponent(this, 0, 0, collider, GetFollowerEnemyFilter());
+    Collider *collider = new AABBCollider(48, 32);
+    mColliderComponent = new ColliderComponent(this, 0, 16, collider, GetBaseEnemyFilter());
     
     // Static enemy - no gravity
     mRigidBodyComponent->SetApplyGravity(false);
@@ -59,6 +59,10 @@ Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, float
     mAnimatorComponent->AddAnimation("Death", {2, 1, 0});  // Run animation frames as death effect
 
     mAnimatorComponent->LoopAnimation("Run");
+
+    mSkillFilter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::EnemySkills});
+    mSkillFilter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player});
+    mBasicAttack = new BasicAttack(this, mSkillFilter, 1);
 }
 
 Enemy::~Enemy()
@@ -86,10 +90,10 @@ void Enemy::OnUpdate(float deltaTime)
     if (mIsDead) return;
     
     // Update attack cooldown timer
-    if (mAttackTimer > 0.0f)
-    {
-        mAttackTimer -= deltaTime;
-    }
+    // if (mAttackTimer > 0.0f)
+    // {
+    //     mAttackTimer -= deltaTime;
+    // }
     
     // Check for player detection based on current state
     bool playerInProximity = IsPlayerInProximity();  // Close range (360 degrees)
@@ -508,39 +512,42 @@ void Enemy::UpdateAttack(float deltaTime)
 {
     const ShadowCat* player = mGame->GetPlayer();
     if (!player) return;
+
+    if (mBasicAttack->CanUse())
+        mBasicAttack->Execute(player->GetPosition());
     
-    // Stop moving during attack
-    mRigidBodyComponent->SetVelocity(Vector2::Zero);
-    mMovementDirection = Vector2::Zero;  // No movement during attack
+    // // Stop moving during attack
+    // mRigidBodyComponent->SetVelocity(Vector2::Zero);
+    // mMovementDirection = Vector2::Zero;  // No movement during attack
     
-    // Face the player
-    Vector2 toPlayer = player->GetPosition() - mPosition;
-    if (toPlayer.x > 0.0f)
-    {
-        SetScale(Vector2(1.0f, 1.0f));
-    }
-    else if (toPlayer.x < 0.0f)
-    {
-        SetScale(Vector2(-1.0f, 1.0f));
-    }
+    // // Face the player
+    // Vector2 toPlayer = player->GetPosition() - mPosition;
+    // if (toPlayer.x > 0.0f)
+    // {
+    //     SetScale(Vector2(1.0f, 1.0f));
+    // }
+    // else if (toPlayer.x < 0.0f)
+    // {
+    //     SetScale(Vector2(-1.0f, 1.0f));
+    // }
     
-    // Attack if cooldown is ready
-    if (mAttackTimer <= 0.0f)
-    {
-        // Deal damage to player (need to cast away const)
-        const_cast<ShadowCat*>(player)->TakeDamage(mAttackDamage);
+    // // Attack if cooldown is ready
+    // if (mAttackTimer <= 0.0f)
+    // {
+    //     // Deal damage to player (need to cast away const)
+    //     const_cast<ShadowCat*>(player)->TakeDamage(mAttackDamage);
         
-        // Reset cooldown
-        mAttackTimer = mAttackCooldown;
+    //     // Reset cooldown
+    //     mAttackTimer = mAttackCooldown;
         
-        if (mGame->IsDebugging())
-        {
-            SDL_Log("Enemy attacked player for %d damage!", mAttackDamage);
-        }
+    //     if (mGame->IsDebugging())
+    //     {
+    //         SDL_Log("Enemy attacked player for %d damage!", mAttackDamage);
+    //     }
         
-        // Play hit animation (brief attack indication)
-        mAnimatorComponent->PlayAnimationOnce("Hit");
-    }
+    //     // Play hit animation (brief attack indication)
+    //     mAnimatorComponent->PlayAnimationOnce("Hit");
+    // }
 }
 
 void Enemy::OnDebugDraw(class Renderer* renderer)

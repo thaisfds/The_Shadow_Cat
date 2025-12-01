@@ -2,17 +2,18 @@
 
 #include "SkillBase.h"
 #include "../../Math.h"
+#include "../Physics/ColliderComponent.h"
 
 class BasicAttack : public SkillBase
 {
 public:
-    BasicAttack(Actor* owner, int updateOrder = 100);
+    BasicAttack(Actor* owner, CollisionFilter filter, int damage, int updateOrder = 100);
     
     void Update(float deltaTime) override;
 
     bool CanUse() const override { return !mIsAttacking && SkillBase::CanUse(); }
     
-    void Execute() override;
+    void Execute(Vector2 targetPosition) override;
     void EndAttack();
 
 private:
@@ -26,4 +27,5 @@ private:
     float mDamageDelay;
     bool mDamageApplied;
     Vector2 mAttackDirection;
+    CollisionFilter mFilter;
 };

@@ -19,8 +19,5 @@ public:
     void Kill() override;
 
 private:
-    class ParticleSystemComponent *mFireBalls;
     class SkillInputHandler *mSkillInputHandler;
-
-    float mFireBallCooldown = 1.0f;
 };

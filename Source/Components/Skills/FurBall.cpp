@@ -11,10 +11,10 @@ FurBall::FurBall(Actor* owner, int updateOrder)
 {
 	mName = "Fur Ball";
 	mDescription = "Launch a ball of fur that damages enemies on impact.";
-	mCooldown = 0.0f;
+	mCooldown = 4.0f;
 	mCurrentCooldown = 0.0f;
 	mProjectileSpeed = 300.0f;
-	mDamage = 20;
+	mDamage = 10;
 	mDelay = 0.5f;
 	mTimer = 0.0f;
 
@@ -50,7 +50,7 @@ void FurBall::Update(float deltaTime)
 	if (mTimer >= mDuration) EndAttack();
 }
 
-void FurBall::Execute()
+void FurBall::Execute(Vector2 targetPosition)
 {
 	mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("FurBall");
 	mCharacter->SetMovementLock(true);
