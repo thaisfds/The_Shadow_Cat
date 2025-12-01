@@ -13,6 +13,8 @@
 #include "UI/Screens/MainMenu.h"
 #include "UI/Screens/HUD.h"
 #include "UI/Screens/TutorialHUD.h"
+#include "UI/Screens/GameOver.h"
+#include "UI/Screens/WinScreen.h"
 #include "Actors/Actor.h"
 #include "Actors/Block.h"
 #include "Actors/Spawner.h"
@@ -31,6 +33,10 @@ Game::Game()
 	mLevelData(nullptr),
 	mAudio(nullptr),
     mHUD(nullptr),
+	mTutorialHUD(nullptr),
+	mIsPaused(false),
+	mIsGameOver(false),
+	mIsGameWon(false),
 	mShadowCat(nullptr),
 	mController(nullptr),
 	mLevelWidth(0),
@@ -127,6 +133,26 @@ void Game::UnloadScene()
 
     // Reset states
 	mShadowCat = nullptr;
+}
+
+void Game::PauseGame() {
+	// Pause all actors
+	mIsPaused = true;
+
+	for (auto *actor : mActors)
+		actor->SetState(ActorState::Paused);
+}
+
+void Game::ResumeGame() {
+	mIsPaused = false;
+
+	for (auto *actor : mActors)
+		actor->SetState(ActorState::Active);
+}
+
+void Game::ResetGame() {
+	// Bugged so return for now
+	return;
 }
 
 void Game::SetScene(GameScene nextScene)
@@ -481,6 +507,17 @@ void Game::ProcessInput()
 
 void Game::UpdateGame(float deltaTime)
 {
+	// End conditions check
+	if (mIsGameOver || mIsGameWon) {
+		PauseGame();
+
+		if (mIsGameOver) {
+			new GameOver(this, "../Assets/Fonts/Pixellari.ttf");
+		} else {
+			new WinScreen(this, "../Assets/Fonts/Pixellari.ttf");
+		}
+	}
+	
 	// Update all actors and pending actors
 	UpdateActors(deltaTime);
 

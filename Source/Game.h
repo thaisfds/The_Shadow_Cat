@@ -46,6 +46,14 @@ public:
 	void SetScene(GameScene scene);
 	void UnloadScene();
 
+    // Pause Handling
+    void PauseGame();
+    void ResumeGame();
+    void ResetGame();
+
+    void SetGameOver(bool isOver) { mIsGameOver = isOver; }
+    void SetGameWon(bool isWon) { mIsGameWon = isWon; }
+
 	// Renderer
 	class Renderer *GetRenderer() { return mRenderer; }
 
@@ -129,6 +137,12 @@ private:
 	bool mUpdatingActors;
 	bool mIsFullscreen;
 	GameScene mCurrentScene;
+
+    bool mIsPaused;
+
+    // End condition
+    bool mIsGameOver;
+    bool mIsGameWon;
 
 	// Game-specific
 	class ShadowCat *mShadowCat;
