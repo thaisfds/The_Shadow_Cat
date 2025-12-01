@@ -71,12 +71,12 @@ void HUD::SetHealth(int health)
     }
 }
 
-void HUD::UpdateMaxHealth(int maxHealth)
+void HUD::UpdateMaxHealth(int maxHealth, bool fill)
 {
     mMaxHealth = maxHealth;
 
     mMaxHealth = std::max(2, mMaxHealth); // Ensure at least 2
-    mHealth = std::min(mHealth, mMaxHealth);
+    mHealth = fill ? mMaxHealth : std::min(mHealth, mMaxHealth);
 
     InitHealthIcons();
 }
