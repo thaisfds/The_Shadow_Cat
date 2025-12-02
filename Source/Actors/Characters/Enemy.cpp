@@ -470,9 +470,9 @@ void Enemy::UpdateReturningToPatrol(float deltaTime)
 {
     // Check if player re-enters detection range while returning
     bool playerInProximity = IsPlayerInProximity();
-    bool playerInCone = IsPlayerInRange();
+    bool playerInChaseRange = IsPlayerInChaseRange();
     
-    if (playerInProximity || playerInCone)
+    if (playerInProximity || playerInChaseRange)
     {
         // Found the player again!
         mCurrentState = AIState::Chase;
