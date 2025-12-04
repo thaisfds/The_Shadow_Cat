@@ -358,6 +358,7 @@ void Enemy::MoveToward(const Vector2& target, float speed)
     Vector2 velocity = direction * speed;
     mRigidBodyComponent->SetVelocity(velocity);
     mMovementDirection = velocity;
+    mIsMoving = true;  // Play Run animation
     UpdateFacing(direction);
 }
 
@@ -519,6 +520,15 @@ void Enemy::UpdateAttack(float deltaTime)
 {
     const ShadowCat* player = mGame->GetPlayer();
     if (!player) return;
+
+    // Stop moving during attack
+    mRigidBodyComponent->SetVelocity(Vector2::Zero);
+    mMovementDirection = Vector2::Zero;
+    mIsMoving = false;  // Play Idle animation
+    
+    // Face the player
+    Vector2 toPlayer = player->GetPosition() - mPosition;
+    UpdateFacing(toPlayer);
 
     if (mBasicAttack->CanUse())
         mBasicAttack->Execute(player->GetPosition());

@@ -63,6 +63,7 @@ void BasicAttack::Execute(Vector2 targetPosition)
 {
     mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("BasicAttack");
     mCharacter->SetMovementLock(true);
+    mCharacter->SetAnimationLock(true);  // Lock animations so attack anim isn't overridden
     
     mIsAttacking = true;
     mAttackTimer = 0.0f;
@@ -83,4 +84,5 @@ void BasicAttack::EndAttack()
 {
     mIsAttacking = false;
     mCharacter->SetMovementLock(false);
+    mCharacter->SetAnimationLock(false);  // Unlock animations
 }
