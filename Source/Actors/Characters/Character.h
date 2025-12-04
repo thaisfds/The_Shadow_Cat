@@ -37,7 +37,7 @@ public:
         filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::Enemy});
         filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player, CollisionGroup::Environment, CollisionGroup::PlayerSkills});
         return filter;
-    };
+    }
 
     static CollisionFilter GetFollowerEnemyFilter()
     {

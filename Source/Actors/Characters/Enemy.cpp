@@ -6,7 +6,16 @@
 #include "../../Components/Physics/ColliderComponent.h"
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../../Renderer/Renderer.h"
+#include "../../Debug/EnemyDebugDrawer.h"
 #include <SDL.h>
+
+namespace {
+    constexpr float WAYPOINT_REACHED_DISTANCE = 10.0f;
+    constexpr float PATROL_AREA_REACHED_DISTANCE = 20.0f;
+    constexpr float LAST_KNOWN_POSITION_REACHED_DISTANCE = 20.0f;
+    constexpr float MIN_POSITION_CHANGE_TO_DETECT_STUCK = 0.1f;
+    constexpr float DEATH_ANIMATION_DURATION = 0.5f;
+}
 
 Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, EnemyType type, float forwardSpeed)
     : Character(game, forwardSpeed)
@@ -26,9 +35,9 @@ Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, Enemy
     , mSearchDuration(5.0f)  // Search for 5 seconds before giving up
     , mSearchSpeed(60.0f)  // Slower than chase speed
     , mAttackRange(64.0f)
-    , mAttackCooldown(1.5f)
-    , mAttackTimer(0.0f)
-    , mAttackDamage(1)
+    , mAttackCooldown(1.5f)  // NOTE: Unused - BasicAttack manages cooldown internally
+    , mAttackTimer(0.0f)  // NOTE: Unused - BasicAttack manages timer internally
+    , mAttackDamage(1)  // NOTE: Unused - BasicAttack manages damage internally
     , mDetectionRadius(200.0f)
     , mDetectionAngle(Math::ToRadians(90.0f))  // 90 degree cone in front
     , mChaseDetectionRadius(250.0f)  // 25% larger radius for chase persistence
@@ -58,10 +67,11 @@ Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, Enemy
     mAnimatorComponent = new AnimatorComponent(this, animName, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
     mRigidBodyComponent = new RigidBodyComponent(this);
     
+    // Collider dimensions: width=48 (slightly smaller than tile), height=32 (half tile), offset=16 for ground alignment
     Collider *collider = new AABBCollider(48, 32);
     mColliderComponent = new ColliderComponent(this, 0, 16, collider, GetBaseEnemyFilter());
     
-    // Static enemy - no gravity
+    // Disable gravity for ground-based patrol enemy (moves horizontally only)
     mRigidBodyComponent->SetApplyGravity(false);
 
     // Set enemy health (lower than player's 10)
@@ -93,8 +103,7 @@ void Enemy::OnUpdate(float deltaTime)
     {
         mDeathTimer += deltaTime;
         
-        // Destroy actor after death animation completes (0.5 seconds)
-        if (mDeathTimer >= 0.5f)
+        if (mDeathTimer >= DEATH_ANIMATION_DURATION)
         {
             SetState(ActorState::Destroy);
         }
@@ -104,62 +113,109 @@ void Enemy::OnUpdate(float deltaTime)
     // Don't move if dead
     if (mIsDead) return;
     
-    // Update attack cooldown timer
-    // if (mAttackTimer > 0.0f)
-    // {
-    //     mAttackTimer -= deltaTime;
-    // }
+    // Check for player detection (early evaluation for all states)
+    bool playerInCloseRange = IsPlayerInCloseRange();   // 360° proximity detection
+    bool playerInVisionCone = IsPlayerInVisionCone();   // Directional cone detection
+    bool playerInChaseRadius = IsPlayerInChaseRadius(); // 360° extended chase radius
+    bool playerInAttackRange = IsPlayerInAttackRange(); // 360° attack range
     
-    // Check for player detection based on current state
-    bool playerInProximity = IsPlayerInProximity();  // Close range (360 degrees)
-    bool playerInCone = IsPlayerInRange();  // Cone detection
-    bool playerInChaseRange = IsPlayerInChaseRange();  // Circle detection (chase)
-    bool playerInAttackRange = IsPlayerInAttackRange();
-    
-    // State transitions (priority order matters!)
-    if (playerInAttackRange && mCurrentState != AIState::Attack)
+    // State transitions - priority order: Attack > Chase > Search > Return > Patrol
+    switch (mCurrentState)
     {
-        mCurrentState = AIState::Attack;
-        if (mGame->IsDebugging())
-        {
-            SDL_Log("Enemy: -> Attack");
-        }
-    }
-    else if (mCurrentState == AIState::Patrol && (playerInProximity || playerInCone))
-    {
-        // Start chasing if player enters proximity OR cone
-        mCurrentState = AIState::Chase;
-        if (mGame->IsDebugging())
-        {
-            SDL_Log("Enemy: -> Chase (%s)", playerInProximity ? "proximity" : "cone detection");
-        }
-    }
-    else if ((mCurrentState == AIState::Chase || mCurrentState == AIState::Attack) && !playerInAttackRange && playerInChaseRange)
-    {
-        // Stay in chase if already chasing/attacking and player is still in chase range
-        if (mCurrentState == AIState::Attack)
-        {
-            mCurrentState = AIState::Chase;
-            if (mGame->IsDebugging())
+        case AIState::Patrol:
+            if (playerInAttackRange)
             {
-                SDL_Log("Enemy: Attack -> Chase");
+                mCurrentState = AIState::Attack;
+                if (mGame->IsDebugging()) SDL_Log("Enemy: Patrol -> Attack");
             }
-        }
-    }
-    else if ((mCurrentState == AIState::Chase || mCurrentState == AIState::Attack) && !playerInChaseRange)
-    {
-        // Player left chase range - enter Searching state
-        mCurrentState = AIState::Searching;
-        mSearchTimer = 0.0f;  // Reset search timer
-        if (mGame->IsDebugging())
-        {
-            SDL_Log("Enemy: Player lost -> Searching (last known: %.2f, %.2f)", 
+            else if (playerInCloseRange || playerInVisionCone)
+            {
+                mCurrentState = AIState::Chase;
+                if (mGame->IsDebugging()) SDL_Log("Enemy: Patrol -> Chase (%s)", 
+                    playerInCloseRange ? "close range" : "vision cone");
+            }
+            break;
+            
+        case AIState::Chase:
+            if (playerInAttackRange)
+            {
+                mCurrentState = AIState::Attack;
+                if (mGame->IsDebugging()) SDL_Log("Enemy: Chase -> Attack");
+            }
+            else if (!playerInChaseRadius)
+            {
+                mCurrentState = AIState::Searching;
+                mSearchTimer = 0.0f;
+                if (mGame->IsDebugging()) SDL_Log("Enemy: Chase -> Searching (last known: %.2f, %.2f)", 
                     mLastKnownPlayerPos.x, mLastKnownPlayerPos.y);
-        }
+            }
+            break;
+            
+        case AIState::Attack:
+            if (!playerInAttackRange)
+            {
+                if (playerInChaseRadius)
+                {
+                    mCurrentState = AIState::Chase;
+                    if (mGame->IsDebugging()) SDL_Log("Enemy: Attack -> Chase");
+                }
+                else
+                {
+                    mCurrentState = AIState::Searching;
+                    mSearchTimer = 0.0f;
+                    if (mGame->IsDebugging()) SDL_Log("Enemy: Attack -> Searching");
+                }
+            }
+            break;
+            
+        case AIState::Searching:
+            // Searching uses vision cone detection (directional)
+            if (playerInAttackRange)
+            {
+                mCurrentState = AIState::Attack;
+                if (mGame->IsDebugging()) SDL_Log("Enemy: Searching -> Attack");
+            }
+            else if (playerInCloseRange || playerInVisionCone)
+            {
+                mCurrentState = AIState::Chase;
+                if (mGame->IsDebugging()) SDL_Log("Enemy: Searching -> Chase");
+            }
+            break;
+            
+        case AIState::ReturningToPatrol:
+            // ReturningToPatrol uses 360° radius detection (more alert)
+            if (playerInAttackRange)
+            {
+                mCurrentState = AIState::Attack;
+                if (mGame->IsDebugging()) SDL_Log("Enemy: Returning -> Attack");
+            }
+            else if (playerInCloseRange || playerInChaseRadius)
+            {
+                mCurrentState = AIState::Chase;
+                if (mGame->IsDebugging()) SDL_Log("Enemy: Returning -> Chase");
+            }
+            break;
     }
     
-    // Update detected flag for debug visualization
-    mPlayerDetected = (mCurrentState == AIState::Patrol) ? (playerInProximity || playerInCone) : playerInChaseRange;
+    // Update detected flag for debug visualization (reflects actual detection logic per state)
+    switch (mCurrentState)
+    {
+        case AIState::Patrol:
+            mPlayerDetected = playerInCloseRange || playerInVisionCone;
+            break;
+        case AIState::Chase:
+            mPlayerDetected = playerInChaseRadius;
+            break;
+        case AIState::Attack:
+            mPlayerDetected = playerInAttackRange;
+            break;
+        case AIState::Searching:
+            mPlayerDetected = playerInCloseRange || playerInVisionCone;
+            break;
+        case AIState::ReturningToPatrol:
+            mPlayerDetected = playerInCloseRange || playerInChaseRadius;
+            break;
+    }
     
     // Execute state behavior
     switch (mCurrentState)
@@ -198,25 +254,49 @@ void Enemy::TakeDamage(int damage)
     }
 }
 
-bool Enemy::IsPlayerInRange() const
+// Helper: Get player reference if valid
+const ShadowCat* Enemy::GetPlayerIfValid() const
 {
-    const ShadowCat* player = mGame->GetPlayer();
+    return mGame->GetPlayer();
+}
+
+// Helper: Calculate squared distance to player (avoids sqrt for performance)
+float Enemy::GetSquaredDistanceToPlayer(const ShadowCat* player) const
+{
+    if (!player) return FLT_MAX;
+    Vector2 playerOffset = player->GetPosition() - mPosition;
+    return playerOffset.LengthSq();
+}
+
+// Helper: Check if player is within a specific radius (360° circular detection)
+bool Enemy::IsPlayerInRange(float radius) const
+{
+    const ShadowCat* player = GetPlayerIfValid();
     if (!player) return false;
     
-    Vector2 toPlayer = player->GetPosition() - mPosition;
-    float distanceSquared = toPlayer.LengthSq();
+    float radiusSquared = radius * radius;
+    return GetSquaredDistanceToPlayer(player) <= radiusSquared;
+}
+
+bool Enemy::IsPlayerInVisionCone() const
+{
+    const ShadowCat* player = GetPlayerIfValid();
+    if (!player) return false;
     
-    // Use chase radius during Searching state, normal detection radius otherwise
-    float radius = (mCurrentState == AIState::Searching) ? mChaseDetectionRadius : mDetectionRadius;
-    float detectionRadiusSquared = radius * radius;
+    // Use chase radius during Searching and ReturningToPatrol states, normal detection radius otherwise
+    float radius = (mCurrentState == AIState::Searching || mCurrentState == AIState::ReturningToPatrol) 
+        ? mChaseDetectionRadius : mDetectionRadius;
+    float radiusSquared = radius * radius;
     
-    // Check distance first
-    if (distanceSquared > detectionRadiusSquared)
+    // Check distance first (early exit for performance)
+    float distanceSquared = GetSquaredDistanceToPlayer(player);
+    if (distanceSquared > radiusSquared)
         return false;
     
     // Check if player is within detection cone (in front of enemy)
-    Vector2 forward = GetForwardDirection();
+    Vector2 toPlayer = player->GetPosition() - mPosition;
     toPlayer.Normalize();
+    Vector2 forward = GetForwardDirection();
     
     // Calculate angle between forward direction and direction to player
     float dotProduct = Vector2::Dot(forward, toPlayer);
@@ -226,30 +306,16 @@ bool Enemy::IsPlayerInRange() const
     return angleToPlayer <= (mDetectionAngle / 2.0f);
 }
 
-bool Enemy::IsPlayerInProximity() const
+// 360° proximity detection - close range circular detection (no directional requirement)
+bool Enemy::IsPlayerInCloseRange() const
 {
-    const ShadowCat* player = mGame->GetPlayer();
-    if (!player) return false;
-    
-    Vector2 toPlayer = player->GetPosition() - mPosition;
-    float distanceSquared = toPlayer.LengthSq();
-    float proximityRadiusSquared = mProximityRadius * mProximityRadius;
-    
-    // Simple circular check - works 360 degrees
-    return distanceSquared <= proximityRadiusSquared;
+    return IsPlayerInRange(mProximityRadius);
 }
 
-bool Enemy::IsPlayerInChaseRange() const
+// 360° extended chase radius - larger circular detection for maintaining chase
+bool Enemy::IsPlayerInChaseRadius() const
 {
-    const ShadowCat* player = mGame->GetPlayer();
-    if (!player) return false;
-    
-    Vector2 toPlayer = player->GetPosition() - mPosition;
-    float distanceSquared = toPlayer.LengthSq();
-    float chaseRadiusSquared = mChaseDetectionRadius * mChaseDetectionRadius;
-    
-    // Simple circular check - no angle restriction during chase
-    return distanceSquared <= chaseRadiusSquared;
+    return IsPlayerInRange(mChaseDetectionRadius);
 }
 
 Vector2 Enemy::GetForwardDirection() const
@@ -271,16 +337,28 @@ Vector2 Enemy::GetForwardDirection() const
         return Vector2(-1.0f, 0.0f);  // Facing left
 }
 
+// 360° attack range detection - checks if player is close enough to attack
 bool Enemy::IsPlayerInAttackRange() const
 {
-    const ShadowCat* player = mGame->GetPlayer();
-    if (!player) return false;
-    
-    Vector2 toPlayer = player->GetPosition() - mPosition;
-    float distanceSquared = toPlayer.LengthSq();
-    float attackRangeSquared = mAttackRange * mAttackRange;
-    
-    return distanceSquared <= attackRangeSquared;
+    return IsPlayerInRange(mAttackRange);
+}
+
+void Enemy::UpdateFacing(const Vector2& direction)
+{
+    if (direction.x > 0.0f)
+        SetScale(Vector2(1.0f, 1.0f));
+    else if (direction.x < 0.0f)
+        SetScale(Vector2(-1.0f, 1.0f));
+}
+
+void Enemy::MoveToward(const Vector2& target, float speed)
+{
+    Vector2 direction = target - mPosition;
+    direction.Normalize();
+    Vector2 velocity = direction * speed;
+    mRigidBodyComponent->SetVelocity(velocity);
+    mMovementDirection = velocity;
+    UpdateFacing(direction);
 }
 
 void Enemy::UpdatePatrol(float deltaTime)
@@ -320,8 +398,7 @@ void Enemy::UpdatePatrol(float deltaTime)
     Vector2 toWaypoint = mPatrolWaypoints[mCurrentWaypoint] - mPosition;
     float distanceToWaypoint = toWaypoint.Length();
     
-    // Check if we've reached the waypoint (within 10 pixels)
-    if (distanceToWaypoint < 10.0f)
+    if (distanceToWaypoint < WAYPOINT_REACHED_DISTANCE)
     {
         // Reached waypoint, start pause before moving to next one
         mIsPatrolPaused = true;
@@ -339,7 +416,7 @@ void Enemy::UpdatePatrol(float deltaTime)
     
     // Check if enemy hit a wall (position didn't change despite velocity)
     float positionChange = (mPosition - mPreviousPosition).Length();
-    if (positionChange < 0.1f && deltaTime > 0.0f)
+    if (positionChange < MIN_POSITION_CHANGE_TO_DETECT_STUCK && deltaTime > 0.0f)
     {
         // We're stuck, start pause and switch waypoints
         mIsPatrolPaused = true;
@@ -363,15 +440,7 @@ void Enemy::UpdatePatrol(float deltaTime)
     mMovementDirection = velocity;  // Track movement direction for cone detection
     mIsMoving = true;  // Set to true so ManageAnimations plays Run
     
-    // Update sprite facing direction based on movement
-    if (toWaypoint.x > 0.0f)
-    {
-        SetScale(Vector2(1.0f, 1.0f));
-    }
-    else if (toWaypoint.x < 0.0f)
-    {
-        SetScale(Vector2(-1.0f, 1.0f));
-    }
+    UpdateFacing(toWaypoint);
 }
 
 void Enemy::UpdateChase(float deltaTime)
@@ -382,24 +451,8 @@ void Enemy::UpdateChase(float deltaTime)
     // Update last known position while chasing
     mLastKnownPlayerPos = player->GetPosition();
     
-    // Calculate direction to player
-    Vector2 toPlayer = player->GetPosition() - mPosition;
-    toPlayer.Normalize();
-    
     // Move toward player
-    Vector2 velocity = toPlayer * mChaseSpeed;
-    mRigidBodyComponent->SetVelocity(velocity);
-    mMovementDirection = velocity;  // Track movement direction
-    
-    // Update sprite facing direction based on movement
-    if (toPlayer.x > 0.0f)
-    {
-        SetScale(Vector2(1.0f, 1.0f));
-    }
-    else if (toPlayer.x < 0.0f)
-    {
-        SetScale(Vector2(-1.0f, 1.0f));
-    }
+    MoveToward(player->GetPosition(), mChaseSpeed);
 }
 
 void Enemy::UpdateSearching(float deltaTime)
@@ -418,28 +471,11 @@ void Enemy::UpdateSearching(float deltaTime)
         return;
     }
     
-    // Check if player has re-entered detection range
-    bool playerInProximity = IsPlayerInProximity();
-    bool playerInCone = IsPlayerInRange();
-    
-    if (playerInProximity || playerInCone)
-    {
-        // Found the player again!
-        // Found the player again!
-        mCurrentState = AIState::Chase;
-        if (mGame->IsDebugging())
-        {
-            SDL_Log("Enemy: Player re-detected during search -> Chase");
-        }
-        return;
-    }
-    
     // Calculate direction to last known position
     Vector2 toLastKnown = mLastKnownPlayerPos - mPosition;
     float distanceToLastKnown = toLastKnown.Length();
     
-    // If we've reached the last known position, give up
-    if (distanceToLastKnown < 20.0f)  // Within 20 pixels (close enough)
+    if (distanceToLastKnown < LAST_KNOWN_POSITION_REACHED_DISTANCE)
     {
         mCurrentState = AIState::ReturningToPatrol;
         if (mGame->IsDebugging())
@@ -450,39 +486,11 @@ void Enemy::UpdateSearching(float deltaTime)
     }
     
     // Move toward last known position
-    toLastKnown.Normalize();
-    Vector2 velocity = toLastKnown * mSearchSpeed;
-    mRigidBodyComponent->SetVelocity(velocity);
-    mMovementDirection = velocity;  // Track movement direction for cone detection
-    
-    // Update sprite facing direction based on movement
-    if (toLastKnown.x > 0.0f)
-    {
-        SetScale(Vector2(1.0f, 1.0f));
-    }
-    else if (toLastKnown.x < 0.0f)
-    {
-        SetScale(Vector2(-1.0f, 1.0f));
-    }
+    MoveToward(mLastKnownPlayerPos, mSearchSpeed);
 }
 
 void Enemy::UpdateReturningToPatrol(float deltaTime)
 {
-    // Check if player re-enters detection range while returning
-    bool playerInProximity = IsPlayerInProximity();
-    bool playerInChaseRange = IsPlayerInChaseRange();
-    
-    if (playerInProximity || playerInChaseRange)
-    {
-        // Found the player again!
-        mCurrentState = AIState::Chase;
-        if (mGame->IsDebugging())
-        {
-            SDL_Log("Enemy: Player detected while returning -> Chase");
-        }
-        return;
-    }
-    
     // Find nearest patrol waypoint
     float distToWaypoint0 = (mPatrolWaypoints[0] - mPosition).Length();
     float distToWaypoint1 = (mPatrolWaypoints[1] - mPosition).Length();
@@ -492,11 +500,8 @@ void Enemy::UpdateReturningToPatrol(float deltaTime)
     Vector2 toWaypoint = mPatrolWaypoints[nearestWaypoint] - mPosition;
     float distanceToWaypoint = toWaypoint.Length();
     
-    // Check if we've reached the patrol area (within 20 pixels of a waypoint)
-    if (distanceToWaypoint < 20.0f)
+    if (distanceToWaypoint < PATROL_AREA_REACHED_DISTANCE)
     {
-        // Back in patrol area, resume normal patrol
-        // Back in patrol area, resume normal patrol
         mCurrentState = AIState::Patrol;
         mCurrentWaypoint = nearestWaypoint;
         if (mGame->IsDebugging())
@@ -507,20 +512,7 @@ void Enemy::UpdateReturningToPatrol(float deltaTime)
     }
     
     // Move toward nearest waypoint
-    toWaypoint.Normalize();
-    Vector2 velocity = toWaypoint * mPatrolSpeed;
-    mRigidBodyComponent->SetVelocity(velocity);
-    mMovementDirection = velocity;  // Track movement direction for cone detection
-    
-    // Update sprite facing direction based on movement
-    if (toWaypoint.x > 0.0f)
-    {
-        SetScale(Vector2(1.0f, 1.0f));
-    }
-    else if (toWaypoint.x < 0.0f)
-    {
-        SetScale(Vector2(-1.0f, 1.0f));
-    }
+    MoveToward(mPatrolWaypoints[nearestWaypoint], mPatrolSpeed);
 }
 
 void Enemy::UpdateAttack(float deltaTime)
@@ -530,274 +522,11 @@ void Enemy::UpdateAttack(float deltaTime)
 
     if (mBasicAttack->CanUse())
         mBasicAttack->Execute(player->GetPosition());
-    
-    // // Stop moving during attack
-    // mRigidBodyComponent->SetVelocity(Vector2::Zero);
-    // mMovementDirection = Vector2::Zero;  // No movement during attack
-    
-    // // Face the player
-    // Vector2 toPlayer = player->GetPosition() - mPosition;
-    // if (toPlayer.x > 0.0f)
-    // {
-    //     SetScale(Vector2(1.0f, 1.0f));
-    // }
-    // else if (toPlayer.x < 0.0f)
-    // {
-    //     SetScale(Vector2(-1.0f, 1.0f));
-    // }
-    
-    // // Attack if cooldown is ready
-    // if (mAttackTimer <= 0.0f)
-    // {
-    //     // Deal damage to player (need to cast away const)
-    //     const_cast<ShadowCat*>(player)->TakeDamage(mAttackDamage);
-        
-    //     // Reset cooldown
-    //     mAttackTimer = mAttackCooldown;
-        
-    //     if (mGame->IsDebugging())
-    //     {
-    //         SDL_Log("Enemy attacked player for %d damage!", mAttackDamage);
-    //     }
-        
-    //     // Play hit animation (brief attack indication)
-    //     mAnimatorComponent->PlayAnimationOnce("Hit");
-    // }
 }
 
 void Enemy::OnDebugDraw(class Renderer* renderer)
 {
-    if (!mGame->IsDebugging()) return;
-    
-    Vector3 detectionColor = mPlayerDetected ? Vector3(1.0f, 0.0f, 0.0f) : Vector3(1.0f, 1.0f, 0.0f); // Red : Yellow
-    
-    // Draw different visualization based on state
-    if (mCurrentState == AIState::Patrol)
-    {
-        // Draw detection cone during patrol
-        Vector2 forward = GetForwardDirection();
-        float baseAngle = Math::Atan2(forward.y, forward.x);
-        
-        const int segments = 16;
-        float halfConeAngle = mDetectionAngle / 2.0f;
-        float startAngle = baseAngle - halfConeAngle;
-        float angleStep = mDetectionAngle / segments;
-        
-        // Draw the arc
-        for (int i = 0; i < segments; i++)
-        {
-            float angle1 = startAngle + i * angleStep;
-            float angle2 = startAngle + (i + 1) * angleStep;
-            
-            Vector2 p1 = mPosition + Vector2(
-                Math::Cos(angle1) * mDetectionRadius,
-                Math::Sin(angle1) * mDetectionRadius
-            );
-            
-            Vector2 p2 = mPosition + Vector2(
-                Math::Cos(angle2) * mDetectionRadius,
-                Math::Sin(angle2) * mDetectionRadius
-            );
-            
-            renderer->DrawRect(p1, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
-        }
-        
-        // Draw cone edges
-        Vector2 leftEdge = mPosition + Vector2(
-            Math::Cos(startAngle) * mDetectionRadius,
-            Math::Sin(startAngle) * mDetectionRadius
-        );
-        Vector2 rightEdge = mPosition + Vector2(
-            Math::Cos(startAngle + mDetectionAngle) * mDetectionRadius,
-            Math::Sin(startAngle + mDetectionAngle) * mDetectionRadius
-        );
-        
-        const int edgePoints = 8;
-        for (int i = 0; i <= edgePoints; i++)
-        {
-            float t = i / (float)edgePoints;
-            Vector2 leftPoint = mPosition + (leftEdge - mPosition) * t;
-            Vector2 rightPoint = mPosition + (rightEdge - mPosition) * t;
-            
-            renderer->DrawRect(leftPoint, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
-            renderer->DrawRect(rightPoint, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
-        }
-        
-        // Always draw proximity circle (white/light blue color)
-        Vector3 proximityColor = Vector3(0.8f, 0.8f, 1.0f); // Light blue
-        const int proxSegments = 24;
-        const float proxAngleStep = Math::TwoPi / proxSegments;
-        
-        for (int i = 0; i < proxSegments; i++)
-        {
-            float angle1 = i * proxAngleStep;
-            
-            Vector2 p1 = mPosition + Vector2(
-                Math::Cos(angle1) * mProximityRadius,
-                Math::Sin(angle1) * mProximityRadius
-            );
-            
-            renderer->DrawRect(p1, Vector2(3.0f, 3.0f), 0.0f, proximityColor, mGame->GetCameraPos(), RendererMode::LINES);
-        }
-    }
-    else if (mCurrentState == AIState::Searching)
-    {
-        // Draw search area visualization - orange/yellow color to indicate searching
-        Vector3 searchColor = Vector3(1.0f, 0.6f, 0.0f); // Orange
-        const int segments = 32;
-        const float angleStep = Math::TwoPi / segments;
-        
-        // Draw detection cone (still active during search) - uses chase radius for extended range
-        Vector2 forward = GetForwardDirection();
-        float baseAngle = Math::Atan2(forward.y, forward.x);
-        
-        const int coneSegments = 16;
-        float halfConeAngle = mDetectionAngle / 2.0f;
-        float startAngle = baseAngle - halfConeAngle;
-        float coneAngleStep = mDetectionAngle / coneSegments;
-        
-        for (int i = 0; i < coneSegments; i++)
-        {
-            float angle1 = startAngle + i * coneAngleStep;
-            
-            Vector2 p1 = mPosition + Vector2(
-                Math::Cos(angle1) * mChaseDetectionRadius,
-                Math::Sin(angle1) * mChaseDetectionRadius
-            );
-            
-            renderer->DrawRect(p1, Vector2(3.0f, 3.0f), 0.0f, searchColor, mGame->GetCameraPos(), RendererMode::LINES);
-        }
-        
-        // Draw proximity circle
-        Vector3 proximityColor = Vector3(0.8f, 0.8f, 1.0f);
-        const int proxSegments = 24;
-        const float proxAngleStep = Math::TwoPi / proxSegments;
-        
-        for (int i = 0; i < proxSegments; i++)
-        {
-            float angle1 = i * proxAngleStep;
-            
-            Vector2 p1 = mPosition + Vector2(
-                Math::Cos(angle1) * mProximityRadius,
-                Math::Sin(angle1) * mProximityRadius
-            );
-            
-            renderer->DrawRect(p1, Vector2(3.0f, 3.0f), 0.0f, proximityColor, mGame->GetCameraPos(), RendererMode::LINES);
-        }
-        
-        // Draw last known position marker (X shape)
-        Vector3 markerColor = Vector3(1.0f, 0.0f, 1.0f); // Magenta
-        float markerSize = 16.0f;
-        
-        // Draw X at last known position
-        for (int i = -1; i <= 1; i++)
-        {
-            renderer->DrawRect(
-                mLastKnownPlayerPos + Vector2(i * 4.0f, i * 4.0f),
-                Vector2(5.0f, 5.0f),
-                0.0f,
-                markerColor,
-                mGame->GetCameraPos(),
-                RendererMode::LINES
-            );
-            renderer->DrawRect(
-                mLastKnownPlayerPos + Vector2(i * 4.0f, -i * 4.0f),
-                Vector2(5.0f, 5.0f),
-                0.0f,
-                markerColor,
-                mGame->GetCameraPos(),
-                RendererMode::LINES
-            );
-        }
-        
-        // Draw line from enemy to last known position
-        Vector2 toLastKnown = mLastKnownPlayerPos - mPosition;
-        float distance = toLastKnown.Length();
-        const int linePoints = 10;
-        
-        for (int i = 0; i <= linePoints; i++)
-        {
-            float t = i / (float)linePoints;
-            Vector2 point = mPosition + toLastKnown * t;
-            renderer->DrawRect(point, Vector2(3.0f, 3.0f), 0.0f, markerColor, mGame->GetCameraPos(), RendererMode::LINES);
-        }
-    }
-    else
-    {
-        // Draw chase circle during chase/attack states
-        const int segments = 32;
-        const float angleStep = Math::TwoPi / segments;
-        
-        for (int i = 0; i < segments; i++)
-        {
-            float angle1 = i * angleStep;
-            float angle2 = (i + 1) * angleStep;
-            
-            Vector2 p1 = mPosition + Vector2(
-                Math::Cos(angle1) * mChaseDetectionRadius,
-                Math::Sin(angle1) * mChaseDetectionRadius
-            );
-            
-            Vector2 p2 = mPosition + Vector2(
-                Math::Cos(angle2) * mChaseDetectionRadius,
-                Math::Sin(angle2) * mChaseDetectionRadius
-            );
-            
-            renderer->DrawRect(p1, Vector2(4.0f, 4.0f), 0.0f, detectionColor, mGame->GetCameraPos(), RendererMode::LINES);
-        }
-        
-        // Always draw proximity circle (white/light blue color)
-        Vector3 proximityColor = Vector3(0.8f, 0.8f, 1.0f); // Light blue
-        const int proxSegments = 24;
-        const float proxAngleStep = Math::TwoPi / proxSegments;
-        
-        for (int i = 0; i < proxSegments; i++)
-        {
-            float angle1 = i * proxAngleStep;
-            
-            Vector2 p1 = mPosition + Vector2(
-                Math::Cos(angle1) * mProximityRadius,
-                Math::Sin(angle1) * mProximityRadius
-            );
-            
-            renderer->DrawRect(p1, Vector2(3.0f, 3.0f), 0.0f, proximityColor, mGame->GetCameraPos(), RendererMode::LINES);
-        }
-    }
-    
-    // Always draw patrol waypoints (green squares) for all states
-    Vector3 waypointColor = Vector3(0.0f, 1.0f, 0.0f); // Green
-    Vector3 currentWaypointColor = Vector3(0.0f, 1.0f, 1.0f); // Cyan for current target
-    
-    for (int i = 0; i < 2; i++)
-    {
-        Vector3 color = (i == mCurrentWaypoint && mCurrentState == AIState::Patrol) ? currentWaypointColor : waypointColor;
-        
-        // Draw a square at each waypoint
-        for (int dx = -8; dx <= 8; dx += 4)
-        {
-            for (int dy = -8; dy <= 8; dy += 4)
-            {
-                renderer->DrawRect(
-                    mPatrolWaypoints[i] + Vector2(dx, dy),
-                    Vector2(4.0f, 4.0f),
-                    0.0f,
-                    color,
-                    mGame->GetCameraPos(),
-                    RendererMode::LINES
-                );
-            }
-        }
-    }
-    
-    // Draw line between waypoints
-    Vector2 waypointDiff = mPatrolWaypoints[1] - mPatrolWaypoints[0];
-    const int linePoints = 15;
-    for (int i = 0; i <= linePoints; i++)
-    {
-        float t = i / (float)linePoints;
-        Vector2 point = mPatrolWaypoints[0] + waypointDiff * t;
-        renderer->DrawRect(point, Vector2(2.0f, 2.0f), 0.0f, waypointColor, mGame->GetCameraPos(), RendererMode::LINES);
-    }
+    EnemyDebugDrawer::Draw(renderer, this, mGame);
 }
 
 void Enemy::Kill()

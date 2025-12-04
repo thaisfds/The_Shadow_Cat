@@ -3,6 +3,8 @@
 #include "../../Components/Physics/ColliderComponent.h"
 #include "../../Components/Skills/BasicAttack.h"
 
+class ShadowCat;  // Forward declaration
+
 class Enemy : public Character
 {
 public:
@@ -30,6 +32,19 @@ public:
     void Kill() override;
     
     void OnDebugDraw(class Renderer* renderer);
+    
+    // Getters for debug visualization
+    AIState GetCurrentState() const { return mCurrentState; }
+    const Vector2* GetPatrolWaypoints() const { return mPatrolWaypoints; }
+    int GetCurrentWaypoint() const { return mCurrentWaypoint; }
+    float GetDetectionRadius() const { return mDetectionRadius; }
+    float GetDetectionAngle() const { return mDetectionAngle; }
+    float GetChaseDetectionRadius() const { return mChaseDetectionRadius; }
+    float GetProximityRadius() const { return mProximityRadius; }
+    float GetAttackRange() const { return mAttackRange; }
+    Vector2 GetLastKnownPlayerPos() const { return mLastKnownPlayerPos; }
+    bool IsPlayerDetected() const { return mPlayerDetected; }
+    Vector2 GetForwardDirection() const;
 
 private:
     CollisionFilter mSkillFilter;
@@ -62,9 +77,9 @@ private:
     
     // Attack behavior
     float mAttackRange;
-    float mAttackCooldown;
-    float mAttackTimer;
-    int mAttackDamage;
+    float mAttackCooldown;  // Unused: BasicAttack manages cooldown internally
+    float mAttackTimer;  // Unused: BasicAttack manages timer internally
+    int mAttackDamage;  // Unused: BasicAttack manages damage internally
     
     // Player detection
     float mDetectionRadius;
@@ -73,11 +88,16 @@ private:
     float mProximityRadius;  // Small circle for close-range detection (360 degrees)
     bool mPlayerDetected;
     
-    bool IsPlayerInRange() const;
-    bool IsPlayerInProximity() const;
-    bool IsPlayerInChaseRange() const;
-    bool IsPlayerInAttackRange() const;
-    Vector2 GetForwardDirection() const;
+    // Detection helpers
+    const ShadowCat* GetPlayerIfValid() const;
+    float GetSquaredDistanceToPlayer(const ShadowCat* player) const;
+    bool IsPlayerInRange(float radius) const;  // Generic 360° range detection
+    bool IsPlayerInVisionCone() const;  // Directional cone detection (patrol)
+    bool IsPlayerInCloseRange() const;  // 360° proximity detection
+    bool IsPlayerInChaseRadius() const;  // 360° extended chase detection
+    bool IsPlayerInAttackRange() const;  // 360° attack range detection
+    void UpdateFacing(const Vector2& direction);
+    void MoveToward(const Vector2& target, float speed);
     void UpdatePatrol(float deltaTime);
     void UpdateChase(float deltaTime);
     void UpdateSearching(float deltaTime);

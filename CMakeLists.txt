@@ -107,6 +107,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/ClawAttack.h
         Source/Components/Skills/FurBall.cpp
         Source/Components/Skills/FurBall.h
+        Source/Debug/EnemyDebugDrawer.cpp
+        Source/Debug/EnemyDebugDrawer.h
 )
 
 configure_local_linking(${PROJECT_NAME})
