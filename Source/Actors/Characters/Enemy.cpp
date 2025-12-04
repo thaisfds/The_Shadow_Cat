@@ -7,6 +7,7 @@
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../../Renderer/Renderer.h"
 #include "../../Debug/EnemyDebugDrawer.h"
+#include <cfloat>
 #include <SDL.h>
 
 namespace {
