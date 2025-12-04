@@ -1,7 +1,12 @@
 #pragma once
+#include <functional>
+#include <map>
+
 #include "../Component.h"
 #include <string>
+#include <vector>
 #include "../../Math.h"
+#include "../../DelayedActionSystem.h"
 
 class Character;
 
@@ -12,12 +17,12 @@ public:
     virtual ~SkillBase() = default;
 
     void Update(float deltaTime) override;
-    virtual void ProcessInput(const uint8_t* keyState) override;
     
-    virtual void Execute(Vector2 targetPosition) = 0;
     virtual bool CanUse() const;
     
-    void StartCooldown() { mCurrentCooldown = mCooldown; }
+    virtual void StartSkill(Vector2 targetPosition);
+    virtual void EndSkill() { mIsUsing = false; }
+    
     float GetCooldown() const { return mCurrentCooldown; }
     bool IsOnCooldown() const { return mCurrentCooldown > 0.0f; }
     
@@ -31,4 +36,20 @@ protected:
     std::string mDescription;
     float mCooldown;
     float mCurrentCooldown;
+    bool mIsUsing;
+    Vector2 mTargetVector; // Can be either direction or position depending on skill
+
+    struct DelayedAction
+    {
+        float delay;
+        std::function<void()> action;
+        bool executed = false;
+    };
+
+    class DelayedActionSystem mDelayedActions;
+
+    void AddDelayedAction(float delay, std::function<void()> action)
+    {
+        mDelayedActions.AddDelayedAction(delay, action);
+    }
 };

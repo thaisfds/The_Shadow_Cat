@@ -7,6 +7,7 @@
 #include "../Drawing/DrawComponent.h"
 #include "../Physics/Physics.h"
 #include "../../Game.h"
+#include "SkillBase.h"
 
 
 BasicAttack::BasicAttack(Actor* owner, CollisionFilter filter, int damage, int updateOrder)
@@ -16,73 +17,50 @@ BasicAttack::BasicAttack(Actor* owner, CollisionFilter filter, int damage, int u
     mDescription = "A simple melee attack.";
     mCooldown = 2.0f;
     mCurrentCooldown = 0.0f;
-    mIsAttacking = false;
-    mDamageDelay = 0.53f; // Hardcoded for now, want to change later
     mFilter = filter;
     mDamage = damage;
 
-    mAttackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("BasicAttack");
-    if (mAttackDuration == 0.0f) mAttackDuration = 1.0f;
-
     mConeRadius = 50.0f;
     mConeAngle = Math::ToRadians(45.0f);
+    
+    float attackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("BasicAttack");
+    if (attackDuration == 0.0f) attackDuration = 1.0f;
+    AddDelayedAction(0.53f, [this]() { Execute(); });
+    AddDelayedAction(attackDuration, [this]() { EndSkill(); });
 }
 
-void BasicAttack::Update(float deltaTime)
+void BasicAttack::Execute()
 {
-    SkillBase::Update(deltaTime);
+    mCharacter->GetGame()->GetAttackTrailActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
+        0.3f,
+        0.0f,
+        mCharacter->GetPosition() + mTargetVector * mConeRadius,
+        std::atan2(mTargetVector.y, mTargetVector.x),
+        mCharacter->GetScale().x < 0.0f
+    );
 
-    if (!mIsAttacking) return;
-
-    mAttackTimer += deltaTime;
-    if (mAttackTimer >= mDamageDelay && !mDamageApplied)
+    auto hitColliders = Physics::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mTargetVector, mConeAngle, mConeRadius, mFilter);
+    for (auto collider : hitColliders)
     {
-        mDamageApplied = true;
-        // This should emit particle only when damaging, not here. Also, make a playOnce for animatedParticles
-        mCharacter->GetGame()->GetAttackTrailActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
-            0.3f,
-            0.0f,
-            mCharacter->GetPosition() + mAttackDirection * mConeRadius,
-            std::atan2(mAttackDirection.y, mAttackDirection.x),
-            mCharacter->GetScale().x < 0.0f
-        );
-
-        auto hitColliders = Physics::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mAttackDirection, mConeAngle, mConeRadius, mFilter);
-        for (auto collider : hitColliders)
-        {
-            auto enemyActor = collider->GetOwner();
-            auto enemyCharacter = dynamic_cast<Character*>(enemyActor);
-            enemyCharacter->TakeDamage(mDamage);
-        }
+        auto enemyActor = collider->GetOwner();
+        auto enemyCharacter = dynamic_cast<Character*>(enemyActor);
+        enemyCharacter->TakeDamage(mDamage);
     }
-
-    if (mAttackTimer >= mAttackDuration) EndAttack();
 }
 
-void BasicAttack::Execute(Vector2 targetPosition)
+void BasicAttack::StartSkill(Vector2 targetPosition)
 {
+    SkillBase::StartSkill(targetPosition);
+
     mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("BasicAttack");
     mCharacter->SetMovementLock(true);
     mCharacter->SetAnimationLock(true);  // Lock animations so attack anim isn't overridden
-    
-    mIsAttacking = true;
-    mAttackTimer = 0.0f;
-    mDamageApplied = false;
-    
-    mAttackDirection = targetPosition - mCharacter->GetPosition();
-    mAttackDirection.Normalize();
-
-    if (mAttackDirection.x > 0.0f)
-        mCharacter->SetScale(Vector2(1.0f, mCharacter->GetScale().y));
-    else if (mAttackDirection.x < 0.0f)
-        mCharacter->SetScale(Vector2(-1.0f, mCharacter->GetScale().y));
-    
-    StartCooldown();
 }
 
-void BasicAttack::EndAttack()
+void BasicAttack::EndSkill()
 {
-    mIsAttacking = false;
+    SkillBase::EndSkill();
+    
     mCharacter->SetMovementLock(false);
     mCharacter->SetAnimationLock(false);  // Unlock animations
 }

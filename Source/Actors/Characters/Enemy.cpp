@@ -532,7 +532,7 @@ void Enemy::UpdateAttack(float deltaTime)
     UpdateFacing(toPlayer);
 
     if (mBasicAttack->CanUse())
-        mBasicAttack->Execute(player->GetPosition());
+        mBasicAttack->StartSkill(player->GetPosition());
 }
 
 void Enemy::OnDebugDraw(class Renderer* renderer)

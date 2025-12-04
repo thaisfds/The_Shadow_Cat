@@ -15,65 +15,41 @@ FurBall::FurBall(Actor* owner, int updateOrder)
 	mCurrentCooldown = 0.0f;
 	mProjectileSpeed = 300.0f;
 	mDamage = 10;
-	mDelay = 0.5f;
-	mTimer = 0.0f;
 
-	mDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("FurBall");
-	if (mDuration == 0.0f) mDuration = 1.0f;
+	float duration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("FurBall");
+	if (duration == 0.0f) duration = 1.0f;
+	
+	AddDelayedAction(0.5f, [this]() { Execute(); });
+	AddDelayedAction(duration, [this]() { EndSkill(); });
 }
 
-void FurBall::Update(float deltaTime)
+void FurBall::Execute()
 {
-	SkillBase::Update(deltaTime);
+	CollisionFilter filter;
+	filter.belongsTo = CollisionFilter::GroupMask({ CollisionGroup::PlayerSkills });
+	filter.collidesWith = CollisionFilter::GroupMask({ CollisionGroup::Enemy });
 
-	if (!mIsAttacking) return;
-
-	mTimer += deltaTime;
-	if (mTimer >= mDelay && !mFired)
-	{
-		mFired = true;
-		
-		CollisionFilter filter;
-		filter.belongsTo = CollisionFilter::GroupMask({ CollisionGroup::PlayerSkills });
-		filter.collidesWith = CollisionFilter::GroupMask({ CollisionGroup::Enemy });
-
-		mCharacter->GetGame()->GetFurBallActor()->Awake(
-			mCharacter->GetPosition() + mDirection * 20.0f,
-			mDirection,
-			mProjectileSpeed,
-			mDamage,
-			mDelay,
-			filter
-		);
-	}
-
-	if (mTimer >= mDuration) EndAttack();
+	mCharacter->GetGame()->GetFurBallActor()->Awake(
+		mCharacter->GetPosition() + mTargetVector * 20.0f,
+		mTargetVector,
+		mProjectileSpeed,
+		mDamage,
+		filter
+	);
 }
 
-void FurBall::Execute(Vector2 targetPosition)
+void FurBall::StartSkill(Vector2 targetPosition)
 {
+	SkillBase::StartSkill(targetPosition);
+
 	mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("FurBall");
 	mCharacter->SetMovementLock(true);
-
-	mIsAttacking = true;
-	mTimer = 0.0f;
-	mFired = false;
-
-	Vector2 mouseWorldPos = mCharacter->GetGame()->GetMouseWorldPosition();
-	mDirection = mouseWorldPos - mCharacter->GetPosition();
-	mDirection.Normalize();
-
-	if (mDirection.x > 0.0f)
-		mCharacter->SetScale(Vector2(1.0f, mCharacter->GetScale().y));
-	else if (mDirection.x < 0.0f)
-		mCharacter->SetScale(Vector2(-1.0f, mCharacter->GetScale().y));
-
-	StartCooldown();
 }
 
-void FurBall::EndAttack()
+void FurBall::EndSkill()
 {
-	mIsAttacking = false;
+	SkillBase::EndSkill();
+
 	mCharacter->SetMovementLock(false);
 }
 
@@ -124,7 +100,7 @@ void FurBallActor::Kill()
 	mDead = true;
 }
 
-void FurBallActor::Awake(Vector2 position, Vector2 direction, float speed, int damage, float delay, CollisionFilter filter)
+void FurBallActor::Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter)
 {
 	mAnimatorComponent->SetEnabled(true);
 	mAnimatorComponent->SetVisible(true);

@@ -12,67 +12,44 @@ ClawAttack::ClawAttack(Actor* owner, int updateOrder)
 	mDescription = "Perform a ferocious pounce, slashing with your claws.";
 	mCooldown = 3.0f;
 	mCurrentCooldown = 0.0f;
-	mIsAttacking = false;
-	mDamageDelay = 1.3f; // Hardcoded for now, want to change later
 
-	mAttackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("ClawAttack");
-	if (mAttackDuration == 0.0f) mAttackDuration = 1.0f;
-
+	
 	mConeRadius = 60.0f;
 	mConeAngle = Math::ToRadians(60.0f);
 	mDamage = 20;
+	
+	float attackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("ClawAttack");
+	if (attackDuration == 0.0f) attackDuration = 1.0f;
+	AddDelayedAction(1.3f, [this]() { Execute(); });
+	AddDelayedAction(attackDuration, [this]() { EndSkill(); });
 }
 
-void ClawAttack::Update(float deltaTime)
+void ClawAttack::Execute()
 {
-	SkillBase::Update(deltaTime);
+	CollisionFilter filter;
+	filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::PlayerSkills});
+	filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Enemy});
 
-	if (!mIsAttacking) return;
-
-	mAttackTimer += deltaTime;
-	if (mAttackTimer >= mDamageDelay && !mDamageApplied)
+	auto hitColliders = Physics::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mTargetVector, mConeAngle, mConeRadius, filter);
+	for (auto collider : hitColliders)
 	{
-		mDamageApplied = true;
-
-		CollisionFilter filter;
-		filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::PlayerSkills});
-		filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Enemy});
-
-		auto hitColliders = Physics::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mAttackDirection, mConeAngle, mConeRadius, filter);
-		for (auto collider : hitColliders)
-		{
-			auto enemyActor = collider->GetOwner();
-			auto enemyCharacter = dynamic_cast<Character*>(enemyActor);
-			enemyCharacter->TakeDamage(mDamage);
-		}
+		auto enemyActor = collider->GetOwner();
+		auto enemyCharacter = dynamic_cast<Character*>(enemyActor);
+		enemyCharacter->TakeDamage(mDamage);
 	}
-
-	if (mAttackTimer >= mAttackDuration) EndAttack();
 }
 
-void ClawAttack::Execute(Vector2 targetPosition)
+void ClawAttack::StartSkill(Vector2 targetPosition)
 {
+	SkillBase::StartSkill(targetPosition);
+
 	mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("ClawAttack");
 	mCharacter->SetMovementLock(true);
-
-	mIsAttacking = true;
-	mAttackTimer = 0.0f;
-	mDamageApplied = false;
-
-	Vector2 mouseWorldPos = mCharacter->GetGame()->GetMouseWorldPosition();
-	mAttackDirection = mouseWorldPos - mCharacter->GetPosition();
-	mAttackDirection.Normalize();
-
-	if (mAttackDirection.x < 0.0f)
-		mCharacter->SetScale(Vector2(-1.0f, 1.0f));
-	else
-		mCharacter->SetScale(Vector2(1.0f, 1.0f));
-
-	StartCooldown();
 }
 
-void ClawAttack::EndAttack()
+void ClawAttack::EndSkill()
 {
-	mIsAttacking = false;
+	SkillBase::EndSkill();
+
 	mCharacter->SetMovementLock(false);
 }

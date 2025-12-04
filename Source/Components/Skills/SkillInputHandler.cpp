@@ -39,7 +39,7 @@ void SkillInputHandler::HandleEvent(const SDL_Event& event)
     {
         SDL_Log("Skill used: %s", skill->GetName().c_str());
         Vector2 targetPosition = mOwner->GetGame()->GetMouseWorldPosition();
-        skill->Execute(targetPosition);
+        skill->StartSkill(targetPosition);
     }
 }
 

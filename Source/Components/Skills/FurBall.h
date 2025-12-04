@@ -12,23 +12,16 @@ class FurBall : public SkillBase
 public:
 	FurBall(Actor* owner, int updateOrder = 100);
 
-	void Update(float deltaTime) override;
-
 	bool CanUse() const override { return SkillBase::CanUse(); }
 
-	void Execute(Vector2 targetPosition) override;
-	void EndAttack();
+	void StartSkill(Vector2 targetPosition) override;
+	void EndSkill() override;
+
+	void Execute();
 
 private:
 	float mProjectileSpeed;
 	int mDamage;
-
-	float mDelay;
-	float mTimer;
-	float mDuration;
-	bool mIsAttacking;
-	bool mFired;
-	Vector2 mDirection;
 };
 
 class FurBallActor : public Actor
@@ -40,7 +33,7 @@ public:
 	void OnUpdate(float deltaTime) override;
 
 	void Kill() override;
-	void Awake(Vector2 position, Vector2 direction, float speed, int damage, float delay, CollisionFilter filter);
+	void Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter);
 
 	bool IsDead() const { return mDead; }
 
