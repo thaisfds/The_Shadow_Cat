@@ -8,13 +8,21 @@ class ClawAttack : public SkillBase
 public:
 	ClawAttack(Actor* owner, int updateOrder = 100);
 	
+	void Update(float deltaTime) override;
+
 	void StartSkill(Vector2 targetPosition) override;
 	void EndSkill() override;
 
 	void Execute();
 	
 private:
-	float mConeRadius;
 	float mConeAngle;
-	int mDamage;
+	float mDamage;
+	float mForwardSpeed;
+	float mBackwardDistancePercentage;
+	float mBackwardSpeed;
+
+	Vector2 mVelocity;
+
+	nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;
 };

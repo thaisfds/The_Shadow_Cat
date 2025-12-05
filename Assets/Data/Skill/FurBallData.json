@@ -1,0 +1,18 @@
+{
+	"id": "furBallSkill",
+	"name": "Fur Ball",
+	"description": "Launch a ball of fur that damages an enemy on impact.",
+	"cooldown": 4.0,
+	"range": 300,
+	"effects":
+	[
+		{
+			"type": "damage",
+			"amount": 15
+		},
+		{
+			"type": "projectileSpeed",
+			"amount": 300
+		}
+	]
+}

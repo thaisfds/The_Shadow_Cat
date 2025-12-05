@@ -830,11 +830,9 @@ void Game::GenerateOutput()
 	{
 		drawable->Draw(mRenderer);
 
+		auto actor = drawable->GetOwner();
 		if (mIsDebugging)
 		{
-			// Call debug draw for actor
-			auto actor = drawable->GetOwner();
-			
 			// Check if actor is an Enemy and call its debug draw
 			auto enemy = dynamic_cast<Enemy*>(actor);
 			if (enemy)
@@ -848,6 +846,9 @@ void Game::GenerateOutput()
 				comp->DebugDraw(mRenderer);
 			}
 		}
+
+		for (auto comp : actor->GetComponents())
+			comp->ComponentDraw(mRenderer);
 	}
 
 	// Draw UI (TODO: unify in a single draw function and remove mDrawables, add to renderer)

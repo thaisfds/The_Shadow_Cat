@@ -117,6 +117,13 @@ void AABBCollider::DebugDraw(class Renderer* renderer)
 	Vector2 min = GetMin();
 	Vector2 max = GetMax();
 	Vector2 size = max - min;
-	renderer->DrawRect(mComponent->GetOwner()->GetPosition(), size, 0.0f,
+	renderer->DrawRect(mComponent->GetPosition(), size, 0.0f,
 					   Color::Green, mComponent->GetOwner()->GetGame()->GetCameraPos(), RendererMode::LINES);
+}
+
+void CircleCollider::DebugDraw(class Renderer* renderer)
+{
+	Vector2 center = mComponent->GetPosition();
+	renderer->DrawCircle(center, mRadius, Color::Green,
+						 mComponent->GetOwner()->GetGame()->GetCameraPos());
 }

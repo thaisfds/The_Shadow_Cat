@@ -7,18 +7,24 @@
 #include "../../Game.h"
 #include "../../GameConstants.h"
 #include "../Physics/ColliderComponent.h"
+#include "SkillBase.h"
 
 
 Stomp::Stomp(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
 {
-	mName = "Stomp";
-	mDescription = "Bring a pawerful stomp down, damaging nearby enemies.";
-	mCooldown = 5.0f;
-	mCurrentCooldown = 0.0f;
+		LoadSkillDataFromJSON("StompData");
+}
 
-	mDamage = 15;
-	mStompRadius = 50.0f;
+nlohmann::json Stomp::LoadSkillDataFromJSON(const std::string& fileName)
+{
+	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
+
+	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
+	mStompRadius = SkillJsonParser::GetFloatEffectValue(data, "stompRadius");
+	mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
+
+	return data;
 }
 
 void Stomp::StartSkill(Vector2 targetPosition)
@@ -33,7 +39,8 @@ void Stomp::StartSkill(Vector2 targetPosition)
 		mCharacter->GetGame()->GetMouseWorldPosition(),
 		mDamage,
 		0.65f,
-		filter
+		filter,
+		mAreaOfEffect
 	);
 }
 
@@ -43,13 +50,23 @@ StompActor::StompActor(class Game* game)
 {
 	mAnimatorComponent = new AnimatorComponent(this, "StompAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
 	CollisionFilter filter;
-	Collider *collider = new AABBCollider(GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
-	mColliderComponent = new ColliderComponent(this, 0, 0, collider, filter);
+	mColliderComponent = new ColliderComponent(this, 0, 0, nullptr, filter);
 	Kill();
 }
 
 StompActor::~StompActor()
 {
+}
+
+bool Stomp::CanUse(Vector2 targetPosition, bool showRangeOnFalse) const
+{
+	if (!SkillBase::CanUse(targetPosition, showRangeOnFalse)) return false;
+	
+	Vector2 position = mCharacter->GetPosition();
+	bool inRange = (targetPosition - position).Length() <= mRange;
+	if (!inRange && showRangeOnFalse) mDrawRangeTimer = GameConstants::DRAW_SKILL_RANGE_DURATION;
+
+	return inRange;
 }
 
 void StompActor::OnUpdate(float deltaTime)
@@ -76,17 +93,20 @@ void StompActor::Kill()
 	mAnimatorComponent->SetVisible(false);
 	mAnimatorComponent->SetEnabled(false);
 	mColliderComponent->SetEnabled(false);
+	mColliderComponent->SetDebugDrawIfDisabled(false);
 	mDead = true;
 
 	mDelayedActions.Clear();
 }
 
-void StompActor::Awake(Vector2 position, int damage, float delay, CollisionFilter filter)
+void StompActor::Awake(Vector2 position, int damage, float delay, CollisionFilter filter, Collider *areaOfEffect)
 {
 	mAnimatorComponent->SetEnabled(true);
 	mAnimatorComponent->SetVisible(true);
 	mAnimatorComponent->PlayAnimationOnce("Stomp");
 	mColliderComponent->SetFilter(filter);
+	mColliderComponent->SetCollider(areaOfEffect);
+	mColliderComponent->SetDebugDrawIfDisabled(true);
 	
 	mDamage = damage;
 	mDead = false;

@@ -7,18 +7,25 @@
 #include <vector>
 #include "../../Math.h"
 #include "../../DelayedActionSystem.h"
+#include "../../Json.h"
+#include "../../SkillJsonParser.h"
 
 class Character;
 
 class SkillBase : public Component
 {
+protected:
+
+    virtual nlohmann::json LoadSkillDataFromJSON(const std::string& fileName);
+
 public:
     SkillBase(class Actor* owner, int updateOrder = 100);
     virtual ~SkillBase() = default;
 
     void Update(float deltaTime) override;
+    void ComponentDraw(class Renderer* renderer) override;
     
-    virtual bool CanUse() const;
+    virtual bool CanUse(Vector2 targetPosition, bool showRangeOnFalse = false) const;
     
     virtual void StartSkill(Vector2 targetPosition);
     virtual void EndSkill() { mIsUsing = false; }
@@ -36,8 +43,11 @@ protected:
     std::string mDescription;
     float mCooldown;
     float mCurrentCooldown;
+    float mRange;
     bool mIsUsing;
     Vector2 mTargetVector; // Can be either direction or position depending on skill
+
+    mutable float mDrawRangeTimer = 0.0f;
 
     struct DelayedAction
     {

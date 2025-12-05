@@ -8,21 +8,23 @@
 Dash::Dash(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
 {
-	mName = "Dash";
-	mDescription = "Quickly dash in a direction to evade attacks.";
-	mCooldown = 4.0f;
-	mCurrentCooldown = 0.0f;
-	mIsDashing = false;
+	LoadSkillDataFromJSON("DashData");
 
-	mDashSpeed = 400.0f;
-
-	float dashDuration = 0.5f;
-
+	float dashDuration = mRange / mDashSpeed;
 	float dashEndDelay = dashDuration - mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("DashEnd");
 	AddDelayedAction(dashEndDelay, [this]() { 
 		mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("DashEnd", false); 
 	});
 	AddDelayedAction(dashDuration, [this]() { EndSkill(); });
+}
+
+nlohmann::json Dash::LoadSkillDataFromJSON(const std::string& fileName)
+{
+	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
+
+	mDashSpeed = SkillJsonParser::GetFloatEffectValue(data, "speed");
+
+	return data;
 }
 
 void Dash::Update(float deltaTime)

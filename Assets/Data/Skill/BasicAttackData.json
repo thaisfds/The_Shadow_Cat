@@ -1,0 +1,15 @@
+{
+	"id": "BasicAttackSkill",
+	"name": "Basic Attack",
+	"description": "A simple melee attack.",
+	"cooldown": 1.5,
+	"range": 50,
+	"angle": 45,
+	"effects":
+	[
+		{
+			"type": "damage",
+			"amount": 10
+		}
+	]
+}

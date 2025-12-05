@@ -111,6 +111,8 @@ add_executable(${PROJECT_NAME}
         Source/Debug/EnemyDebugDrawer.h
         Source/DelayedActionSystem.cpp
         Source/DelayedActionSystem.h
+        Source/SkillJsonParser.cpp
+        Source/SkillJsonParser.h
 )
 
 configure_local_linking(${PROJECT_NAME})

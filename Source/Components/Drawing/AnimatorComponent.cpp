@@ -6,7 +6,7 @@
 #include <fstream>
 #include <map>
 
-const std::string ANIMATION_DATA_PATH = "../Assets/AnimationData/";
+const std::string ANIMATION_DATA_PATH = "../Assets/Data/Animation/";
 
 AnimatorComponent::AnimatorComponent(class Actor *owner, const std::string &animationName,
 									 int width, int height, int drawOrder)

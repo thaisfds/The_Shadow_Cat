@@ -9,18 +9,23 @@
 FurBall::FurBall(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
 {
-	mName = "Fur Ball";
-	mDescription = "Launch a ball of fur that damages enemies on impact.";
-	mCooldown = 4.0f;
-	mCurrentCooldown = 0.0f;
-	mProjectileSpeed = 300.0f;
-	mDamage = 10;
+	LoadSkillDataFromJSON("FurBallData");
 
 	float duration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("FurBall");
 	if (duration == 0.0f) duration = 1.0f;
 	
 	AddDelayedAction(0.5f, [this]() { Execute(); });
 	AddDelayedAction(duration, [this]() { EndSkill(); });
+}
+
+nlohmann::json FurBall::LoadSkillDataFromJSON(const std::string& fileName)
+{
+	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
+
+	mProjectileSpeed = SkillJsonParser::GetFloatEffectValue(data, "projectileSpeed");
+	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
+
+	return data;
 }
 
 void FurBall::Execute()
@@ -96,6 +101,7 @@ void FurBallActor::Kill()
 	mAnimatorComponent->SetVisible(false);
 	mAnimatorComponent->SetEnabled(false);
 	mColliderComponent->SetEnabled(false);
+	mColliderComponent->SetDebugDrawIfDisabled(false);
 	mRigidBodyComponent->SetEnabled(false);
 	mDead = true;
 }
@@ -105,6 +111,7 @@ void FurBallActor::Awake(Vector2 position, Vector2 direction, float speed, int d
 	mAnimatorComponent->SetEnabled(true);
 	mAnimatorComponent->SetVisible(true);
 	mColliderComponent->SetFilter(filter);
+	mColliderComponent->SetDebugDrawIfDisabled(true);
 	mRigidBodyComponent->SetEnabled(true);
 
 	SetPosition(position);

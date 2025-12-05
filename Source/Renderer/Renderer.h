@@ -40,6 +40,9 @@ public:
     void DrawGeometry(const Vector2 &position, const Vector2 &size,  float rotation,
                       const Vector3 &color, const Vector2 &cameraPos, VertexArray *vertexArray, RendererMode mode);
 
+    void DrawCircle(const Vector2 &center, float radius, const Vector3 &color,
+                    const Vector2 &cameraPos = Vector2::Zero);
+
     void DrawAllUI();
 
     void UpdateViewport(int windowWidth, int windowHeight);

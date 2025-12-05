@@ -12,13 +12,15 @@ public:
 	Stomp(Actor* owner, int updateOrder = 100);
 
 	void StartSkill(Vector2 targetPosition) override;
+
+	bool CanUse(Vector2 targetPosition, bool showRangeOnFalse) const override;
 	
 private:
-	int mDamage;
+	float mDamage;
 	float mStompRadius;
+	Collider* mAreaOfEffect;
 
-	float mStompDelay;
-	float mStompTimer;
+	nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;
 };
 
 class StompActor : public Actor
@@ -32,13 +34,13 @@ public:
 	void Execute();
 
 	void Kill() override;
-	void Awake(Vector2 position, int damage, float delay, CollisionFilter filter);
+	void Awake(Vector2 position, int damage, float delay, CollisionFilter filter, Collider *areaOfEffect);
 
 	bool IsDead() const { return mDead; }
 private:
 	bool mDead;
 
-	int mDamage;
+	float mDamage;
 
 	class DelayedActionSystem mDelayedActions;
 	

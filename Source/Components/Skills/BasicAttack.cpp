@@ -13,15 +13,9 @@
 BasicAttack::BasicAttack(Actor* owner, CollisionFilter filter, int damage, int updateOrder)
     : SkillBase(owner, updateOrder)
 {
-    mName = "Basic Attack";
-    mDescription = "A simple melee attack.";
-    mCooldown = 2.0f;
-    mCurrentCooldown = 0.0f;
-    mFilter = filter;
-    mDamage = damage;
+    LoadSkillDataFromJSON("BasicAttackData");
 
-    mConeRadius = 50.0f;
-    mConeAngle = Math::ToRadians(45.0f);
+    mFilter = filter;
     
     float attackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("BasicAttack");
     if (attackDuration == 0.0f) attackDuration = 1.0f;
@@ -29,17 +23,27 @@ BasicAttack::BasicAttack(Actor* owner, CollisionFilter filter, int damage, int u
     AddDelayedAction(attackDuration, [this]() { EndSkill(); });
 }
 
+nlohmann::json BasicAttack::LoadSkillDataFromJSON(const std::string& fileName)
+{
+    auto data = SkillBase::LoadSkillDataFromJSON(fileName);
+
+    mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
+    mConeAngle = Math::ToRadians(SkillJsonParser::GetFloatValue(data, "angle"));
+
+    return data;
+}
+
 void BasicAttack::Execute()
 {
     mCharacter->GetGame()->GetAttackTrailActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
         0.3f,
         0.0f,
-        mCharacter->GetPosition() + mTargetVector * mConeRadius,
+        mCharacter->GetPosition() + mTargetVector * mRange,
         std::atan2(mTargetVector.y, mTargetVector.x),
         mCharacter->GetScale().x < 0.0f
     );
 
-    auto hitColliders = Physics::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mTargetVector, mConeAngle, mConeRadius, mFilter);
+    auto hitColliders = Physics::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mTargetVector, mConeAngle, mRange, mFilter);
     for (auto collider : hitColliders)
     {
         auto enemyActor = collider->GetOwner();

@@ -9,7 +9,7 @@ ColliderComponent::ColliderComponent(class Actor *owner, int dx, int dy, Collide
 	  , mFilter(filter)
 	  , mCollider(collider)
 {
-	mCollider->SetComponent(this);
+	if (mCollider) mCollider->SetComponent(this);
 	GetGame()->AddCollider(this);
 }
 
@@ -25,14 +25,12 @@ void ColliderComponent::DetectCollisions(RigidBodyComponent *rigidBody)
 	mCollider->SolveCollisions(rigidBody);
 }
 
-
 void ColliderComponent::DebugDraw(class Renderer *renderer)
 {
-	if (!mIsEnabled) return;
+	if (!mIsEnabled && !mDebugDrawIfDisabled) return;
 	
 	mCollider->DebugDraw(renderer);
 }
-
 
 void ColliderComponent::SetOffset(Vector2 offset)
 {
@@ -46,4 +44,10 @@ bool ColliderComponent::ShouldCollideWith(ColliderComponent* other) const
 	if (!CollisionFilter::ShouldCollide(mFilter, other->GetFilter())) return false; 
 
 	return true;
+}
+
+void ColliderComponent::SetCollider(Collider* collider)
+{
+	mCollider = collider;
+	if (mCollider) mCollider->SetComponent(this);
 }

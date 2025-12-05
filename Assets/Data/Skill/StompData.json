@@ -1,0 +1,19 @@
+{
+	"id": "stompSkill",
+	"name": "Stomp",
+	"description": "Bring a pawerful stomp down, damaging nearby enemies.",
+	"cooldown": 5.0,
+	"range": 50,
+	"areaOfEffect":
+	{
+		"type": "circle",
+		"radius": 20
+	},
+	"effects":
+	[
+		{
+			"type": "damage",
+			"amount": 30
+		}
+	]
+}

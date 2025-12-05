@@ -12,8 +12,6 @@ class FurBall : public SkillBase
 public:
 	FurBall(Actor* owner, int updateOrder = 100);
 
-	bool CanUse() const override { return SkillBase::CanUse(); }
-
 	void StartSkill(Vector2 targetPosition) override;
 	void EndSkill() override;
 
@@ -21,7 +19,9 @@ public:
 
 private:
 	float mProjectileSpeed;
-	int mDamage;
+	float mDamage;
+
+	nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;
 };
 
 class FurBallActor : public Actor

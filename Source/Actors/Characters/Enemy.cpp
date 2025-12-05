@@ -527,12 +527,9 @@ void Enemy::UpdateAttack(float deltaTime)
     mMovementDirection = Vector2::Zero;
     mIsMoving = false;  // Play Idle animation
     
-    // Face the player
-    Vector2 toPlayer = player->GetPosition() - mPosition;
-    UpdateFacing(toPlayer);
-
-    if (mBasicAttack->CanUse())
-        mBasicAttack->StartSkill(player->GetPosition());
+    Vector2 playerPos = player->GetPosition();
+    if (mBasicAttack->CanUse(playerPos))
+        mBasicAttack->StartSkill(playerPos);
 }
 
 void Enemy::OnDebugDraw(class Renderer* renderer)

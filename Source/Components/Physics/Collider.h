@@ -50,6 +50,8 @@ public:
 	CircleCollider(float radius) : mRadius(radius) {}
 
 	bool CheckCollision(const Collider* other) const override;
+	void SolveCollisions(const RigidBodyComponent* rigidBody) override {}
+	void DebugDraw(class Renderer* renderer) override;
 
 	float GetRadius() const { return mRadius; }
 

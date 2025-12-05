@@ -35,10 +35,10 @@ void SkillInputHandler::HandleEvent(const SDL_Event& event)
         mKeyToSkill[SkillInput{InputType::Keyboard, event.key.keysym.scancode}] :
         mKeyToSkill[SkillInput{InputType::Mouse, static_cast<Uint8>(event.button.button)}];
     
-    if (skill && skill->CanUse())
+    Vector2 targetPosition = mOwner->GetGame()->GetMouseWorldPosition();
+    if (skill && skill->CanUse(targetPosition, true))
     {
         SDL_Log("Skill used: %s", skill->GetName().c_str());
-        Vector2 targetPosition = mOwner->GetGame()->GetMouseWorldPosition();
         skill->StartSkill(targetPosition);
     }
 }

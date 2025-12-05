@@ -1,0 +1,14 @@
+{
+	"id": "dashSkill",
+	"name": "Dash",
+	"description": "Quickly dash in a direction to evade attacks or close distance.",
+	"cooldown": 3.0,
+	"range": 250,
+	"effects":
+	[
+		{
+			"type": "speed",
+			"amount": 400
+		}
+	]
+}

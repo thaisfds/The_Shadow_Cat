@@ -8,29 +8,55 @@
 ClawAttack::ClawAttack(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
 {
-	mName = "Claw Attack";
-	mDescription = "Perform a ferocious pounce, slashing with your claws.";
-	mCooldown = 3.0f;
-	mCurrentCooldown = 0.0f;
+	LoadSkillDataFromJSON("ClawAttackData");
 
-	
-	mConeRadius = 60.0f;
-	mConeAngle = Math::ToRadians(60.0f);
-	mDamage = 20;
-	
 	float attackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("ClawAttack");
 	if (attackDuration == 0.0f) attackDuration = 1.0f;
-	AddDelayedAction(1.3f, [this]() { Execute(); });
+
+	float jumpStartTime = 1.25f;
+	float jumpEndTime = 1.35f;
+	float backwardsJumpDelay = 0.2f;
+
+	float forwardDistance = mForwardSpeed * (jumpEndTime - jumpStartTime);
+	float backwardDistance = -forwardDistance * mBackwardDistancePercentage;
+	mBackwardSpeed = backwardDistance / (attackDuration - (jumpEndTime + backwardsJumpDelay));
+
+	AddDelayedAction(jumpStartTime, [this]() { mVelocity = mTargetVector * mForwardSpeed;});
+	AddDelayedAction(jumpEndTime, [this]() { Execute(); });
+	AddDelayedAction(jumpEndTime + backwardsJumpDelay, [this]() { mVelocity = mTargetVector * mBackwardSpeed; });
 	AddDelayedAction(attackDuration, [this]() { EndSkill(); });
+}
+
+nlohmann::json ClawAttack::LoadSkillDataFromJSON(const std::string& fileName)
+{
+	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
+
+	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
+	mConeAngle = Math::ToRadians(SkillJsonParser::GetFloatValue(data, "angle"));
+	mForwardSpeed = SkillJsonParser::GetFloatEffectValue(data, "forwardSpeed");
+	mBackwardDistancePercentage = SkillJsonParser::GetFloatEffectValue(data, "backwardDistancePercentage");
+
+	return data;
+}
+
+void ClawAttack::Update(float deltaTime)
+{
+	SkillBase::Update(deltaTime);
+
+	if (!mIsUsing) return;
+
+	mCharacter->GetComponent<RigidBodyComponent>()->SetVelocity(mVelocity);
 }
 
 void ClawAttack::Execute()
 {
+	mVelocity = Vector2::Zero;
+
 	CollisionFilter filter;
 	filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::PlayerSkills});
 	filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Enemy});
 
-	auto hitColliders = Physics::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mTargetVector, mConeAngle, mConeRadius, filter);
+	auto hitColliders = Physics::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mTargetVector, mConeAngle, mRange, filter);
 	for (auto collider : hitColliders)
 	{
 		auto enemyActor = collider->GetOwner();
@@ -51,5 +77,6 @@ void ClawAttack::EndSkill()
 {
 	SkillBase::EndSkill();
 
+	mVelocity = Vector2::Zero;
 	mCharacter->SetMovementLock(false);
 }

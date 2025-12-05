@@ -16,9 +16,10 @@ public:
     void Execute();
 
 private:
-    float mConeRadius;
     float mConeAngle;
-    int mDamage;
+    float mDamage;
 
     CollisionFilter mFilter;
+
+    nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;
 };
