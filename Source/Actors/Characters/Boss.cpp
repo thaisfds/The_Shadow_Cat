@@ -32,15 +32,15 @@ Boss::Boss(class Game* game, Vector2 arenaCenter, BossType type, bool playSpawnA
     SetPosition(arenaCenter);
     
     // Select sprite based on boss type
-    const char* spriteName = "WhiteBoss";
+    const char* spriteName = "WhiteBossAnim";
     switch (type)
     {
         case BossType::OrangeBoss:
-            spriteName = "OrangeBoss";
+            spriteName = "OrangeBossAnim";
             break;
         case BossType::WhiteBoss:
         default:
-            spriteName = "WhiteBoss";
+            spriteName = "WhiteBossAnim";
             break;
     }
     

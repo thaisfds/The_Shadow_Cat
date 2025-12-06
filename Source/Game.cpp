@@ -21,6 +21,7 @@
 #include "Actors/Characters/ShadowCat.h"
 #include "Components/AnimatedParticleSystemComponent.h"
 #include "Actors/Characters/Enemy.h"
+#include "Actors/Characters/Boss.h"
 
 Game::Game()
 	: mWindow(nullptr),
@@ -436,6 +437,17 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
 				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
 				spawner->SetPosition(position);
+			}
+			// ========== BOSS SPAWNS ==========
+			// Tile ID 16: WhiteBoss with spawn animation
+			else if (tileID == 16)
+			{
+				auto boss = new Boss(this, position, Boss::BossType::WhiteBoss, true);
+			}
+			// Tile ID 17: OrangeBoss with spawn animation
+			else if (tileID == 17)
+			{
+				auto boss = new Boss(this, position, Boss::BossType::OrangeBoss, true);
 			}
 		}
 	}

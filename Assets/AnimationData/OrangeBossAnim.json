@@ -1,0 +1,15 @@
+{
+  "image": "../Assets/Sprites/OrangeBoss/OrangeBoss.png",
+  "spriteSheetData": "../Assets/Sprites/OrangeBoss/OrangeBoss.json",
+  "animations": 
+  {
+    "Idle": [0],
+    "Walk": [1, 2],
+    "BasicAttack": [3, 4],
+    "SpecialAttack": [5, 6],
+    "Attack": [3, 4],
+    "Hit": [0, 3],
+    "Death": [6, 5, 4, 3, 2, 1, 0]
+  },
+  "base": "Idle"
+}
