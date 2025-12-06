@@ -6,6 +6,7 @@
 #include "../../Components/Physics/ColliderComponent.h"
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../Physics/CollisionFilter.h"
+#include "../../DelayedActionSystem.h"
 
 class FurBall : public SkillBase
 {
@@ -20,6 +21,7 @@ public:
 private:
 	float mProjectileSpeed;
 	float mDamage;
+	Collider* mAreaOfEffect;
 
 	nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;
 };
@@ -33,7 +35,7 @@ public:
 	void OnUpdate(float deltaTime) override;
 
 	void Kill() override;
-	void Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter);
+	void Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter, Collider* areaOfEffect, float lifetime);
 
 	bool IsDead() const { return mDead; }
 
@@ -44,7 +46,14 @@ private:
 	int mDamage;
     Vector2 mDirection;
 
+	class DelayedActionSystem mDelayedActions;
+
 	class AnimatorComponent *mAnimatorComponent;
 	class ColliderComponent *mColliderComponent;
 	class RigidBodyComponent *mRigidBodyComponent;
+
+	void AddDelayedAction(float delay, std::function<void()> action)
+	{
+		mDelayedActions.AddDelayedAction(delay, action);
+	}
 };

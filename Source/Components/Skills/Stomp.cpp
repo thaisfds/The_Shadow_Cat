@@ -13,7 +13,7 @@
 Stomp::Stomp(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
 {
-		LoadSkillDataFromJSON("StompData");
+	LoadSkillDataFromJSON("StompData");
 }
 
 nlohmann::json Stomp::LoadSkillDataFromJSON(const std::string& fileName)
@@ -21,7 +21,6 @@ nlohmann::json Stomp::LoadSkillDataFromJSON(const std::string& fileName)
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
 	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
-	mStompRadius = SkillJsonParser::GetFloatEffectValue(data, "stompRadius");
 	mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
 
 	return data;

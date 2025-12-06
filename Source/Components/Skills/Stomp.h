@@ -17,7 +17,6 @@ public:
 	
 private:
 	float mDamage;
-	float mStompRadius;
 	Collider* mAreaOfEffect;
 
 	nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;

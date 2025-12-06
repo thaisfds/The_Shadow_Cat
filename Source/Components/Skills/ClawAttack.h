@@ -16,11 +16,12 @@ public:
 	void Execute();
 	
 private:
-	float mConeAngle;
 	float mDamage;
 	float mForwardSpeed;
 	float mBackwardDistancePercentage;
 	float mBackwardSpeed;
+
+	Collider* mAreaOfEffect;
 
 	Vector2 mVelocity;
 

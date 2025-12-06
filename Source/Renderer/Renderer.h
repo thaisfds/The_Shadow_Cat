@@ -43,6 +43,9 @@ public:
     void DrawCircle(const Vector2 &center, float radius, const Vector3 &color,
                     const Vector2 &cameraPos = Vector2::Zero);
 
+    void DrawPolygon(const std::vector<Vector2> &points, const Vector3 &color, const Vector2 &offset = Vector2::Zero,
+                     const Vector2 &cameraPos = Vector2::Zero);
+
     void DrawAllUI();
 
     void UpdateViewport(int windowWidth, int windowHeight);

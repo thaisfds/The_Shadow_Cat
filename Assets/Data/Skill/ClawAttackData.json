@@ -4,12 +4,17 @@
 	"description": "Perform a ferocious pounce, slashing with your claws.",
 	"cooldown": 3.0,
 	"range": 70,
-	"angle": 60,
+	"areaOfEffect":
+	{
+		"type": "cone",
+		"length": "@range",
+		"angle": 60
+	},
 	"effects":
 	[
 		{
 			"type": "damage",
-			"amount": 20
+			"amount": 40
 		},
 		{
 			"type": "forwardSpeed",

@@ -32,9 +32,9 @@ nlohmann::json ClawAttack::LoadSkillDataFromJSON(const std::string& fileName)
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
 	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
-	mConeAngle = Math::ToRadians(SkillJsonParser::GetFloatValue(data, "angle"));
 	mForwardSpeed = SkillJsonParser::GetFloatEffectValue(data, "forwardSpeed");
 	mBackwardDistancePercentage = SkillJsonParser::GetFloatEffectValue(data, "backwardDistancePercentage");
+	mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
 
 	return data;
 }
@@ -56,13 +56,28 @@ void ClawAttack::Execute()
 	filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::PlayerSkills});
 	filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Enemy});
 
-	auto hitColliders = Physics::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mTargetVector, mConeAngle, mRange, filter);
+	auto collisionActor = mCharacter->GetGame()->GetCollisionQueryActor();
+
+	((PolygonCollider*)mAreaOfEffect)->SetForward(mTargetVector);
+	collisionActor->GetComponent<ColliderComponent>()->SetCollider(mAreaOfEffect);
+	collisionActor->GetComponent<ColliderComponent>()->SetFilter(filter);
+
+	auto pos = mCharacter->GetPosition();
+	auto hitColliders = mAreaOfEffect->GetOverlappingCollidersAt(&pos);
 	for (auto collider : hitColliders)
 	{
 		auto enemyActor = collider->GetOwner();
 		auto enemyCharacter = dynamic_cast<Character*>(enemyActor);
 		enemyCharacter->TakeDamage(mDamage);
 	}
+
+	if (mCharacter->GetGame()->IsDebugging())
+	{
+		auto vertices = ((PolygonCollider*)mAreaOfEffect)->GetVertices();
+		for (auto& v : vertices) v += pos;
+		Physics::DebugDrawPolygon(mCharacter->GetGame(), vertices, 0.5f, 15);
+	}
+
 }
 
 void ClawAttack::StartSkill(Vector2 targetPosition)

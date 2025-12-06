@@ -28,7 +28,7 @@ nlohmann::json BasicAttack::LoadSkillDataFromJSON(const std::string& fileName)
     auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
     mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
-    mConeAngle = Math::ToRadians(SkillJsonParser::GetFloatValue(data, "angle"));
+    mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
 
     return data;
 }
@@ -43,13 +43,27 @@ void BasicAttack::Execute()
         mCharacter->GetScale().x < 0.0f
     );
 
-    auto hitColliders = Physics::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mTargetVector, mConeAngle, mRange, mFilter);
+    auto collisionActor = mCharacter->GetGame()->GetCollisionQueryActor();
+
+	((PolygonCollider*)mAreaOfEffect)->SetForward(mTargetVector);
+    collisionActor->GetComponent<ColliderComponent>()->SetCollider(mAreaOfEffect);
+    collisionActor->GetComponent<ColliderComponent>()->SetFilter(mFilter);
+
+    auto pos = mCharacter->GetPosition();
+    auto hitColliders = mAreaOfEffect->GetOverlappingCollidersAt(&pos);
     for (auto collider : hitColliders)
     {
         auto enemyActor = collider->GetOwner();
         auto enemyCharacter = dynamic_cast<Character*>(enemyActor);
         enemyCharacter->TakeDamage(mDamage);
     }
+
+    if (mCharacter->GetGame()->IsDebugging())
+	{
+		auto vertices = ((PolygonCollider*)mAreaOfEffect)->GetVertices();
+		for (auto& v : vertices) v += pos;
+		Physics::DebugDrawPolygon(mCharacter->GetGame(), vertices, 0.5f, 15);
+	}
 }
 
 void BasicAttack::StartSkill(Vector2 targetPosition)

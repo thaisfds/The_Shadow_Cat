@@ -8,34 +8,70 @@
 #include <algorithm>
 #include <vector>
 
-bool Physics::CheckAABBAABB(const AABBCollider *a, const AABBCollider *b)
+bool Physics::CheckAABBAABB(const AABBCollider *a, const AABBCollider *b, Vector2 *positionA, Vector2 *positionB)
 {
-	auto posA = a->GetComponent()->GetPosition();
+	auto posA = positionA ? *positionA : a->GetComponent()->GetPosition();
 	auto halfA = a->GetHalfDimensions();
-	auto posB = b->GetComponent()->GetPosition();
+	auto posB = positionB ? *positionB : b->GetComponent()->GetPosition();
 	auto halfB = b->GetHalfDimensions();
 
 	return (Math::Abs(posA.x - posB.x) <= (halfA.x + halfB.x)) &&
 		   (Math::Abs(posA.y - posB.y) <= (halfA.y + halfB.y));
 }
 
-bool Physics::CheckAABBCircle(const AABBCollider *aabb, const CircleCollider *circle)
+bool Physics::CheckAABBCircle(const AABBCollider *aabb, const CircleCollider *circle, Vector2 *positionA, Vector2 *positionB)
 {
-	auto posAABB = aabb->GetComponent()->GetPosition();
-	auto posCircle = circle->GetComponent()->GetPosition();
+	auto posCircle = positionB ? *positionB : circle->GetComponent()->GetPosition();
 
-	return OverlapCircleAABB(posCircle, circle->GetRadius(), aabb);
+	return OverlapCircleAABB(posCircle, circle->GetRadius(), aabb, positionA);
 }
 
-bool Physics::CheckCircleCircle(const CircleCollider* a, const CircleCollider* b)
+bool Physics::CheckCircleCircle(const CircleCollider* a, const CircleCollider* b, Vector2* positionA, Vector2* positionB)
 {
-	auto posA = a->GetComponent()->GetPosition();
-	auto posB = b->GetComponent()->GetPosition();
+	auto posA = positionA ? *positionA : a->GetComponent()->GetPosition();
+	auto posB = positionB ? *positionB : b->GetComponent()->GetPosition();
 
 	float dx = posA.x - posB.x;
 	float dy = posA.y - posB.y;
 	float rSum = a->GetRadius() + b->GetRadius();
 	return (dx * dx + dy * dy) <= (rSum * rSum);
+}
+
+bool Physics::CheckPolygonPolygon(const PolygonCollider* a, const PolygonCollider* b, Vector2* positionA, Vector2* positionB)
+{
+	auto posA = positionA ? *positionA : a->GetComponent()->GetPosition();
+	auto posB = positionB ? *positionB : b->GetComponent()->GetPosition();
+
+	std::vector<Vector2> polyA;
+	for (const auto& vertex : a->GetVertices())
+		polyA.push_back(vertex + posA);
+
+	std::vector<Vector2> polyB;
+	for (const auto& vertex : b->GetVertices())
+		polyB.push_back(vertex + posB);
+
+	return OverlapPolygons(polyA, polyB);
+}
+
+bool Physics::CheckPolygonAABB(const PolygonCollider* poly, const AABBCollider* aabb, Vector2* positionPoly, Vector2* positionAABB)
+{
+	auto posPoly = positionPoly ? *positionPoly : poly->GetComponent()->GetPosition();
+	auto posAABB = positionAABB ? *positionAABB : aabb->GetComponent()->GetPosition();
+
+	std::vector<Vector2> polygon;
+	for (const auto& vertex : poly->GetVertices())
+		polygon.push_back(vertex + posPoly);
+
+	Vector2 aabbMin = aabb->GetMinAt(posAABB);
+	Vector2 aabbMax = aabb->GetMaxAt(posAABB);
+	std::vector<Vector2> box = {
+		aabbMin,
+		Vector2(aabbMax.x, aabbMin.y),
+		aabbMax,
+		Vector2(aabbMin.x, aabbMax.y)
+	};
+
+	return OverlapPolygons(polygon, box);
 }
 
 std::vector<ColliderComponent*> Physics::GetOverlappingColliders(Game* game, Collider* collider)
@@ -58,8 +94,7 @@ std::vector<ColliderComponent*> Physics::ConeCast(Game *game, Vector2 origin, Ve
 {
 	float radiusSq = radius * radius;
 	auto colliderComponents = game->GetColliders();
-	std::vector<Vector2> coneTriangle = CreateConeTriangle(origin, direction, angle, radius);
-	ParticleSystemComponent* debugParticles = game->GetDebugActor()->GetParticleSystemComponent();
+	std::vector<Vector2> coneTriangle = GetConeVertices(origin, direction, angle, radius);
 	std::vector<ColliderComponent*> hitColliders;
 	for (auto c : colliderComponents)
 	{
@@ -74,10 +109,27 @@ std::vector<ColliderComponent*> Physics::ConeCast(Game *game, Vector2 origin, Ve
 	return hitColliders;
 }
 
-bool Physics::OverlapCircleAABB(Vector2 center, float radius, const AABBCollider *aabb)
+std::vector<ColliderComponent*> Physics::CheckCollisionAt(Game* game, Collider* collider, Vector2 newPosition, CollisionFilter filter)
+{
+	std::vector<ColliderComponent*> hitColliders;
+	auto colliderComponents = game->GetColliders();
+	for (auto c : colliderComponents)
+	{
+		if (!c->IsEnabled()) continue;
+		if (!CollisionFilter::ShouldCollide(filter, c->GetFilter())) continue;
+		if (collider->CheckCollision(c->GetCollider()))
+		{
+			hitColliders.push_back(c);
+		}
+	}
+
+	return hitColliders;
+}
+
+bool Physics::OverlapCircleAABB(Vector2 center, float radius, const AABBCollider *aabb, Vector2* posAABB)
 {
 	float radiusSq = radius * radius;
-	float distSq = GetPointAABBDistanceSquared(center, aabb);
+	float distSq = GetPointAABBDistanceSq(center, aabb, posAABB);
 	return distSq <= radiusSq;
 }
 
@@ -105,7 +157,7 @@ bool Physics::OverlapTriangleAABB(const std::vector<Vector2>& triangle, const AA
 	return overlap;
 }
 
-std::vector<Vector2> Physics::CreateConeTriangle(Vector2 origin, Vector2 direction, float angle, float length)
+std::vector<Vector2> Physics::GetConeVertices(Vector2 origin, Vector2 direction, float angle, float length)
 {
 	direction.Normalize();
 	float halfAngle = angle / 2.0f;
@@ -150,7 +202,7 @@ bool Physics::IsColliderWithinDistance(Vector2 origin, const ColliderComponent* 
 {
     const Collider* baseCollider = collider->GetCollider();
     if (const AABBCollider* aabb = dynamic_cast<const AABBCollider*>(baseCollider)) 
-		return GetPointAABBDistanceSquared(origin, aabb) <= (radius * radius);
+		return GetPointAABBDistanceSq(origin, aabb) <= (radius * radius);
     else if (const CircleCollider* circle = dynamic_cast<const CircleCollider*>(baseCollider)) {
         Vector2 center = collider->GetPosition();
         float dx = origin.x - center.x;
@@ -160,10 +212,10 @@ bool Physics::IsColliderWithinDistance(Vector2 origin, const ColliderComponent* 
     return false;
 }
 
-float Physics::GetPointAABBDistanceSquared(Vector2 point, const AABBCollider* aabb)
+float Physics::GetPointAABBDistanceSq(Vector2 point, const AABBCollider* aabb, Vector2* posAABB)
 {
-	Vector2 aabbMin = aabb->GetMin();
-	Vector2 aabbMax = aabb->GetMax();
+	Vector2 aabbMin = aabb->GetMinAt(posAABB ? *posAABB : aabb->GetComponent()->GetPosition());
+	Vector2 aabbMax = aabb->GetMaxAt(posAABB ? *posAABB : aabb->GetComponent()->GetPosition());
 	float closestX = Math::Clamp(point.x, aabbMin.x, aabbMax.x);
 	float closestY = Math::Clamp(point.y, aabbMin.y, aabbMax.y);
 	float dx = point.x - closestX;

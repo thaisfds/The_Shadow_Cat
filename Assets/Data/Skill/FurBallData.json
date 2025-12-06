@@ -4,6 +4,11 @@
 	"description": "Launch a ball of fur that damages an enemy on impact.",
 	"cooldown": 4.0,
 	"range": 300,
+	"areaOfEffect":
+	{
+		"type": "circle",
+		"radius": 20
+	},
 	"effects":
 	[
 		{

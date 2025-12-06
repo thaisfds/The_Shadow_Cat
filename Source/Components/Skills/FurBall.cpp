@@ -24,6 +24,7 @@ nlohmann::json FurBall::LoadSkillDataFromJSON(const std::string& fileName)
 
 	mProjectileSpeed = SkillJsonParser::GetFloatEffectValue(data, "projectileSpeed");
 	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
+	mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
 
 	return data;
 }
@@ -34,12 +35,16 @@ void FurBall::Execute()
 	filter.belongsTo = CollisionFilter::GroupMask({ CollisionGroup::PlayerSkills });
 	filter.collidesWith = CollisionFilter::GroupMask({ CollisionGroup::Enemy });
 
+	float lifetime = mRange / mProjectileSpeed;
+
 	mCharacter->GetGame()->GetFurBallActor()->Awake(
 		mCharacter->GetPosition() + mTargetVector * 20.0f,
 		mTargetVector,
 		mProjectileSpeed,
 		mDamage,
-		filter
+		filter,
+		mAreaOfEffect,
+		lifetime
 	);
 }
 
@@ -63,8 +68,7 @@ FurBallActor::FurBallActor(class Game* game)
 {
 	mAnimatorComponent = new AnimatorComponent(this, "FurBallAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
 	CollisionFilter filter;
-	Collider *collider = new AABBCollider(GameConstants::TILE_SIZE / 2, GameConstants::TILE_SIZE / 2);
-	mColliderComponent = new ColliderComponent(this, 0, 0, collider, filter);
+	mColliderComponent = new ColliderComponent(this, 0, 0, nullptr, filter);
 	mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 0.0f, false);
 	Kill();
 }
@@ -94,6 +98,8 @@ void FurBallActor::OnUpdate(float deltaTime)
 			return;
 		}
 	}
+
+	mDelayedActions.Update(deltaTime);
 }
 
 void FurBallActor::Kill()
@@ -101,22 +107,29 @@ void FurBallActor::Kill()
 	mAnimatorComponent->SetVisible(false);
 	mAnimatorComponent->SetEnabled(false);
 	mColliderComponent->SetEnabled(false);
+	mColliderComponent->SetCollider(nullptr);
 	mColliderComponent->SetDebugDrawIfDisabled(false);
 	mRigidBodyComponent->SetEnabled(false);
 	mDead = true;
+
+	mDelayedActions.Clear();
 }
 
-void FurBallActor::Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter)
+void FurBallActor::Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter, Collider* areaOfEffect, float lifetime)
 {
 	mAnimatorComponent->SetEnabled(true);
 	mAnimatorComponent->SetVisible(true);
 	mColliderComponent->SetFilter(filter);
+	mColliderComponent->SetCollider(areaOfEffect);
 	mColliderComponent->SetDebugDrawIfDisabled(true);
 	mRigidBodyComponent->SetEnabled(true);
-
+	
 	SetPosition(position);
 	mDirection = direction;
 	mSpeed = speed;
 	mDamage = damage;
 	mDead = false;
+	
+	mDelayedActions.Reset();
+	AddDelayedAction(lifetime, [this]() { Kill(); });
 }

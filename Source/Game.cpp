@@ -222,6 +222,9 @@ void Game::SetScene(GameScene nextScene)
 
 void Game::InitializeActors()
 {
+	mCollisionQueryActor = new Actor(this);
+	new ColliderComponent(mCollisionQueryActor, 0, 0, nullptr, CollisionFilter());
+
 	// Initialize debug actor
 	mDebugActor = new DebugActor(this);
 

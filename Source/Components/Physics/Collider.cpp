@@ -1,18 +1,27 @@
 #include "Collider.h"
-#include "ColliderComponent.h"
 #include "Physics.h"
 #include "../../Game.h"
 
-Vector2 AABBCollider::GetMin() const
+bool Collider::CheckCollision(const Collider* other)
 {
-    Vector2 center = GetComponent()->GetPosition();
-    return Vector2(center.x - mHalfDimensions.x, center.y - mHalfDimensions.y);
+	auto pos = mComponent->GetPosition();
+	return CheckCollisionAt(&pos, other);
 }
 
-Vector2 AABBCollider::GetMax() const
+std::vector<ColliderComponent*> Collider::GetOverlappingColliders()
 {
-    Vector2 center = GetComponent()->GetPosition();
-    return Vector2(center.x + mHalfDimensions.x, center.y + mHalfDimensions.y);
+	auto pos = mComponent->GetPosition();
+	return GetOverlappingCollidersAt(&pos);
+}
+
+Vector2 AABBCollider::GetMinAt(Vector2 position) const
+{
+	return Vector2(position.x - mHalfDimensions.x, position.y - mHalfDimensions.y);
+}
+
+Vector2 AABBCollider::GetMaxAt(Vector2 position) const
+{
+	return Vector2(position.x + mHalfDimensions.x, position.y + mHalfDimensions.y);
 }
 
 void AABBCollider::SolveCollisions(const RigidBodyComponent* rigidBody)
@@ -34,28 +43,94 @@ void AABBCollider::SolveCollisions(const RigidBodyComponent* rigidBody)
 	}
 }
 
-bool AABBCollider::CheckCollision(const Collider* other) const
+bool AABBCollider::CheckCollisionAt(Vector2* newPosition, const Collider* other) const
 {
 	if (this == other) return false;
 
 	if (const AABBCollider* aabb = dynamic_cast<const AABBCollider*>(other))
-		return Physics::CheckAABBAABB(this, aabb);
+		return Physics::CheckAABBAABB(this, aabb, newPosition);
 	else if (const CircleCollider* circle = dynamic_cast<const CircleCollider*>(other))
-		return Physics::CheckAABBCircle(this, circle);
+		return Physics::CheckAABBCircle(this, circle, newPosition);
+	else if (const PolygonCollider* poly = dynamic_cast<const PolygonCollider*>(other))
+		return Physics::CheckPolygonAABB(poly, this, nullptr, newPosition);
 
 	return false;
 }
 
-bool CircleCollider::CheckCollision(const Collider* other) const
+bool CircleCollider::CheckCollisionAt(Vector2* newPosition, const Collider* other) const
 {
 	if (this == other) return false;
 	
 	if (const CircleCollider* circle = dynamic_cast<const CircleCollider*>(other))
-		return Physics::CheckCircleCircle(this, circle);
+		return Physics::CheckCircleCircle(this, circle, newPosition);
 	else if (const AABBCollider* aabb = dynamic_cast<const AABBCollider*>(other))
-		return Physics::CheckAABBCircle(aabb, this);
+		return Physics::CheckAABBCircle(aabb, this, nullptr, newPosition);
+	else if (const PolygonCollider* poly = dynamic_cast<const PolygonCollider*>(other))
+		SDL_Log("Circle-Polygon collision not implemented yet");
 
 	return false;
+}
+
+bool PolygonCollider::CheckCollisionAt(Vector2* newPosition, const Collider* other) const
+{
+	if (this == other) return false;
+
+	if (const PolygonCollider* poly = dynamic_cast<const PolygonCollider*>(other))
+		return Physics::CheckPolygonPolygon(this, poly, newPosition);
+	else if (const AABBCollider* aabb = dynamic_cast<const AABBCollider*>(other))
+		return Physics::CheckPolygonAABB(this, aabb, newPosition);
+	else if (const CircleCollider* circle = dynamic_cast<const CircleCollider*>(other))
+		SDL_Log("Polygon-Circle collision not implemented yet");
+
+	return false;
+}
+
+std::vector<ColliderComponent*> AABBCollider::GetOverlappingCollidersAt(Vector2* newPosition) const
+{
+	std::vector<ColliderComponent*> hitColliders;
+	auto colliderComponents = mComponent->GetOwner()->GetGame()->GetColliders();
+	CollisionFilter filter = mComponent->GetFilter();
+	for (auto c : colliderComponents)
+	{
+		if (!c->IsEnabled()) continue;
+		if (!CollisionFilter::ShouldCollide(filter, c->GetFilter())) continue;
+
+		if (CheckCollisionAt(newPosition, c->GetCollider())) hitColliders.push_back(c);
+	}
+
+	return hitColliders;
+}
+
+std::vector<ColliderComponent*> CircleCollider::GetOverlappingCollidersAt(Vector2* newPosition) const
+{
+	std::vector<ColliderComponent*> hitColliders;
+	auto colliderComponents = mComponent->GetOwner()->GetGame()->GetColliders();
+	CollisionFilter filter = mComponent->GetFilter();
+	for (auto c : colliderComponents)
+	{
+		if (!c->IsEnabled()) continue;
+		if (!CollisionFilter::ShouldCollide(filter, c->GetFilter())) continue;
+
+		if (CheckCollisionAt(newPosition, c->GetCollider())) hitColliders.push_back(c);
+	}
+
+	return hitColliders;
+}
+
+std::vector<ColliderComponent*> PolygonCollider::GetOverlappingCollidersAt(Vector2* newPosition) const
+{
+	std::vector<ColliderComponent*> hitColliders;
+	auto colliderComponents = mComponent->GetOwner()->GetGame()->GetColliders();
+	CollisionFilter filter = mComponent->GetFilter();
+	for (auto c : colliderComponents)
+	{
+		if (!c->IsEnabled()) continue;
+		if (!CollisionFilter::ShouldCollide(filter, c->GetFilter())) continue;
+
+		if (CheckCollisionAt(newPosition, c->GetCollider())) hitColliders.push_back(c);
+	}
+
+	return hitColliders;
 }
 
 float AABBCollider::GetMinVerticalOverlap(AABBCollider *b) const
@@ -126,4 +201,29 @@ void CircleCollider::DebugDraw(class Renderer* renderer)
 	Vector2 center = mComponent->GetPosition();
 	renderer->DrawCircle(center, mRadius, Color::Green,
 						 mComponent->GetOwner()->GetGame()->GetCameraPos());
+}
+
+void PolygonCollider::DebugDraw(class Renderer* renderer)
+{
+	Vector2 offset = mComponent->GetPosition();
+	renderer->DrawPolygon(mVertices, Color::Green, offset,
+						 mComponent->GetOwner()->GetGame()->GetCameraPos());
+}
+
+void PolygonCollider::SetForward(Vector2 forward)
+{
+	mForward = forward;
+	mForward.Normalize();
+	
+	// Recalculate vertices based on forward direction
+	// Negate Y because coordinate system has Y increasing downward
+	float angle = Math::Atan2(-mForward.y, mForward.x);
+	Matrix2 rotation = Matrix2::CreateRotation(angle);
+	
+	mVertices.clear();
+	for (const auto& baseVertex : mBaseVertices)
+	{
+		Vector2 rotated = rotation * baseVertex;
+		mVertices.push_back(rotated);
+	}
 }

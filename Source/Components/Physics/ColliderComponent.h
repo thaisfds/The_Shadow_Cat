@@ -4,8 +4,8 @@
 #include "CollisionFilter.h"
 #include "RigidBodyComponent.h"
 #include "../../Actors/Actor.h"
-#include "Collider.h"
 
+class Collider;
 
 class ColliderComponent : public Component
 {

@@ -4,7 +4,12 @@
 	"description": "A simple melee attack.",
 	"cooldown": 1.5,
 	"range": 50,
-	"angle": 45,
+	"areaOfEffect":
+	{
+		"type": "cone",
+		"length": "@range",
+		"angle": 45
+	},
 	"effects":
 	[
 		{
