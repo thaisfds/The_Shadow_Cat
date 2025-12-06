@@ -1,0 +1,10 @@
+TODO LIST ARTES E ANIMAÇÕES
+- Arte das cartinhas
+- Animação de morte e de q tomou hit dos personagens
+
+HUD
+- Arte de botao de new adventure, exit, e options (pode ser o fundo só, o texto eu coloco por cima)
+- Arte de indicadores de habilidades (incluindo ataque básico) vao ser quadrados no canto inferior direito
+- Arte de ponteiro do mouse pra indicar onde está apontando (patinha)
+- Arte de controles (WASD, mouse e os outros botoes)
+- Arte de inimigo morto (p contador de inimigos ate spawnar o boss)
