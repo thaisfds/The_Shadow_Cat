@@ -26,7 +26,7 @@ Boss::Boss(class Game* game, Vector2 arenaCenter, BossType type, bool playSpawnA
     , mArenaCenter(arenaCenter)
     , mArenaRadius(300.0f)     // Can move up to 300 pixels from arena center
     , mDetectionRadius(350.0f) // Detect player in large arena area
-    , mAttackRange(80.0f)      // Melee attack range
+    , mAttackRange(120.0f)     // Melee attack range (increased for boss)
 {
     // Set position to arena center
     SetPosition(arenaCenter);
@@ -45,12 +45,13 @@ Boss::Boss(class Game* game, Vector2 arenaCenter, BossType type, bool playSpawnA
     }
     
     // Boss sprites are 64x64 (double the tile size)
-    mAnimatorComponent = new AnimatorComponent(this, spriteName, 64, 64);
+    // Scale to 128x128 for proper boss size (2x regular enemies)
+    mAnimatorComponent = new AnimatorComponent(this, spriteName, 128, 128);
     mRigidBodyComponent = new RigidBodyComponent(this);
     
-    // Larger collider for boss: width=56, height=48, centered
-    Collider* collider = new AABBCollider(56, 48);
-    mColliderComponent = new ColliderComponent(this, 0, 8, collider, GetBaseEnemyFilter());
+    // Larger collider for boss: width=112, height=96 (scaled to match 128x128 sprite)
+    Collider* collider = new AABBCollider(112, 96);
+    mColliderComponent = new ColliderComponent(this, 0, 16, collider, GetBaseEnemyFilter());
     
     // Disable gravity for boss (stationary arena defender)
     mRigidBodyComponent->SetApplyGravity(false);
@@ -63,7 +64,9 @@ Boss::Boss(class Game* game, Vector2 arenaCenter, BossType type, bool playSpawnA
     // OrangeBoss: Idle (0), Walk (1-2), BasicAttack (3-4), SpecialAttack (5-6)
     mAnimatorComponent->AddAnimation("Idle", {0});
     mAnimatorComponent->AddAnimation("Walk", {1, 2});
+    mAnimatorComponent->AddAnimation("Run", {1, 2});  // Alias for Walk
     mAnimatorComponent->AddAnimation("Attack", {3, 4});
+    mAnimatorComponent->AddAnimation("BasicAttack", {3, 4});  // Alias for BasicAttack skill
     mAnimatorComponent->AddAnimation("Hit", {0, 3});
     mAnimatorComponent->AddAnimation("Death", {4, 3, 2, 1, 0});
     
@@ -303,15 +306,25 @@ void Boss::UpdateCombat(float deltaTime)
     const ShadowCat* player = GetPlayerIfValid();
     if (!player) return;
     
-    // Boss stays relatively stationary but faces player
-    mRigidBodyComponent->SetVelocity(Vector2::Zero);
-    mIsMoving = false;
-    
     Vector2 toPlayer = player->GetPosition() - mPosition;
-    UpdateFacing(toPlayer);
+    float distanceToPlayer = toPlayer.Length();
     
-    // Could add slight movement toward player here if desired
-    // For now, boss is a stationary defender
+    // Move toward player if not in attack range
+    if (distanceToPlayer > mAttackRange)
+    {
+        toPlayer.Normalize();
+        Vector2 velocity = toPlayer * 40.0f;  // Slow movement speed (boss is heavy)
+        mRigidBodyComponent->SetVelocity(velocity);
+        mIsMoving = true;  // Play Walk animation
+        UpdateFacing(toPlayer);
+    }
+    else
+    {
+        // Stop when in attack range
+        mRigidBodyComponent->SetVelocity(Vector2::Zero);
+        mIsMoving = false;
+        UpdateFacing(toPlayer);
+    }
 }
 
 void Boss::UpdateAttacking(float deltaTime)
