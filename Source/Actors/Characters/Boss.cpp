@@ -6,6 +6,7 @@
 #include "../../Components/Physics/ColliderComponent.h"
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../../Renderer/Renderer.h"
+#include "../../Debug/BossDebugDrawer.h"
 #include <cfloat>
 #include <SDL.h>
 
@@ -335,9 +336,5 @@ void Boss::UpdateAttacking(float deltaTime)
 
 void Boss::OnDebugDraw(class Renderer* renderer)
 {
-    if (!mGame->IsDebugging()) return;
-    
-    // Draw arena radius (detection range)
-    // This would be similar to EnemyDebugDrawer but for boss-specific visualization
-    // TODO
+    BossDebugDrawer::Draw(renderer, this, mGame);
 }
