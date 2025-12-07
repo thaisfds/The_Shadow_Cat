@@ -9,7 +9,8 @@
 #include "../../Game.h"
 
 
-BasicAttack::BasicAttack(Actor* owner, CollisionFilter filter, int damage, int updateOrder)
+BasicAttack::BasicAttack(Actor* owner, CollisionFilter filter, int damage, int updateOrder,
+                         float coneRadius, float coneAngleDegrees)
     : SkillBase(owner, updateOrder)
 {
     mName = "Basic Attack";
@@ -24,8 +25,8 @@ BasicAttack::BasicAttack(Actor* owner, CollisionFilter filter, int damage, int u
     mAttackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("BasicAttack");
     if (mAttackDuration == 0.0f) mAttackDuration = 1.0f;
 
-    mConeRadius = 50.0f;
-    mConeAngle = Math::ToRadians(45.0f);
+    mConeRadius = coneRadius;
+    mConeAngle = Math::ToRadians(coneAngleDegrees);
 }
 
 void BasicAttack::Update(float deltaTime)

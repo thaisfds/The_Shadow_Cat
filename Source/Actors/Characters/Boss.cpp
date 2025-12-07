@@ -83,7 +83,8 @@ Boss::Boss(class Game* game, Vector2 arenaCenter, BossType type, bool playSpawnA
     // Setup attack skill
     mSkillFilter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::EnemySkills});
     mSkillFilter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player});
-    mBasicAttack = new BasicAttack(this, mSkillFilter, 2);  // Boss deals 2 damage
+    // Boss attack: 2 damage, default update order (100), 200px cone radius, 100 degree cone angle
+    mBasicAttack = new BasicAttack(this, mSkillFilter, 2, 100, 200.0f, 100.0f);
 }
 
 Boss::~Boss()
