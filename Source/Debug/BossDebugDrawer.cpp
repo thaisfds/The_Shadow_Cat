@@ -1,5 +1,6 @@
 #include "BossDebugDrawer.h"
 #include "../Actors/Characters/Boss.h"
+#include "../Actors/Characters/ShadowCat.h"
 #include "../Renderer/Renderer.h"
 #include "../Game.h"
 #include <SDL.h>
@@ -7,6 +8,18 @@
 void BossDebugDrawer::Draw(Renderer* renderer, const Boss* boss, Game* game)
 {
     if (!game->IsDebugging()) return;
+    
+    Vector2 position = boss->GetPosition();
+    Vector2 cameraPos = game->GetCameraPos();
+    
+    // Draw line to player if player exists
+    auto player = game->GetPlayer();
+    if (player && boss->GetCurrentState() != Boss::BossState::Dead)
+    {
+        Vector2 playerPos = player->GetPosition();
+        float distance = (playerPos - position).Length();
+        DrawLineToPlayer(renderer, position, playerPos, distance, cameraPos);
+    }
     
     // Draw state-specific visualization
     switch (boss->GetCurrentState())
@@ -34,7 +47,6 @@ void BossDebugDrawer::Draw(Renderer* renderer, const Boss* boss, Game* game)
     
     // Always draw arena center marker
     Vector2 arenaCenter = boss->GetArenaCenter();
-    Vector2 cameraPos = game->GetCameraPos();
     Vector3 centerColor = Vector3(1.0f, 1.0f, 1.0f); // White
     
     // Draw crosshair at arena center
@@ -176,5 +188,40 @@ void BossDebugDrawer::DrawAttackRange(Renderer* renderer, const Vector2& positio
         
         // Draw larger points for attack range visibility
         renderer->DrawRect(p, Vector2(6.0f, 6.0f), 0.0f, attackColor, cameraPos, RendererMode::LINES);
+    }
+}
+
+void BossDebugDrawer::DrawLineToPlayer(Renderer* renderer, const Vector2& bossPos,
+                                        const Vector2& playerPos, float distance, const Vector2& cameraPos)
+{
+    Vector3 lineColor;
+    
+    // Color based on distance ranges
+    if (distance <= 120.0f)  // Attack range
+        lineColor = Vector3(1.0f, 0.0f, 0.0f);  // Red
+    else if (distance <= 350.0f)  // Detection range
+        lineColor = Vector3(1.0f, 0.5f, 0.0f);  // Orange
+    else
+        lineColor = Vector3(0.5f, 0.5f, 0.5f);  // Gray
+    
+    // Draw line from boss to player
+    Vector2 toPlayer = playerPos - bossPos;
+    const int linePoints = 15;
+    
+    for (int i = 0; i <= linePoints; i++)
+    {
+        float t = i / (float)linePoints;
+        Vector2 point = bossPos + toPlayer * t;
+        renderer->DrawRect(point, Vector2(3.0f, 3.0f), 0.0f, lineColor, cameraPos, RendererMode::LINES);
+    }
+    
+    // Draw distance text at midpoint (represented as small markers)
+    Vector2 midpoint = (bossPos + playerPos) * 0.5f;
+    
+    // Draw a marker at midpoint
+    for (int dx = -6; dx <= 6; dx += 3)
+    {
+        renderer->DrawRect(midpoint + Vector2(dx, 0), Vector2(4.0f, 4.0f), 0.0f, lineColor, cameraPos, RendererMode::LINES);
+        renderer->DrawRect(midpoint + Vector2(0, dx), Vector2(4.0f, 4.0f), 0.0f, lineColor, cameraPos, RendererMode::LINES);
     }
 }

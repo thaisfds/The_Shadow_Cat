@@ -27,4 +27,6 @@ private:
                                     bool playerDetected, const Vector2& cameraPos);
     static void DrawAttackRange(Renderer* renderer, const Vector2& position, float radius, 
                                 const Vector2& cameraPos);
+    static void DrawLineToPlayer(Renderer* renderer, const Vector2& bossPos, 
+                                 const Vector2& playerPos, float distance, const Vector2& cameraPos);
 };
