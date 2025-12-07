@@ -854,6 +854,13 @@ void Game::GenerateOutput()
 				enemy->OnDebugDraw(mRenderer);
 			}
 			
+			// Check if actor is a Boss and call its debug draw
+			auto boss = dynamic_cast<Boss*>(actor);
+			if (boss)
+			{
+				boss->OnDebugDraw(mRenderer);
+			}
+			
 			// Call debug draw for actor components
 			for (auto comp : actor->GetComponents())
 			{
