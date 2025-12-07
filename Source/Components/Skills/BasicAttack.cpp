@@ -53,7 +53,10 @@ void BasicAttack::Update(float deltaTime)
         {
             auto enemyActor = collider->GetOwner();
             auto enemyCharacter = dynamic_cast<Character*>(enemyActor);
-            enemyCharacter->TakeDamage(mDamage);
+            if (enemyCharacter)
+            {
+                enemyCharacter->TakeDamage(mDamage);
+            }
         }
     }
 

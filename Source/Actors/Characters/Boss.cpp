@@ -94,6 +94,12 @@ Boss::~Boss()
 void Boss::OnUpdate(float deltaTime)
 {
     Character::OnUpdate(deltaTime);
+    
+    // Update attack skill
+    if (mBasicAttack)
+    {
+        mBasicAttack->Update(deltaTime);
+    }
 
     // Handle death state
     if (mCurrentState == BossState::Dead)
