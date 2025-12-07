@@ -89,10 +89,15 @@ Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, Enemy
     mSkillFilter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::EnemySkills});
     mSkillFilter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player});
     mBasicAttack = new BasicAttack(this, mSkillFilter, 1);
+    
+    // Register with Game for tracking
+    game->RegisterEnemy(this);
 }
 
 Enemy::~Enemy()
 {
+    // Unregister from Game
+    GetGame()->UnregisterEnemy(this);
 }
 
 void Enemy::OnUpdate(float deltaTime)

@@ -5,6 +5,7 @@
 #include <vector>
 #include "Actors/Actor.h"
 #include "Actors/DebugActor.h"
+#include "Actors/Characters/Boss.h"
 #include "Renderer/Renderer.h"
 #include "AudioSystem.h"
 #include "Components/Skills/FurBall.h"
@@ -77,6 +78,14 @@ public:
 	// Game specific
 	const class ShadowCat *GetPlayer() { return mShadowCat; }
 	class HUD *GetHUD() { return mHUD; }
+
+	// Enemy and Boss tracking
+	void RegisterEnemy(class Enemy* enemy);
+	void RegisterBoss(class Boss* boss);
+	void UnregisterEnemy(class Enemy* enemy);
+	void UnregisterBoss(class Boss* boss);
+	int CountAliveEnemies() const;
+	int CountAliveBosses() const;
 
 	// Level dimensions
 	int GetLevelWidth() const { return mLevelWidth; }
@@ -155,6 +164,18 @@ private:
 
 	// Global particle system
 	class Actor *mAttackTrailActor;
+
+	// Enemy and Boss tracking
+	std::vector<class Enemy*> mEnemies;
+	std::vector<class Boss*> mBosses;
+	
+	// Boss spawn data (stored until enemies are defeated)
+	struct BossSpawnData {
+		Vector2 arenaCenter;
+		Boss::BossType bossType;
+		bool playSpawnAnimation;
+	};
+	std::vector<BossSpawnData> mPendingBossSpawns;
 
 	// Debug
 	bool mIsDebugging;

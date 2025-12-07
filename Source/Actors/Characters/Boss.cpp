@@ -85,10 +85,15 @@ Boss::Boss(class Game* game, Vector2 arenaCenter, BossType type, bool playSpawnA
     mSkillFilter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player});
     // Boss attack: 2 damage, default update order (100), 200px cone radius, 100 degree cone angle
     mBasicAttack = new BasicAttack(this, mSkillFilter, 2, 100, 200.0f, 100.0f);
+    
+    // Register with Game for tracking
+    game->RegisterBoss(this);
 }
 
 Boss::~Boss()
 {
+    // Unregister from Game
+    GetGame()->UnregisterBoss(this);
 }
 
 void Boss::OnUpdate(float deltaTime)

@@ -125,6 +125,9 @@ void Game::UnloadScene()
 
 	mStompActors.clear();
 	mFurBallActors.clear();
+	mEnemies.clear();
+	mBosses.clear();
+	mPendingBossSpawns.clear();
 
     // Delete UI screens
     for (auto ui : mUIStack) {
@@ -439,21 +442,27 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				spawner->SetPosition(position);
 			}
 			// ========== BOSS SPAWNS ==========
-			// Tile ID 16: WhiteBoss with spawn animation
+			// Tile ID 16: WhiteBoss - store spawn data, will spawn after enemies defeated
 			else if (tileID == 16)
 			{
-				auto boss = new Boss(this, position, Boss::BossType::WhiteBoss, true);
+				BossSpawnData bossData;
+				bossData.arenaCenter = position;
+				bossData.bossType = Boss::BossType::WhiteBoss;
+				bossData.playSpawnAnimation = true;
+				mPendingBossSpawns.push_back(bossData);
 			}
-			// Tile ID 17: OrangeBoss with spawn animation
+			// Tile ID 17: OrangeBoss - store spawn data, will spawn after enemies defeated
 			else if (tileID == 17)
 			{
-				auto boss = new Boss(this, position, Boss::BossType::OrangeBoss, true);
-			}
+				BossSpawnData bossData;
+				bossData.arenaCenter = position;
+				bossData.bossType = Boss::BossType::OrangeBoss;
+				bossData.playSpawnAnimation = true;
+			mPendingBossSpawns.push_back(bossData);
 		}
 	}
 }
-
-void Game::RunLoop()
+}void Game::RunLoop()
 {
 	while (mIsRunning)
 	{
@@ -583,6 +592,25 @@ void Game::UpdateGame(float deltaTime)
 	// Update camera position
 	UpdateCamera();
 
+	// ========== BOSS CONDITIONAL SPAWNING ==========
+	// Spawn boss only when all regular enemies are defeated
+	if (mShadowCat)
+	{
+		int aliveEnemies = CountAliveEnemies();
+		
+		// Spawn boss when all regular enemies are defeated
+		if (aliveEnemies == 0 && !mPendingBossSpawns.empty())
+		{
+			// Spawn all pending bosses
+			for (const auto& bossData : mPendingBossSpawns)
+			{
+				auto boss = new Boss(this, bossData.arenaCenter, bossData.bossType, bossData.playSpawnAnimation);
+			}
+			mPendingBossSpawns.clear();
+		}
+	}
+
+	// ========== ORIGINAL LEVEL TRANSITION (grid-based) ==========
 	if (mShadowCat)
 	{
 		Vector2 playerPos = mShadowCat->GetPosition();
@@ -617,12 +645,12 @@ void Game::UpdateGame(float deltaTime)
 				break;
 			case GameScene::Level3:
 				SetGameWon(true);
-			break;
+				break;
+			default:
+				break;
+			}
 			
-			break;
-		default:
-			return;
-		}			if (!mIsGameWon)
+			if (!mIsGameWon)
 				SetScene(nextScene);
 		}
 	}
@@ -964,4 +992,52 @@ FurBallActor* Game::GetFurBallActor()
 	}
 	
 	return furball;
+}
+
+void Game::RegisterEnemy(Enemy* enemy)
+{
+	if (enemy)
+		mEnemies.push_back(enemy);
+}
+
+void Game::RegisterBoss(Boss* boss)
+{
+	if (boss)
+		mBosses.push_back(boss);
+}
+
+void Game::UnregisterEnemy(Enemy* enemy)
+{
+	auto iter = std::find(mEnemies.begin(), mEnemies.end(), enemy);
+	if (iter != mEnemies.end())
+		mEnemies.erase(iter);
+}
+
+void Game::UnregisterBoss(Boss* boss)
+{
+	auto iter = std::find(mBosses.begin(), mBosses.end(), boss);
+	if (iter != mBosses.end())
+		mBosses.erase(iter);
+}
+
+int Game::CountAliveEnemies() const
+{
+	int count = 0;
+	for (auto enemy : mEnemies)
+	{
+		if (enemy && enemy->GetState() == ActorState::Active && !enemy->IsDead())
+			count++;
+	}
+	return count;
+}
+
+int Game::CountAliveBosses() const
+{
+	int count = 0;
+	for (auto boss : mBosses)
+	{
+		if (boss && boss->GetState() == ActorState::Active && !boss->IsDead())
+			count++;
+	}
+	return count;
 }
