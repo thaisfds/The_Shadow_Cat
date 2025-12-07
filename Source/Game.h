@@ -157,6 +157,7 @@ private:
 	class ShadowCat *mShadowCat;
 	class HUD *mHUD;
 	class TutorialHUD *mTutorialHUD;
+	class LevelPortal *mLevelPortal;
 	int **mLevelData;
 
 	class std::vector<StompActor *> mStompActors;

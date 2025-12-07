@@ -22,6 +22,7 @@
 #include "Components/AnimatedParticleSystemComponent.h"
 #include "Actors/Characters/Enemy.h"
 #include "Actors/Characters/Boss.h"
+#include "Actors/LevelPortal.h"
 
 Game::Game()
 	: mWindow(nullptr),
@@ -35,6 +36,7 @@ Game::Game()
 	mAudio(nullptr),
     mHUD(nullptr),
 	mTutorialHUD(nullptr),
+	mLevelPortal(nullptr),
 	mIsPaused(false),
 	mIsGameOver(false),
 	mIsGameWon(false),
@@ -140,6 +142,7 @@ void Game::UnloadScene()
 
     // Reset states
 	mShadowCat = nullptr;
+	mLevelPortal = nullptr;
 }
 
 void Game::PauseGame() {
@@ -389,11 +392,18 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
 				spawner->SetPosition(position);
 			}
-			// Blocks
+			// Blocks (excluding tile 9 - carpet/portal, handled by LevelPortal actor)
 			else if (tileID >= 4 && tileID <= 10)
 			{
-				auto block = new Block(this, tileID);
-				block->SetPosition(position);
+				if (tileID == 9)
+				{
+					SDL_Log("[BUILD] Skipping tile 9 (carpet) at (%.1f, %.1f) - will be rendered by LevelPortal", position.x, position.y);
+				}
+				else
+				{
+					auto block = new Block(this, tileID);
+					block->SetPosition(position);
+				}
 			}
 			// Dummy
 			else if (tileID == 11)
@@ -462,6 +472,26 @@ void Game::BuildLevel(int **levelData, int width, int height)
 		}
 	}
 }
+	
+	// Spawn portal at center of last row (initially hidden)
+	int centerColumn = width / 2;
+	int lastRow = height - 1;
+	float portalX = (centerColumn * GameConstants::TILE_SIZE) + (GameConstants::TILE_SIZE / 2.0f);
+	float portalY = (lastRow * GameConstants::TILE_SIZE) + (GameConstants::TILE_SIZE / 2.0f);
+	
+	SDL_Log("[BUILD] Creating portal at (%.1f, %.1f) - Scene=%d, PendingBosses=%zu, Debug=%d", 
+	        portalX, portalY, (int)mCurrentScene, mPendingBossSpawns.size(), mIsDebugging);
+	
+	mLevelPortal = new LevelPortal(this);
+	mLevelPortal->SetPosition(Vector2(portalX, portalY));
+	
+	// Show portal immediately only in debug mode
+	// For all levels (including Lobby), portal will activate via UpdateGame logic
+	if (mIsDebugging)
+	{
+		SDL_Log("[BUILD] Debug mode enabled - showing portal immediately");
+		mLevelPortal->Activate();
+	}
 }void Game::RunLoop()
 {
 	while (mIsRunning)
@@ -597,21 +627,38 @@ void Game::UpdateGame(float deltaTime)
 	if (mShadowCat)
 	{
 		int aliveEnemies = CountAliveEnemies();
+		int aliveBosses = CountAliveBosses();
 		
 		// Spawn boss when all regular enemies are defeated
+		bool justSpawnedBoss = false;
 		if (aliveEnemies == 0 && !mPendingBossSpawns.empty())
 		{
+			SDL_Log("[BOSS] All enemies defeated! Spawning %zu boss(es)...", mPendingBossSpawns.size());
 			// Spawn all pending bosses
 			for (const auto& bossData : mPendingBossSpawns)
 			{
 				auto boss = new Boss(this, bossData.arenaCenter, bossData.bossType, bossData.playSpawnAnimation);
 			}
 			mPendingBossSpawns.clear();
+			justSpawnedBoss = true;
+			SDL_Log("[BOSS] Boss spawned! Total bosses registered: %zu, alive: %d", mBosses.size(), CountAliveBosses());
+		}
+		
+		// Activate portal only after boss has been spawned AND defeated
+		bool bossWasDefeated = (aliveBosses == 0 && mPendingBossSpawns.empty() && !mBosses.empty());
+		bool noBossLevel = (mBosses.empty() && mPendingBossSpawns.empty());
+		
+		// Don't activate portal on the same frame we spawn the boss
+		if (mLevelPortal && aliveEnemies == 0 && (bossWasDefeated || noBossLevel) && !mLevelPortal->IsActive() && !justSpawnedBoss)
+		{
+			SDL_Log("[PORTAL] ACTIVATING - All threats cleared! (Enemies: %d, Bosses: %d, Registered: %zu)", 
+			        aliveEnemies, aliveBosses, mBosses.size());
+			mLevelPortal->Activate();
 		}
 	}
 
-	// ========== ORIGINAL LEVEL TRANSITION (grid-based) ==========
-	if (mShadowCat)
+	// ========== LEVEL TRANSITION (grid-based, but requires portal to be active) ==========
+	if (mShadowCat && mLevelPortal && mLevelPortal->IsActive())
 	{
 		Vector2 playerPos = mShadowCat->GetPosition();
 		int gridX = static_cast<int>(playerPos.x / GameConstants::TILE_SIZE);
@@ -633,7 +680,7 @@ void Game::UpdateGame(float deltaTime)
 			{
 			case GameScene::Lobby:
 				nextScene = GameScene::Level1;
-				SDL_Log("Transitioning: Lobby -> Level 1");
+				SDL_Log("[TRANSITION] Portal active - Transitioning: Lobby -> Level 1");
 				break;
 			case GameScene::Level1:
 				nextScene = GameScene::Level2;

@@ -45,6 +45,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Block.h
         Source/Actors/Spawner.cpp
         Source/Actors/Spawner.h
+        Source/Actors/LevelPortal.cpp
+        Source/Actors/LevelPortal.h
         Source/Components/Drawing/AnimatorComponent.cpp
         Source/Components/Drawing/AnimatorComponent.h
         Source/Components/Drawing/RectComponent.cpp
