@@ -1,6 +1,7 @@
 #include "SkillJsonParser.h"
 #include "Components/Physics/Collider.h"
 #include "Components/Physics/Physics.h"
+#include "Components/Skills/SkillBase.h"
 #include <SDL.h>
 
 float SkillJsonParser::GetFloatEffectValue(const nlohmann::json &skillData, const std::string &effectName)
@@ -11,8 +12,8 @@ float SkillJsonParser::GetFloatEffectValue(const nlohmann::json &skillData, cons
 		{
 			if (effect.contains("type") && effect["type"].get<std::string>() == effectName)
 			{
-				if (effect.contains("amount") && effect["amount"].is_number())
-					return effect["amount"].get<float>();
+				if (effect.contains("value") && effect["value"].is_number())
+					return effect["value"].get<float>();
 			}
 		}
 	}
@@ -100,12 +101,12 @@ Collider* SkillJsonParser::GetAreaOfEffect(const nlohmann::json& skillData)
 				);
 				return coneCollider;
 			}
-			else if (type == "aabb" &&
-					 aoeData.contains("width") && aoeData["width"].is_number() &&
-					 aoeData.contains("height") && aoeData["height"].is_number())
+			else if (type == "aabb" 
+				&& aoeData.contains("width") && aoeData["width"].is_number()
+				&& aoeData.contains("height") && aoeData["height"].is_number())
 			{
-				float width = aoeData["width"].get<float>();
-				float height = aoeData["height"].get<float>();
+				float width = ExtractFloatValue(skillData, aoeData["width"]);
+				float height = ExtractFloatValue(skillData, aoeData["height"]);
 				return new AABBCollider(width, height);
 			}
 		}
@@ -113,4 +114,27 @@ Collider* SkillJsonParser::GetAreaOfEffect(const nlohmann::json& skillData)
 
 	SDL_Log("Skill data does not contain valid areaOfEffect");
 	return nullptr;
+}
+
+UpgradeInfo SkillJsonParser::GetUpgradeInfo(const nlohmann::json& skillData, const std::string& upgradeType, float *upgradeTarget)
+{
+	UpgradeInfo info;
+	if (skillData.contains("upgrades") && skillData["upgrades"].is_array())
+	{
+		for (const auto& upgrade : skillData["upgrades"])
+		{
+			if (upgrade.contains("type") && upgrade["type"].get<std::string>() == upgradeType)
+			{
+				info.type = upgradeType;
+				info.value = ExtractFloatValue(skillData, upgrade["value"]);
+				if (upgrade.contains("maxLevel") && upgrade["maxLevel"].is_number())
+					info.maxLevel = upgrade["maxLevel"].get<int>();
+				return info;
+			}
+		}
+		info.upgradeTarget = upgradeTarget;
+	}
+
+	SDL_Log("Skill data does not contain upgrade of type: %s", upgradeType.c_str());
+	return info;
 }

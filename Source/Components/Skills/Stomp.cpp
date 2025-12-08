@@ -22,6 +22,12 @@ nlohmann::json Stomp::LoadSkillDataFromJSON(const std::string& fileName)
 
 	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
 	mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
+	mRadius = mAreaOfEffect ? ((CircleCollider*)mAreaOfEffect)->GetRadius() : 0.0f;
+
+	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "damage", &mDamage));
+	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
+	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "range", &mRange));
+	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "radius", &mRadius));
 
 	return data;
 }
@@ -33,6 +39,8 @@ void Stomp::StartSkill(Vector2 targetPosition)
 	CollisionFilter filter;
 	filter.belongsTo = CollisionFilter::GroupMask({ CollisionGroup::PlayerSkills });
 	filter.collidesWith = CollisionFilter::GroupMask({ CollisionGroup::Enemy });
+
+	((CircleCollider*)mAreaOfEffect)->SetRadius(mRadius);
 
 	mCharacter->GetGame()->GetStompActor()->Awake(
 		mCharacter->GetGame()->GetMouseWorldPosition(),

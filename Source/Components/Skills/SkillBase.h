@@ -9,15 +9,12 @@
 #include "../../DelayedActionSystem.h"
 #include "../../Json.h"
 #include "../../SkillJsonParser.h"
+#include "UpgradeInfo.h"
 
 class Character;
 
 class SkillBase : public Component
 {
-protected:
-
-    virtual nlohmann::json LoadSkillDataFromJSON(const std::string& fileName);
-
 public:
     SkillBase(class Actor* owner, int updateOrder = 100);
     virtual ~SkillBase() = default;
@@ -35,6 +32,7 @@ public:
     
     const std::string& GetName() const { return mName; }
     const std::string& GetDescription() const { return mDescription; }
+    std::vector<UpgradeInfo> GetAvailableUpgrades() const;
 
 protected:
     class Character *mCharacter;
@@ -62,4 +60,12 @@ protected:
     {
         mDelayedActions.AddDelayedAction(delay, action);
     }
+
+    std::vector<UpgradeInfo> mUpgrades;
+
+    void RegisterUpgrade(const std::string& type, float value, int maxLevel, float* variable);
+    void ApplyUpgrade(const std::string& upgradeType);
+    bool CanUpgrade(const std::string& upgradeType) const;
+    
+    virtual nlohmann::json LoadSkillDataFromJSON(const std::string& fileName);
 };

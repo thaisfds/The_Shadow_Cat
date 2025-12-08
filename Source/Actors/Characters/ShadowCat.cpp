@@ -32,7 +32,7 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     
     mAnimatorComponent->LoopAnimation("Idle");
 
-    hp = 10;
+    hp = 100;
 
     if (mGame->GetHUD())
         mGame->GetHUD()->UpdateMaxHealth(hp, true);
@@ -147,4 +147,27 @@ void ShadowCat::TakeDamage(int damage)
 void ShadowCat::Kill()
 {
     mGame->SetGameOver(true);
+}
+
+std::vector<UpgradeInfo> ShadowCat::GetRandomUpgrades()
+{
+    std::vector<UpgradeInfo> allUpgrades;
+
+    auto assignedSkills = mSkillInputHandler->GetAssignedSkills();
+    for (auto skill : assignedSkills)
+    {
+        auto skillUpgrades = skill->GetAvailableUpgrades();
+        allUpgrades.insert(allUpgrades.end(), skillUpgrades.begin(), skillUpgrades.end());
+    }
+
+    // Shuffle the upgrades with time
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    std::random_shuffle(allUpgrades.begin(), allUpgrades.end());
+
+    std::vector<UpgradeInfo> selectedUpgrades;
+    int upgradesToSelect = std::min(GameConstants::UPGRADE_COUNT, static_cast<int>(allUpgrades.size()));
+
+    for (int i = 0; i < upgradesToSelect; ++i) selectedUpgrades.push_back(allUpgrades[i]);
+
+    return selectedUpgrades;
 }

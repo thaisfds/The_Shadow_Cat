@@ -14,7 +14,7 @@
 	[
 		{
 			"type": "damage",
-			"amount": 10
+			"value": 10
 		}
 	]
 }

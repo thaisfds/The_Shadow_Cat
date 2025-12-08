@@ -26,6 +26,11 @@ nlohmann::json FurBall::LoadSkillDataFromJSON(const std::string& fileName)
 	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
 	mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
 
+	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "projectileSpeed", &mProjectileSpeed));
+	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "damage", &mDamage));
+	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
+	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "range", &mRange));
+
 	return data;
 }
 

@@ -13,11 +13,31 @@
 	[
 		{
 			"type": "damage",
-			"amount": 15
+			"value": 15
 		},
 		{
 			"type": "projectileSpeed",
-			"amount": 300
+			"value": 300
+		}
+	],
+	"upgrades":
+	[
+		{
+			"type": "damage",
+			"value": 5
+		},
+		{
+			"type": "range",
+			"value": 20
+		},
+		{
+			"type": "cooldown",
+			"value": -0.4,
+			"max": 4
+		},
+		{
+			"type": "projectileSpeed",
+			"value": 50
 		}
 	]
 }

@@ -8,7 +8,23 @@
 	[
 		{
 			"type": "speed",
-			"amount": 400
+			"value": 400
+		}
+	],
+	"upgrades":
+	[
+		{
+			"type": "range",
+			"value": 20
+		},
+		{
+			"type": "cooldown",
+			"value": -0.3,
+			"max": 5
+		},
+		{
+			"type": "speed",
+			"value": 50
 		}
 	]
 }

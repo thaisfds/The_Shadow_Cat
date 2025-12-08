@@ -3,7 +3,7 @@
 	"name": "Stomp",
 	"description": "Bring a pawerful stomp down, damaging nearby enemies.",
 	"cooldown": 5.0,
-	"range": 50,
+	"range": 100,
 	"areaOfEffect":
 	{
 		"type": "circle",
@@ -13,7 +13,27 @@
 	[
 		{
 			"type": "damage",
-			"amount": 30
+			"value": 30
+		}
+	],
+	"upgrades":
+	[
+		{
+			"type": "damage",
+			"value": 10
+		},
+		{
+			"type": "range",
+			"value": 10
+		},
+		{
+			"type": "cooldown",
+			"value": -0.5,
+			"max": 5
+		},
+		{
+			"type": "radius",
+			"value": 10
 		}
 	]
 }

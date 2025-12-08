@@ -96,3 +96,11 @@ int SkillInputHandler::KeyToSlot(SkillInput key) const
     if (key == SkillInput(InputType::Keyboard, SDL_SCANCODE_LSHIFT)) return 4;
     return -1;
 }
+
+std::vector<SkillBase*> SkillInputHandler::GetAssignedSkills() const
+{
+    std::vector<SkillBase*> skills;
+    for (const auto& pair : mKeyToSkill)
+        if (pair.second) skills.push_back(pair.second);
+    return skills;
+}

@@ -22,4 +22,6 @@ namespace GameConstants
     constexpr int JOYSTICK_DEAD_ZONE = 8000;
 
     constexpr float DRAW_SKILL_RANGE_DURATION = 0.5f;
+
+    constexpr int UPGRADE_COUNT = 5;
 }

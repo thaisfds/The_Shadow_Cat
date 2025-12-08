@@ -57,10 +57,8 @@ void SkillBase::StartSkill(Vector2 targetPosition)
 	mTargetVector = targetPosition - mCharacter->GetPosition();
 	mTargetVector.Normalize();
 
-	if (mTargetVector.x < 0.0f)
-		mCharacter->SetScale(Vector2(-1.0f, 1.0f));
-	else
-		mCharacter->SetScale(Vector2(1.0f, 1.0f));
+	if (mTargetVector.x < 0.0f) mCharacter->SetScale(Vector2(-1.0f, 1.0f));
+	else mCharacter->SetScale(Vector2(1.0f, 1.0f));
 }
 
 void SkillBase::ComponentDraw(class Renderer* renderer)
@@ -74,3 +72,49 @@ bool SkillBase::CanUse(Vector2 targetPosition, bool showRangeOnFalse) const
 	return mCurrentCooldown <= 0.0f;
 }
 
+void SkillBase::RegisterUpgrade(const std::string& type, float value, int maxLevel, float* variable)
+{
+    UpgradeInfo info;
+    info.value = value;
+    info.maxLevel = maxLevel;
+    info.currentLevel = 0;
+    info.upgradeTarget = variable;
+    
+	mUpgrades.push_back(info);
+}
+
+void SkillBase::ApplyUpgrade(const std::string& upgradeType)
+{
+    auto it = std::find_if(mUpgrades.begin(), mUpgrades.end(), [&](const UpgradeInfo& upgrade)
+	{
+        return upgrade.type == upgradeType;
+    });
+    if (it == mUpgrades.end()) return;
+    
+    auto& upgrade = *it;
+    upgrade.currentLevel++;
+    
+    *(upgrade.upgradeTarget) += upgrade.value;
+}
+
+bool SkillBase::CanUpgrade(const std::string& upgradeType) const
+{
+	auto it = std::find_if(mUpgrades.begin(), mUpgrades.end(), [&](const UpgradeInfo& upgrade)
+	{
+        return upgrade.type == upgradeType;
+    });
+	if (it == mUpgrades.end()) return false;
+	
+	const auto& upgrade = *it;
+	if (upgrade.maxLevel != -1 && upgrade.currentLevel >= upgrade.maxLevel) return false;
+	
+	return true;
+}
+
+std::vector<UpgradeInfo> SkillBase::GetAvailableUpgrades() const
+{
+	std::vector<UpgradeInfo> availableUpgrades;
+	for (const auto& upgrade : mUpgrades)
+		if (CanUpgrade(upgrade.type)) availableUpgrades.push_back(upgrade);
+	return availableUpgrades;
+}

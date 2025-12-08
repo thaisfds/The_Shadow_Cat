@@ -63,6 +63,7 @@ public:
 	void DebugDraw(class Renderer* renderer) override;
 
 	float GetRadius() const { return mRadius; }
+	void SetRadius(float radius) { mRadius = radius; }
 
 private:
 	float mRadius;

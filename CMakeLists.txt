@@ -113,6 +113,7 @@ add_executable(${PROJECT_NAME}
         Source/DelayedActionSystem.h
         Source/SkillJsonParser.cpp
         Source/SkillJsonParser.h
+        Source/Components/Skills/UpgradeInfo.h
 )
 
 configure_local_linking(${PROJECT_NAME})

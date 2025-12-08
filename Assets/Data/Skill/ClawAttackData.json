@@ -14,15 +14,15 @@
 	[
 		{
 			"type": "damage",
-			"amount": 40
+			"value": 40
 		},
 		{
 			"type": "forwardSpeed",
-			"amount": 600
+			"value": 600
 		},
 		{
 			"type": "backwardDistancePercentage",
-			"amount": 0.7
+			"value": 0.7
 		}
 	]
 }
