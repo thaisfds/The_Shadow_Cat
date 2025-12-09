@@ -30,6 +30,7 @@ Game::Game()
 	  mTicksCount(0),
 	  mIsRunning(true),
 	  mIsDebugging(false),
+	  mIsGodMode(true),
 	  mUpdatingActors(false),
 	  mCameraPos(Vector2::Zero),
 	  mLevelData(nullptr),
@@ -404,6 +405,23 @@ void Game::BuildLevel(int **levelData, int width, int height)
 		currentEnemyType = Enemy::EnemyType::OrangeCat;
 	}
 
+	// Determine if this is a boss level
+	bool isBossLevel = (mCurrentScene == GameScene::Level1_Boss ||
+						mCurrentScene == GameScene::Level2_Boss ||
+						mCurrentScene == GameScene::Level3_Boss);
+
+	// Determine boss type for boss levels
+	Boss::BossType currentBossType = Boss::BossType::WhiteBoss;
+	if (mCurrentScene == GameScene::Level1_Boss)
+	{
+		currentBossType = Boss::BossType::WhiteBoss;
+	}
+	else if (mCurrentScene == GameScene::Level3_Boss)
+	{
+		currentBossType = Boss::BossType::OrangeBoss;
+	}
+	// Level2_Boss não implementado ainda, usa WhiteBoss como padrão
+
 	for (int i = 0; i < height; ++i)
 	{
 		for (int j = 0; j < width; ++j)
@@ -477,63 +495,84 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				block->SetPosition(position);
 			}
 			// ========== IMMEDIATE ENEMY SPAWNS (spawn when level loads) ==========
-			// Tile ID 12: Enemy - small patrol (100px)
+			// Tile ID 12: Enemy - small patrol (100px) OR Boss in boss levels
 			else if (tileID == 12)
 			{
-				// Create waypoints 100 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(100.0f, 0.0f);
-				auto enemy = new Enemy(this, waypointA, waypointB, currentEnemyType);
-				enemy->SetPosition(position);
+				if (isBossLevel)
+				{
+					auto boss = new Boss(this, position, currentBossType, false);
+				}
+				else
+				{
+					// Create waypoints 100 pixels to left and right of spawn position
+					Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
+					Vector2 waypointB = position + Vector2(100.0f, 0.0f);
+					auto enemy = new Enemy(this, waypointA, waypointB, currentEnemyType);
+					enemy->SetPosition(position);
+				}
 			}
-			// Tile ID 13: Enemy with larger patrol (200px)
+			// Tile ID 13: Enemy with larger patrol (200px) OR Boss in boss levels
 			else if (tileID == 13)
 			{
-				// Create waypoints 200 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
-				auto enemy = new Enemy(this, waypointA, waypointB, currentEnemyType);
-				enemy->SetPosition(position);
+				if (isBossLevel)
+				{
+					auto boss = new Boss(this, position, currentBossType, false);
+				}
+				else
+				{
+					// Create waypoints 200 pixels to left and right of spawn position
+					Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
+					Vector2 waypointB = position + Vector2(200.0f, 0.0f);
+					auto enemy = new Enemy(this, waypointA, waypointB, currentEnemyType);
+					enemy->SetPosition(position);
+				}
 			}
 			// ========== DELAYED SPAWNERS (spawn when player approaches) ==========
-			// Tile ID 14: Spawner - small patrol (100px)
+			// Tile ID 14: Spawner - small patrol (100px) OR Boss in boss levels
 			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 14)
 			{
-				// Create waypoints 100 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(100.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
-				spawner->SetPosition(position);
+				if (isBossLevel)
+				{
+					auto boss = new Boss(this, position, currentBossType, false);
+				}
+				else
+				{
+					// Create waypoints 100 pixels to left and right of spawn position
+					Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
+					Vector2 waypointB = position + Vector2(100.0f, 0.0f);
+					auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
+					spawner->SetPosition(position);
+				}
 			}
-			// Tile ID 15: Spawner - large patrol (200px)
+			// Tile ID 15: Spawner - large patrol (200px) OR Boss in boss levels
 			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 15)
 			{
-				// Create waypoints 200 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
-				spawner->SetPosition(position);
+				if (isBossLevel)
+				{
+					// Spawn boss in boss levels
+					auto boss = new Boss(this, position, currentBossType, false);
+				}
+				else
+				{
+					// Create waypoints 200 pixels to left and right of spawn position
+					Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
+					Vector2 waypointB = position + Vector2(200.0f, 0.0f);
+					auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
+					spawner->SetPosition(position);
+				}
 			}
 			// ========== BOSS SPAWNS ==========
-			// Tile ID 16: WhiteBoss - store spawn data, will spawn after enemies defeated
+			// Tile ID 16: WhiteBoss
 			else if (tileID == 16)
 			{
-				BossSpawnData bossData;
-				bossData.arenaCenter = position;
-				bossData.bossType = Boss::BossType::WhiteBoss;
-				bossData.playSpawnAnimation = true;
-				mPendingBossSpawns.push_back(bossData);
+				auto boss = new Boss(this, position, Boss::BossType::WhiteBoss, false);
 			}
-			// Tile ID 17: OrangeBoss - store spawn data, will spawn after enemies defeated
+			// Tile ID 17: OrangeBoss
 			else if (tileID == 17)
 			{
-				BossSpawnData bossData;
-				bossData.arenaCenter = position;
-				bossData.bossType = Boss::BossType::OrangeBoss;
-				bossData.playSpawnAnimation = true;
-				mPendingBossSpawns.push_back(bossData);
+				auto boss = new Boss(this, position, Boss::BossType::OrangeBoss, false);
 			}
 		}
 	}
@@ -655,6 +694,13 @@ void Game::ProcessInput()
 			if (event.key.keysym.sym == SDLK_F1 && event.key.repeat == 0)
 				mIsDebugging = !mIsDebugging;
 
+			// God Mode toggle
+			if (event.key.keysym.sym == SDLK_F2 && event.key.repeat == 0)
+			{
+				mIsGodMode = !mIsGodMode;
+				SDL_Log("[GOD MODE] %s", mIsGodMode ? "ENABLED" : "DISABLED");
+			}
+
 			// Tutorial HUD toggle
 			if (event.key.keysym.sym == SDLK_h && event.key.repeat == 0)
 				if (mTutorialHUD)
@@ -696,37 +742,26 @@ void Game::UpdateGame(float deltaTime)
 	// Update camera position
 	UpdateCamera();
 
-	// ========== BOSS CONDITIONAL SPAWNING ==========
-	// Spawn boss only when all regular enemies are defeated
-	if (mShadowCat)
+	// ========== PORTAL ACTIVATION ==========
+	// Activate portal when all enemies and bosses are defeated (or in God Mode)
+	if (mShadowCat && mLevelPortal)
 	{
 		int aliveEnemies = CountAliveEnemies();
 		int aliveBosses = CountAliveBosses();
 
-		// Spawn boss when all regular enemies are defeated
-		bool justSpawnedBoss = false;
-		if (aliveEnemies == 0 && !mPendingBossSpawns.empty())
+		// Activate portal when all threats are cleared OR in God Mode
+		if ((aliveEnemies == 0 && aliveBosses == 0 || mIsGodMode) && !mLevelPortal->IsActive())
 		{
-			SDL_Log("[BOSS] All enemies defeated! Spawning %zu boss(es)...", mPendingBossSpawns.size());
-			// Spawn all pending bosses
-			for (const auto &bossData : mPendingBossSpawns)
+			if (mIsGodMode)
 			{
-				auto boss = new Boss(this, bossData.arenaCenter, bossData.bossType, bossData.playSpawnAnimation);
+				SDL_Log("[PORTAL] ACTIVATING - God Mode enabled (Enemies: %d, Bosses: %d)",
+						aliveEnemies, aliveBosses);
 			}
-			mPendingBossSpawns.clear();
-			justSpawnedBoss = true;
-			SDL_Log("[BOSS] Boss spawned! Total bosses registered: %zu, alive: %d", mBosses.size(), CountAliveBosses());
-		}
-
-		// Activate portal only after boss has been spawned AND defeated
-		bool bossWasDefeated = (aliveBosses == 0 && mPendingBossSpawns.empty() && !mBosses.empty());
-		bool noBossLevel = (mBosses.empty() && mPendingBossSpawns.empty());
-
-		// Don't activate portal on the same frame we spawn the boss
-		if (mLevelPortal && aliveEnemies == 0 && (bossWasDefeated || noBossLevel) && !mLevelPortal->IsActive() && !justSpawnedBoss)
-		{
-			SDL_Log("[PORTAL] ACTIVATING - All threats cleared! (Enemies: %d, Bosses: %d, Registered: %zu)",
-					aliveEnemies, aliveBosses, mBosses.size());
+			else
+			{
+				SDL_Log("[PORTAL] ACTIVATING - All threats cleared! (Enemies: %d, Bosses: %d)",
+						aliveEnemies, aliveBosses);
+			}
 			mLevelPortal->Activate();
 		}
 	}

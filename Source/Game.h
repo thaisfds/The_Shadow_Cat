@@ -184,5 +184,6 @@ private:
 
 	// Debug
 	bool mIsDebugging;
+	bool mIsGodMode;
 	DebugActor *mDebugActor;
 };
