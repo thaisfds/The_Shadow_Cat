@@ -20,6 +20,9 @@ public:
     bool GetAnimationLock() const { return mIsAnimationLocked; }
     void SetAnimationLock(bool isLocked);
 
+    int GetHP() const { return hp; }
+    int GetMaxHP() const { return maxHp; }
+
     bool GetMovementLock() const { return mIsMovementLocked; }
     void SetMovementLock(bool isLocked);
     
@@ -53,6 +56,7 @@ protected:
     void ManageAnimations();
 
     int hp;
+    int maxHp;
 
     class RigidBodyComponent *mRigidBodyComponent;
     class AnimatorComponent *mAnimatorComponent;
