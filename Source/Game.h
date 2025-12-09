@@ -16,8 +16,11 @@ enum class GameScene
 	MainMenu,
 	Lobby,
 	Level1,
+	Level1_Boss,
 	Level2,
-	Level3
+	Level2_Boss,
+	Level3,
+	Level3_Boss
 };
 
 class Game
@@ -47,13 +50,13 @@ public:
 	void SetScene(GameScene scene);
 	void UnloadScene();
 
-    // Pause Handling
-    void PauseGame();
-    void ResumeGame();
-    void ResetGame();
+	// Pause Handling
+	void PauseGame();
+	void ResumeGame();
+	void ResetGame();
 
-    void SetGameOver(bool isOver) { mIsGameOver = isOver; }
-    void SetGameWon(bool isWon) { mIsGameWon = isWon; }
+	void SetGameOver(bool isOver) { mIsGameOver = isOver; }
+	void SetGameWon(bool isWon) { mIsGameWon = isWon; }
 
 	// Renderer
 	class Renderer *GetRenderer() { return mRenderer; }
@@ -80,10 +83,10 @@ public:
 	class HUD *GetHUD() { return mHUD; }
 
 	// Enemy and Boss tracking
-	void RegisterEnemy(class Enemy* enemy);
-	void RegisterBoss(class Boss* boss);
-	void UnregisterEnemy(class Enemy* enemy);
-	void UnregisterBoss(class Boss* boss);
+	void RegisterEnemy(class Enemy *enemy);
+	void RegisterBoss(class Boss *boss);
+	void UnregisterEnemy(class Enemy *enemy);
+	void UnregisterBoss(class Boss *boss);
 	int CountAliveEnemies() const;
 	int CountAliveBosses() const;
 
@@ -147,11 +150,11 @@ private:
 	bool mIsFullscreen;
 	GameScene mCurrentScene;
 
-    bool mIsPaused;
+	bool mIsPaused;
 
-    // End condition
-    bool mIsGameOver;
-    bool mIsGameWon;
+	// End condition
+	bool mIsGameOver;
+	bool mIsGameWon;
 
 	// Game-specific
 	class ShadowCat *mShadowCat;
@@ -167,11 +170,12 @@ private:
 	class Actor *mAttackTrailActor;
 
 	// Enemy and Boss tracking
-	std::vector<class Enemy*> mEnemies;
-	std::vector<class Boss*> mBosses;
-	
+	std::vector<class Enemy *> mEnemies;
+	std::vector<class Boss *> mBosses;
+
 	// Boss spawn data (stored until enemies are defeated)
-	struct BossSpawnData {
+	struct BossSpawnData
+	{
 		Vector2 arenaCenter;
 		Boss::BossType bossType;
 		bool playSpawnAnimation;

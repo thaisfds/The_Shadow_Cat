@@ -26,24 +26,24 @@
 
 Game::Game()
 	: mWindow(nullptr),
-	mRenderer(nullptr),
-	mTicksCount(0),
-	mIsRunning(true),
-	mIsDebugging(false),
-	mUpdatingActors(false),
-	mCameraPos(Vector2::Zero),
-	mLevelData(nullptr),
-	mAudio(nullptr),
-    mHUD(nullptr),
-	mTutorialHUD(nullptr),
-	mLevelPortal(nullptr),
-	mIsPaused(false),
-	mIsGameOver(false),
-	mIsGameWon(false),
-	mShadowCat(nullptr),
-	mController(nullptr),
-	mLevelWidth(0),
-	mLevelHeight(0)
+	  mRenderer(nullptr),
+	  mTicksCount(0),
+	  mIsRunning(true),
+	  mIsDebugging(false),
+	  mUpdatingActors(false),
+	  mCameraPos(Vector2::Zero),
+	  mLevelData(nullptr),
+	  mAudio(nullptr),
+	  mHUD(nullptr),
+	  mTutorialHUD(nullptr),
+	  mLevelPortal(nullptr),
+	  mIsPaused(false),
+	  mIsGameOver(false),
+	  mIsGameWon(false),
+	  mShadowCat(nullptr),
+	  mController(nullptr),
+	  mLevelWidth(0),
+	  mLevelHeight(0)
 {
 }
 
@@ -58,26 +58,26 @@ bool Game::Initialize()
 	}
 
 	// Init SDL Image
-    int imgFlags = IMG_INIT_PNG;
-    if (!(IMG_Init(imgFlags) & imgFlags))
-    {
-        SDL_Log("Unable to initialize SDL_image: %s", IMG_GetError());
-        return false;
-    }
+	int imgFlags = IMG_INIT_PNG;
+	if (!(IMG_Init(imgFlags) & imgFlags))
+	{
+		SDL_Log("Unable to initialize SDL_image: %s", IMG_GetError());
+		return false;
+	}
 
-    // Initialize SDL_ttf
-    if (TTF_Init() != 0)
-    {
-        SDL_Log("Failed to initialize SDL_ttf");
-        return false;
-    }
+	// Initialize SDL_ttf
+	if (TTF_Init() != 0)
+	{
+		SDL_Log("Failed to initialize SDL_ttf");
+		return false;
+	}
 
-    // Initialize SDL_mixer
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
-    {
-        SDL_Log("Failed to initialize SDL_mixer");
-        return false;
-    }
+	// Initialize SDL_mixer
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
+	{
+		SDL_Log("Failed to initialize SDL_mixer");
+		return false;
+	}
 
 	mWindow = SDL_CreateWindow("The Shadow Cat", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
 	if (!mWindow)
@@ -108,10 +108,10 @@ bool Game::Initialize()
 
 	// Init audio system
 	mAudio = new AudioSystem();
-    mAudio->CacheAllSounds();
+	mAudio->CacheAllSounds();
 
 	// First scene
-    SetScene(GameScene::MainMenu);
+	SetScene(GameScene::MainMenu);
 
 	mTicksCount = SDL_GetTicks();
 
@@ -120,10 +120,11 @@ bool Game::Initialize()
 
 void Game::UnloadScene()
 {
-    // Use state so we can call this from within an actor update
-    for(auto *actor : mActors) {
-        actor->SetState(ActorState::Destroy);
-    }
+	// Use state so we can call this from within an actor update
+	for (auto *actor : mActors)
+	{
+		actor->SetState(ActorState::Destroy);
+	}
 
 	mStompActors.clear();
 	mFurBallActors.clear();
@@ -131,21 +132,24 @@ void Game::UnloadScene()
 	mBosses.clear();
 	mPendingBossSpawns.clear();
 
-    // Delete UI screens
-    for (auto ui : mUIStack) {
+	// Delete UI screens
+	for (auto ui : mUIStack)
+	{
 		// Don't delete HUD or Tutorial HUD here, they persist between scenes
-		if (ui == mHUD || ui == mTutorialHUD) continue;
+		if (ui == mHUD || ui == mTutorialHUD)
+			continue;
 
-        delete ui;
-    }
-    mUIStack.clear();
+		delete ui;
+	}
+	mUIStack.clear();
 
-    // Reset states
+	// Reset states
 	mShadowCat = nullptr;
 	mLevelPortal = nullptr;
 }
 
-void Game::PauseGame() {
+void Game::PauseGame()
+{
 	// Pause all actors
 	mIsPaused = true;
 
@@ -153,78 +157,112 @@ void Game::PauseGame() {
 		actor->SetState(ActorState::Paused);
 }
 
-void Game::ResumeGame() {
+void Game::ResumeGame()
+{
 	mIsPaused = false;
 
 	for (auto *actor : mActors)
 		actor->SetState(ActorState::Active);
 }
 
-void Game::ResetGame() {
+void Game::ResetGame()
+{
 	// Bugged so return for now
 	return;
 }
 
 void Game::SetScene(GameScene nextScene)
 {
-    UnloadScene();
+	UnloadScene();
 
-    switch (nextScene) {
-        case GameScene::MainMenu:
-            mCurrentScene = GameScene::MainMenu;
-			
-			// Main menu back music
-			// mAudio->PlaySound("Music.ogg", true);
+	switch (nextScene)
+	{
+	case GameScene::MainMenu:
+		mCurrentScene = GameScene::MainMenu;
 
-			new MainMenu(this, "../Assets/Fonts/Pixellari.ttf");
-            break;
+		// Main menu back music
+		// mAudio->PlaySound("Music.ogg", true);
 
-        case GameScene::Lobby:
-            mCurrentScene = GameScene::Lobby;
+		new MainMenu(this, "../Assets/Fonts/Pixellari.ttf");
+		break;
+
+	case GameScene::Lobby:
+		mCurrentScene = GameScene::Lobby;
 
 		// Always shown
-		mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf"); 
+		mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf");
 
 		// Toggleable tutorial HUD
 		if (!mTutorialHUD)
 			mTutorialHUD = new TutorialHUD(this, "../Assets/Fonts/Pixellari.ttf");
-		
+
 		// Show tutorial in Lobby
 		if (mTutorialHUD)
 			mTutorialHUD->ShowControls();
 
-		InitializeActors();			break;
+		InitializeActors();
+		break;
 
-        case GameScene::Level1:
-        mCurrentScene = GameScene::Level1;
+	case GameScene::Level1:
+		mCurrentScene = GameScene::Level1;
 
-        // Hide tutorial when entering levels
-        if (mTutorialHUD)
-            mTutorialHUD->HideControls();
+		// Hide tutorial when entering levels
+		if (mTutorialHUD)
+			mTutorialHUD->HideControls();
 
-        InitializeActors();
-        break;
+		InitializeActors();
+		break;
 
-    case GameScene::Level2:
-        mCurrentScene = GameScene::Level2;
+	case GameScene::Level1_Boss:
+		mCurrentScene = GameScene::Level1_Boss;
 
-        // Hide tutorial when entering levels
-        if (mTutorialHUD)
-            mTutorialHUD->HideControls();
+		// Hide tutorial when entering levels
+		if (mTutorialHUD)
+			mTutorialHUD->HideControls();
 
-        InitializeActors();
-        break;
+		InitializeActors();
+		break;
 
-    case GameScene::Level3:
-        mCurrentScene = GameScene::Level3;
+	case GameScene::Level2:
+		mCurrentScene = GameScene::Level2;
 
-        // Hide tutorial when entering levels
-        if (mTutorialHUD)
-            mTutorialHUD->HideControls();
+		// Hide tutorial when entering levels
+		if (mTutorialHUD)
+			mTutorialHUD->HideControls();
 
-        InitializeActors();
-        break;
-    }
+		InitializeActors();
+		break;
+
+	case GameScene::Level2_Boss:
+		mCurrentScene = GameScene::Level2_Boss;
+
+		// Hide tutorial when entering levels
+		if (mTutorialHUD)
+			mTutorialHUD->HideControls();
+
+		InitializeActors();
+		break;
+
+	case GameScene::Level3:
+		mCurrentScene = GameScene::Level3;
+
+		// Hide tutorial when entering levels
+		if (mTutorialHUD)
+			mTutorialHUD->HideControls();
+
+		InitializeActors();
+		break;
+
+	case GameScene::Level3_Boss:
+		mCurrentScene = GameScene::Level3_Boss;
+
+		// Hide tutorial when entering levels
+		if (mTutorialHUD)
+			mTutorialHUD->HideControls();
+
+		InitializeActors();
+		break;
+	}
 }
 
 void Game::InitializeActors()
@@ -233,20 +271,41 @@ void Game::InitializeActors()
 	mDebugActor = new DebugActor(this);
 
 	mAttackTrailActor = new Actor(this);
-    new AnimatedParticleSystemComponent(mAttackTrailActor, "AttackTrailAnim", false);
+	new AnimatedParticleSystemComponent(mAttackTrailActor, "AttackTrailAnim", false);
 
 	std::string levelPath;
-	
+
 	// Choose level based on current scene
-	if (mCurrentScene == GameScene::Lobby) {
+	if (mCurrentScene == GameScene::Lobby)
+	{
 		levelPath = "../Assets/Levels/Lobby/Lobby.csv";
-	} else if (mCurrentScene == GameScene::Level1) {
+	}
+	else if (mCurrentScene == GameScene::Level1)
+	{
 		levelPath = "../Assets/Levels/Level1/Level1.csv";
-	} else if (mCurrentScene == GameScene::Level2) {
+	}
+	else if (mCurrentScene == GameScene::Level1_Boss)
+	{
+		levelPath = "../Assets/Levels/Level1_Boss/Level1_Boss.csv";
+	}
+	else if (mCurrentScene == GameScene::Level2)
+	{
 		levelPath = "../Assets/Levels/Level2/Level2.csv";
-	} else if (mCurrentScene == GameScene::Level3) {
+	}
+	else if (mCurrentScene == GameScene::Level2_Boss)
+	{
+		levelPath = "../Assets/Levels/Level2_Boss/Level2_Boss.csv";
+	}
+	else if (mCurrentScene == GameScene::Level3)
+	{
 		levelPath = "../Assets/Levels/Level3/Level3.csv";
-	} else {
+	}
+	else if (mCurrentScene == GameScene::Level3_Boss)
+	{
+		levelPath = "../Assets/Levels/Level3_Boss/Level3_Boss.csv";
+	}
+	else
+	{
 		levelPath = "../Assets/Levels/Lobby/Lobby.csv";
 	}
 
@@ -338,13 +397,13 @@ void Game::BuildLevel(int **levelData, int width, int height)
 	Enemy::EnemyType currentEnemyType = Enemy::EnemyType::WhiteCat;
 	if (mCurrentScene == GameScene::Level2)
 	{
-		currentEnemyType = Enemy::EnemyType::OrangeCat;
+		currentEnemyType = Enemy::EnemyType::SylvesterCat;
 	}
 	else if (mCurrentScene == GameScene::Level3)
 	{
-		currentEnemyType = Enemy::EnemyType::SylvesterCat;
+		currentEnemyType = Enemy::EnemyType::OrangeCat;
 	}
-	
+
 	for (int i = 0; i < height; ++i)
 	{
 		for (int j = 0; j < width; ++j)
@@ -411,6 +470,12 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto dummy = new Dummy(this);
 				dummy->SetPosition(position);
 			}
+			// Walls (paredes)
+			else if (tileID >= 16 && tileID <= 27)
+			{
+				auto block = new Block(this, tileID);
+				block->SetPosition(position);
+			}
 			// ========== IMMEDIATE ENEMY SPAWNS (spawn when level loads) ==========
 			// Tile ID 12: Enemy - small patrol (100px)
 			else if (tileID == 12)
@@ -468,23 +533,23 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				bossData.arenaCenter = position;
 				bossData.bossType = Boss::BossType::OrangeBoss;
 				bossData.playSpawnAnimation = true;
-			mPendingBossSpawns.push_back(bossData);
+				mPendingBossSpawns.push_back(bossData);
+			}
 		}
 	}
-}
-	
+
 	// Spawn portal at center of last row (initially hidden)
 	int centerColumn = width / 2;
 	int lastRow = height - 1;
 	float portalX = (centerColumn * GameConstants::TILE_SIZE) + (GameConstants::TILE_SIZE / 2.0f);
 	float portalY = (lastRow * GameConstants::TILE_SIZE) + (GameConstants::TILE_SIZE / 2.0f);
-	
-	SDL_Log("[BUILD] Creating portal at (%.1f, %.1f) - Scene=%d, PendingBosses=%zu, Debug=%d", 
-	        portalX, portalY, (int)mCurrentScene, mPendingBossSpawns.size(), mIsDebugging);
-	
+
+	SDL_Log("[BUILD] Creating portal at (%.1f, %.1f) - Scene=%d, PendingBosses=%zu, Debug=%d",
+			portalX, portalY, (int)mCurrentScene, mPendingBossSpawns.size(), mIsDebugging);
+
 	mLevelPortal = new LevelPortal(this);
 	mLevelPortal->SetPosition(Vector2(portalX, portalY));
-	
+
 	// Show portal immediately only in debug mode
 	// For all levels (including Lobby), portal will activate via UpdateGame logic
 	if (mIsDebugging)
@@ -492,7 +557,8 @@ void Game::BuildLevel(int **levelData, int width, int height)
 		SDL_Log("[BUILD] Debug mode enabled - showing portal immediately");
 		mLevelPortal->Activate();
 	}
-}void Game::RunLoop()
+}
+void Game::RunLoop()
 {
 	while (mIsRunning)
 	{
@@ -550,21 +616,24 @@ void Game::ProcessInput()
 				SDL_Log("Game controller removed");
 				SDL_GameControllerClose(mController);
 				mController = nullptr;
-		}
+			}
 			break;
 		case SDL_KEYDOWN:
 		case SDL_MOUSEBUTTONDOWN:
 			// Handle key press for UI screens
-			if (!mUIStack.empty()) {
+			if (!mUIStack.empty())
+			{
 				mUIStack.back()->HandleKeyPress(event.key.keysym.sym);
 			}
 
-			if (event.key.keysym.sym == SDLK_n && event.key.repeat == 0) {
+			if (event.key.keysym.sym == SDLK_n && event.key.repeat == 0)
+			{
 				SetScene(GameScene::Level1);
 			}
 
 			// Fullscreen toggle
-			if (event.key.keysym.sym == SDLK_F11 && event.key.repeat == 0) {
+			if (event.key.keysym.sym == SDLK_F11 && event.key.repeat == 0)
+			{
 				mIsFullscreen = !mIsFullscreen;
 				if (mIsFullscreen)
 				{
@@ -586,11 +655,12 @@ void Game::ProcessInput()
 			if (event.key.keysym.sym == SDLK_F1 && event.key.repeat == 0)
 				mIsDebugging = !mIsDebugging;
 
-		// Tutorial HUD toggle
-		if (event.key.keysym.sym == SDLK_h && event.key.repeat == 0)
-			if (mTutorialHUD)
-				mTutorialHUD->ToggleControlVisibility();			// Pass event to actors
-			for (auto actor : mActors) actor->OnHandleEvent(event);
+			// Tutorial HUD toggle
+			if (event.key.keysym.sym == SDLK_h && event.key.repeat == 0)
+				if (mTutorialHUD)
+					mTutorialHUD->ToggleControlVisibility(); // Pass event to actors
+			for (auto actor : mActors)
+				actor->OnHandleEvent(event);
 			break;
 		}
 	}
@@ -606,12 +676,16 @@ void Game::ProcessInput()
 void Game::UpdateGame(float deltaTime)
 {
 	// End conditions check
-	if (mIsGameOver || mIsGameWon) {
+	if (mIsGameOver || mIsGameWon)
+	{
 		PauseGame();
 
-		if (mIsGameOver) {
+		if (mIsGameOver)
+		{
 			new GameOver(this, "../Assets/Fonts/Pixellari.ttf");
-		} else {
+		}
+		else
+		{
 			new WinScreen(this, "../Assets/Fonts/Pixellari.ttf");
 		}
 	}
@@ -628,14 +702,14 @@ void Game::UpdateGame(float deltaTime)
 	{
 		int aliveEnemies = CountAliveEnemies();
 		int aliveBosses = CountAliveBosses();
-		
+
 		// Spawn boss when all regular enemies are defeated
 		bool justSpawnedBoss = false;
 		if (aliveEnemies == 0 && !mPendingBossSpawns.empty())
 		{
 			SDL_Log("[BOSS] All enemies defeated! Spawning %zu boss(es)...", mPendingBossSpawns.size());
 			// Spawn all pending bosses
-			for (const auto& bossData : mPendingBossSpawns)
+			for (const auto &bossData : mPendingBossSpawns)
 			{
 				auto boss = new Boss(this, bossData.arenaCenter, bossData.bossType, bossData.playSpawnAnimation);
 			}
@@ -643,16 +717,16 @@ void Game::UpdateGame(float deltaTime)
 			justSpawnedBoss = true;
 			SDL_Log("[BOSS] Boss spawned! Total bosses registered: %zu, alive: %d", mBosses.size(), CountAliveBosses());
 		}
-		
+
 		// Activate portal only after boss has been spawned AND defeated
 		bool bossWasDefeated = (aliveBosses == 0 && mPendingBossSpawns.empty() && !mBosses.empty());
 		bool noBossLevel = (mBosses.empty() && mPendingBossSpawns.empty());
-		
+
 		// Don't activate portal on the same frame we spawn the boss
 		if (mLevelPortal && aliveEnemies == 0 && (bossWasDefeated || noBossLevel) && !mLevelPortal->IsActive() && !justSpawnedBoss)
 		{
-			SDL_Log("[PORTAL] ACTIVATING - All threats cleared! (Enemies: %d, Bosses: %d, Registered: %zu)", 
-			        aliveEnemies, aliveBosses, mBosses.size());
+			SDL_Log("[PORTAL] ACTIVATING - All threats cleared! (Enemies: %d, Bosses: %d, Registered: %zu)",
+					aliveEnemies, aliveBosses, mBosses.size());
 			mLevelPortal->Activate();
 		}
 	}
@@ -683,20 +757,32 @@ void Game::UpdateGame(float deltaTime)
 				SDL_Log("[TRANSITION] Portal active - Transitioning: Lobby -> Level 1");
 				break;
 			case GameScene::Level1:
+				nextScene = GameScene::Level1_Boss;
+				SDL_Log("Transitioning: Level 1 -> Level 1 Boss");
+				break;
+			case GameScene::Level1_Boss:
 				nextScene = GameScene::Level2;
-				SDL_Log("Transitioning: Level 1 -> Level 2");
+				SDL_Log("Transitioning: Level 1 Boss -> Level 2");
 				break;
 			case GameScene::Level2:
+				nextScene = GameScene::Level2_Boss;
+				SDL_Log("Transitioning: Level 2 -> Level 2 Boss");
+				break;
+			case GameScene::Level2_Boss:
 				nextScene = GameScene::Level3;
-				SDL_Log("Transitioning: Level 2 -> Level 3");
+				SDL_Log("Transitioning: Level 2 Boss -> Level 3");
 				break;
 			case GameScene::Level3:
+				nextScene = GameScene::Level3_Boss;
+				SDL_Log("Transitioning: Level 3 -> Level 3 Boss");
+				break;
+			case GameScene::Level3_Boss:
 				SetGameWon(true);
 				break;
 			default:
 				break;
 			}
-			
+
 			if (!mIsGameWon)
 				SetScene(nextScene);
 		}
@@ -704,25 +790,31 @@ void Game::UpdateGame(float deltaTime)
 
 	// Audio and UI
 	if (mAudio)
-        mAudio->Update(deltaTime);
+		mAudio->Update(deltaTime);
 
-    // Update UI screens
-    for (auto ui : mUIStack) {
-        if (ui->GetState() == UIScreen::UIState::Active) {
-            ui->Update(deltaTime);
-        }
-    }
+	// Update UI screens
+	for (auto ui : mUIStack)
+	{
+		if (ui->GetState() == UIScreen::UIState::Active)
+		{
+			ui->Update(deltaTime);
+		}
+	}
 
-    // Delete any UI that are closed
-    auto iter = mUIStack.begin();
-    while (iter != mUIStack.end()) {
-        if ((*iter)->GetState() == UIScreen::UIState::Closing) {
-            delete *iter;
-            iter = mUIStack.erase(iter);
-        } else {
-            ++iter;
-        }
-    }
+	// Delete any UI that are closed
+	auto iter = mUIStack.begin();
+	while (iter != mUIStack.end())
+	{
+		if ((*iter)->GetState() == UIScreen::UIState::Closing)
+		{
+			delete *iter;
+			iter = mUIStack.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
 }
 
 void Game::UpdateActors(float deltaTime)
@@ -769,7 +861,7 @@ void Game::UpdateCamera()
 		// Since lobby is small, we allow camera to go out of bounds
 		if (mCurrentScene == GameScene::Lobby)
 			return;
-		
+
 		// Clamp camera to level boundaries
 		float levelPixelWidth = static_cast<float>(mLevelWidth) * static_cast<float>(GameConstants::TILE_SIZE);
 		float levelPixelHeight = static_cast<float>(mLevelHeight) * static_cast<float>(GameConstants::TILE_SIZE);
@@ -854,62 +946,75 @@ void Game::GenerateOutput()
 	// Get background texture based on current scene
 	std::string backgroundPath;
 
-	switch (mCurrentScene) {
-		case GameScene::MainMenu:
-			backgroundPath = "../Assets/HUD/MainMenuBackground.png";
-			break;
-		case GameScene::Lobby:
-			backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
-			break;
-		case GameScene::Level1:
-			backgroundPath = "../Assets/Levels/Level1/Level1Background.png";
-			break;
-		case GameScene::Level2:
-			backgroundPath = "../Assets/Levels/Level2/Level2Background.png";
-			break;
-		case GameScene::Level3:
-			backgroundPath = "../Assets/Levels/Level3/Level3Background.png";
-			break;
-		default:
-			backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
-			break;
+	switch (mCurrentScene)
+	{
+	case GameScene::MainMenu:
+		backgroundPath = "../Assets/HUD/MainMenuBackground.png";
+		break;
+	case GameScene::Lobby:
+		backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
+		break;
+	case GameScene::Level1:
+		backgroundPath = "../Assets/Levels/Level1/Level1Background.png";
+		break;
+	case GameScene::Level1_Boss:
+		backgroundPath = "../Assets/Levels/Level1_Boss/Level1_Boss_Background.png";
+		break;
+	case GameScene::Level2:
+		backgroundPath = "../Assets/Levels/Level2/Level2Background.png";
+		break;
+	case GameScene::Level2_Boss:
+		backgroundPath = "../Assets/Levels/Level2_Boss/Level2_Boss_Background.png";
+		break;
+	case GameScene::Level3:
+		backgroundPath = "../Assets/Levels/Level3/Level3Background.png";
+		break;
+	case GameScene::Level3_Boss:
+		backgroundPath = "../Assets/Levels/Level3_Boss/Level3_Boss_Background.png";
+		break;
+	default:
+		backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
+		break;
 	}
 
 	Texture *backgroundTexture = mRenderer->GetTexture(backgroundPath);
 	if (backgroundTexture)
 	{
 		// Main menu static image overrides scaling
-		if (mCurrentScene == GameScene::MainMenu) {
+		if (mCurrentScene == GameScene::MainMenu)
+		{
 			Vector2 position(GameConstants::WINDOW_WIDTH / 2.0f, GameConstants::WINDOW_HEIGHT / 2.0f);
 			Vector2 size(static_cast<float>(backgroundTexture->GetWidth()), static_cast<float>(backgroundTexture->GetHeight()));
 
 			mRenderer->DrawTexture(position, size, 0.0f, Vector3(1.0f, 1.0f, 1.0f),
 								   backgroundTexture, Vector4::UnitRect, Vector2::Zero);
-		} else {
-		// Align background to level size	
-		float levelPixelWidth = static_cast<float>(mLevelWidth) * static_cast<float>(GameConstants::TILE_SIZE);
-		float levelPixelHeight = static_cast<float>(mLevelHeight) * static_cast<float>(GameConstants::TILE_SIZE);
-
-		float desiredWidth = levelPixelWidth;
-		float desiredHeight = levelPixelHeight;
-
-		float texW = static_cast<float>(backgroundTexture->GetWidth());
-		float texH = static_cast<float>(backgroundTexture->GetHeight());
-
-		float scale = 1.0f;
-		if (texW > 0.0f && texH > 0.0f)
-		{
-			scale = std::max(desiredWidth / texW, desiredHeight / texH);
 		}
+		else
+		{
+			// Align background to level size
+			float levelPixelWidth = static_cast<float>(mLevelWidth) * static_cast<float>(GameConstants::TILE_SIZE);
+			float levelPixelHeight = static_cast<float>(mLevelHeight) * static_cast<float>(GameConstants::TILE_SIZE);
 
-		float backgroundWidth = texW * scale;
-		float backgroundHeight = texH * scale;
+			float desiredWidth = levelPixelWidth;
+			float desiredHeight = levelPixelHeight;
 
-		Vector2 position(levelPixelWidth / 2.0f, levelPixelHeight / 2.0f);
-		Vector2 size(backgroundWidth, backgroundHeight);
+			float texW = static_cast<float>(backgroundTexture->GetWidth());
+			float texH = static_cast<float>(backgroundTexture->GetHeight());
 
-		mRenderer->DrawTexture(position, size, 0.0f, Vector3(1.0f, 1.0f, 1.0f),
-							   backgroundTexture, Vector4::UnitRect, mCameraPos);
+			float scale = 1.0f;
+			if (texW > 0.0f && texH > 0.0f)
+			{
+				scale = std::max(desiredWidth / texW, desiredHeight / texH);
+			}
+
+			float backgroundWidth = texW * scale;
+			float backgroundHeight = texH * scale;
+
+			Vector2 position(levelPixelWidth / 2.0f, levelPixelHeight / 2.0f);
+			Vector2 size(backgroundWidth, backgroundHeight);
+
+			mRenderer->DrawTexture(position, size, 0.0f, Vector3(1.0f, 1.0f, 1.0f),
+								   backgroundTexture, Vector4::UnitRect, mCameraPos);
 		}
 	}
 
@@ -921,21 +1026,21 @@ void Game::GenerateOutput()
 		{
 			// Call debug draw for actor
 			auto actor = drawable->GetOwner();
-			
+
 			// Check if actor is an Enemy and call its debug draw
-			auto enemy = dynamic_cast<Enemy*>(actor);
+			auto enemy = dynamic_cast<Enemy *>(actor);
 			if (enemy)
 			{
 				enemy->OnDebugDraw(mRenderer);
 			}
-			
+
 			// Check if actor is a Boss and call its debug draw
-			auto boss = dynamic_cast<Boss*>(actor);
+			auto boss = dynamic_cast<Boss *>(actor);
 			if (boss)
 			{
 				boss->OnDebugDraw(mRenderer);
 			}
-			
+
 			// Call debug draw for actor components
 			for (auto comp : actor->GetComponents())
 			{
@@ -976,17 +1081,18 @@ void Game::Shutdown()
 	}
 
 	// Delete UI screens
-    for (auto ui : mUIStack) {
-        delete ui;
-    }
-    mUIStack.clear();
+	for (auto ui : mUIStack)
+	{
+		delete ui;
+	}
+	mUIStack.clear();
 
 	mRenderer->Shutdown();
 	delete mRenderer;
 	mRenderer = nullptr;
 
 	delete mAudio;
-    mAudio = nullptr;
+	mAudio = nullptr;
 
 	SDL_DestroyWindow(mWindow);
 	SDL_Quit();
@@ -1009,7 +1115,7 @@ Vector2 Game::GetMouseWorldPosition()
 	return worldPos;
 }
 
-StompActor* Game::GetStompActor()
+StompActor *Game::GetStompActor()
 {
 	StompActor *stomp = nullptr;
 	for (auto actor : mStompActors)
@@ -1021,11 +1127,11 @@ StompActor* Game::GetStompActor()
 		stomp = new StompActor(this);
 		mStompActors.push_back(stomp);
 	}
-	
+
 	return stomp;
 }
 
-FurBallActor* Game::GetFurBallActor()
+FurBallActor *Game::GetFurBallActor()
 {
 	FurBallActor *furball = nullptr;
 	for (auto actor : mFurBallActors)
@@ -1037,30 +1143,30 @@ FurBallActor* Game::GetFurBallActor()
 		furball = new FurBallActor(this);
 		mFurBallActors.push_back(furball);
 	}
-	
+
 	return furball;
 }
 
-void Game::RegisterEnemy(Enemy* enemy)
+void Game::RegisterEnemy(Enemy *enemy)
 {
 	if (enemy)
 		mEnemies.push_back(enemy);
 }
 
-void Game::RegisterBoss(Boss* boss)
+void Game::RegisterBoss(Boss *boss)
 {
 	if (boss)
 		mBosses.push_back(boss);
 }
 
-void Game::UnregisterEnemy(Enemy* enemy)
+void Game::UnregisterEnemy(Enemy *enemy)
 {
 	auto iter = std::find(mEnemies.begin(), mEnemies.end(), enemy);
 	if (iter != mEnemies.end())
 		mEnemies.erase(iter);
 }
 
-void Game::UnregisterBoss(Boss* boss)
+void Game::UnregisterBoss(Boss *boss)
 {
 	auto iter = std::find(mBosses.begin(), mBosses.end(), boss);
 	if (iter != mBosses.end())
