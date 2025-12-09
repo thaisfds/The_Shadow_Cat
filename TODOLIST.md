@@ -16,12 +16,12 @@
         - [ ] Test attack animation
         - [ ] Test cooldown
         - [ ] Player death
-    - [ ] Flexiblility for bosses and spawning animation (skills vs state machine)(complex)
+    - [x] Flexiblility for bosses and spawning animation (skills vs state machine)(complex)
     - [x] (maybe) Detection radius smaller than give-up-from-persuit radius
     - [x] (maybe) Waits for a while before turning on patrol
     - [x] (maybe) Memory of last seen player position
     - [x] (maybe) Return to original patrol area
-- [ ] [Juan] Player basic combat 
+- [ ] [Filipe] Player basic combat 
     - [ ] basic
     - [ ] charged
     - [ ] special
@@ -34,8 +34,9 @@
     - [ ] Castle
 - [ ] [Filipe] Implement collision and physics system
 - [ ] [Filipe] Implement player abilities and upgrades
-- [ ] [_____] Implement boss
-- [ ] [_____] Implement spawn system and wave balancing
+- [ ] [Juan] Implement boss
+- [ ] [Juan] Implement spawn system
+- [ ] [_____] Implement wave balancing
 - [ ] [Filipe] Implement health and roguelike run system
 - [x] [Thaís] Player basic sprit and animations
 
