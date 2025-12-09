@@ -76,9 +76,6 @@ Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, Enemy
     Collider *collider = new AABBCollider(48, 32);
     mColliderComponent = new ColliderComponent(this, 0, 16, collider, GetBaseEnemyFilter());
     
-    // Disable gravity for ground-based patrol enemy (moves horizontally only)
-    mRigidBodyComponent->SetApplyGravity(false);
-
     // Set enemy health (lower than player's 10)
     hp = 30;
 
