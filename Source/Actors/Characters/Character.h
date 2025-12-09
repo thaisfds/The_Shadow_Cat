@@ -22,6 +22,8 @@ public:
 
     bool GetMovementLock() const { return mIsMovementLocked; }
     void SetMovementLock(bool isLocked);
+    
+    bool IsDead() const { return mIsDead; }
 
     void SetSpeedMultiplier(float multiplier);
 

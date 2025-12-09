@@ -5,6 +5,7 @@
 #include <vector>
 #include "Actors/Actor.h"
 #include "Actors/DebugActor.h"
+#include "Actors/Characters/Boss.h"
 #include "Renderer/Renderer.h"
 #include "AudioSystem.h"
 #include "Components/Skills/FurBall.h"
@@ -15,8 +16,11 @@ enum class GameScene
 	MainMenu,
 	Lobby,
 	Level1,
+	Level1_Boss,
 	Level2,
-	Level3
+	Level2_Boss,
+	Level3,
+	Level3_Boss
 };
 
 class Game
@@ -46,13 +50,13 @@ public:
 	void SetScene(GameScene scene);
 	void UnloadScene();
 
-    // Pause Handling
-    void PauseGame();
-    void ResumeGame();
-    void ResetGame();
+	// Pause Handling
+	void PauseGame();
+	void ResumeGame();
+	void ResetGame();
 
-    void SetGameOver(bool isOver) { mIsGameOver = isOver; }
-    void SetGameWon(bool isWon) { mIsGameWon = isWon; }
+	void SetGameOver(bool isOver) { mIsGameOver = isOver; }
+	void SetGameWon(bool isWon) { mIsGameWon = isWon; }
 
 	// Renderer
 	class Renderer *GetRenderer() { return mRenderer; }
@@ -76,7 +80,16 @@ public:
 
 	// Game specific
 	const class ShadowCat *GetPlayer() { return mShadowCat; }
+	class Boss *GetCurrentBoss() const { return mCurrentBoss; }
 	class HUD *GetHUD() { return mHUD; }
+
+	// Enemy and Boss tracking
+	void RegisterEnemy(class Enemy *enemy);
+	void RegisterBoss(class Boss *boss);
+	void UnregisterEnemy(class Enemy *enemy);
+	void UnregisterBoss(class Boss *boss);
+	int CountAliveEnemies() const;
+	int CountAliveBosses() const;
 
 	// Level dimensions
 	int GetLevelWidth() const { return mLevelWidth; }
@@ -139,16 +152,17 @@ private:
 	bool mIsFullscreen;
 	GameScene mCurrentScene;
 
-    bool mIsPaused;
+	bool mIsPaused;
 
-    // End condition
-    bool mIsGameOver;
-    bool mIsGameWon;
+	// End condition
+	bool mIsGameOver;
+	bool mIsGameWon;
 
 	// Game-specific
 	class ShadowCat *mShadowCat;
 	class HUD *mHUD;
 	class TutorialHUD *mTutorialHUD;
+	class LevelPortal *mLevelPortal;
 	int **mLevelData;
 
 	// To use for colliders not attached to a collider component
@@ -160,7 +174,22 @@ private:
 	// Global particle system
 	class Actor *mAttackTrailActor;
 
+	// Enemy and Boss tracking
+	std::vector<class Enemy *> mEnemies;
+	std::vector<class Boss *> mBosses;
+	class Boss *mCurrentBoss;  // Pointer to active boss in current room (null when no boss)
+
+	// Boss spawn data (stored until enemies are defeated)
+	struct BossSpawnData
+	{
+		Vector2 arenaCenter;
+		Boss::BossType bossType;
+		bool playSpawnAnimation;
+	};
+	std::vector<BossSpawnData> mPendingBossSpawns;
+
 	// Debug
 	bool mIsDebugging;
+	bool mIsGodMode;
 	DebugActor *mDebugActor;
 };

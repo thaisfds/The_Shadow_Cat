@@ -1,0 +1,13 @@
+{
+  "image": "../Assets/Sprites/WhiteBoss/WhiteBoss.png",
+  "spriteSheetData": "../Assets/Sprites/WhiteBoss/WhiteBoss.json",
+  "animations": 
+  {
+    "Idle": [0],
+    "Walk": [1, 2],
+    "Attack": [3, 4],
+    "Hit": [0, 3],
+    "Death": [4, 3, 2, 1, 0]
+  },
+  "base": "Idle"
+}
