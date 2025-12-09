@@ -23,6 +23,8 @@ public:
     bool GetMovementLock() const { return mIsMovementLocked; }
     void SetMovementLock(bool isLocked);
 
+    void SetSpeedMultiplier(float multiplier);
+
     static CollisionFilter GetBasePlayerFilter()
     {
         CollisionFilter filter;
@@ -57,6 +59,7 @@ protected:
     class ColliderComponent *mColliderComponent;
 
     float mForwardSpeed;
+    float mSpeedMultiplier = 1.0f;
 
     bool mIsMoving;
 

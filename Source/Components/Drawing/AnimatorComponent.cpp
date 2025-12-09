@@ -11,7 +11,7 @@ const std::string ANIMATION_DATA_PATH = "../Assets/Data/Animation/";
 AnimatorComponent::AnimatorComponent(class Actor *owner, const std::string &animationName,
 									 int width, int height, int drawOrder)
 	: DrawComponent(owner, drawOrder), mIsPaused(false), mWidth(width), mHeight(height), mTextureFactor(1.0f), mCurrentAnimation(nullptr), mLoopAnimName(""), mRemainingLoops(-1)
-	, mAnimSpeed(1.0f), mFrameTimer(0.0f), mCurrentFrameIndex(0)
+	, mAnimSpeed(1.0f), mFrameTimer(0.0f), mCurrentFrameIndex(0), mAnimOffset(Vector2::Zero)
 {
 	bool loaded = LoadAnimationData(animationName);
 	if (!loaded)
@@ -66,7 +66,8 @@ bool AnimatorComponent::LoadAnimationData(const std::string &animationName)
 		{
 			int start = frameIndices["start"].get<int>();
 			int end = frameIndices["end"].get<int>();
-			for (int i = start; i <= end; ++i) indices.push_back(i);
+			if (start <= end) for (int i = start; i <= end; ++i) indices.push_back(i);
+			else for (int i = start; i >= end; --i) indices.push_back(i);
 		}
 		AddAnimation(animName, indices);
 	}
@@ -165,7 +166,7 @@ void AnimatorComponent::Draw(Renderer *renderer)
 		bool flipV = (mOwner->GetScale().y < 0.0f);
 
 		renderer->DrawTexture(
-			mOwner->GetPosition(),
+			mOwner->GetPosition() + mAnimOffset,
 			Vector2(mWidth, mHeight),
 			mOwner->GetRotation(),
 			Vector3(1.0f, 1.0f, 1.0f),

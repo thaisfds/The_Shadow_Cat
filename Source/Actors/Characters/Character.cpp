@@ -68,3 +68,9 @@ void Character::SetMovementLock(bool isLocked)
     mRigidBodyComponent->SetVelocity(Vector2(0, 0));
     mIsMovementLocked = isLocked;
 }
+
+void Character::SetSpeedMultiplier(float multiplier)
+{
+    mForwardSpeed = mForwardSpeed / mSpeedMultiplier * multiplier;
+    mSpeedMultiplier = multiplier;
+}

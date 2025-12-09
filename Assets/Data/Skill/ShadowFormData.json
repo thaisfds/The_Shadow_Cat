@@ -1,0 +1,32 @@
+{
+	"id": "shadowFormSkill",
+	"name": "Shadow Form",
+	"description": "Transform into a shadow, gaining speed and becoming intangible for a short duration.",
+	"cooldown": 4.0,
+	"range": 0.0,
+	"duration": 6.0,
+	"effects":
+	[
+		{
+			"type": "speedMultiplier",
+			"value": 1.5
+		}
+	],
+	"upgrades":
+	[
+		{
+			"type": "duration",
+			"value": 0.5
+		},
+		{
+			"type": "cooldown",
+			"value": -0.5,
+			"max": 4
+		},
+		{
+			"type": "speedMultiplier",
+			"value": 0.1,
+			"max": 5
+		}
+	]
+}

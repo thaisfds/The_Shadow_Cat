@@ -45,6 +45,8 @@ public:
     float GetAnimationDuration(const std::string &name);
     float GetCurrentAnimationDuration() const;
 
+    Vector2 SetAnimOffset(const Vector2 &offset) { mAnimOffset = offset; return mAnimOffset; }
+
 private:
     void SetAnimation(const std::string &name, bool reset = true);
 
@@ -71,6 +73,8 @@ private:
 
     // How fast should the animation run
     float mAnimSpeed = 1.0f;
+
+    Vector2 mAnimOffset;
 
     // Whether or not the animation is paused (defaults to false)
     bool mIsPaused = false;
