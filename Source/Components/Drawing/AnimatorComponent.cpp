@@ -6,12 +6,12 @@
 #include <fstream>
 #include <map>
 
-const std::string ANIMATION_DATA_PATH = "../Assets/AnimationData/";
+const std::string ANIMATION_DATA_PATH = "../Assets/Data/Animation/";
 
 AnimatorComponent::AnimatorComponent(class Actor *owner, const std::string &animationName,
 									 int width, int height, int drawOrder)
-	: DrawComponent(owner, drawOrder), mIsPaused(false), mWidth(width), mHeight(height), mTextureFactor(1.0f), mCurrentAnimation(nullptr), mLoopAnimName(""), mRemainingLoops(-1)
-	, mAnimSpeed(1.0f), mFrameTimer(0.0f), mCurrentFrameIndex(0)
+	: DrawComponent(owner, drawOrder), mIsPaused(false), mSize(width, height), mTextureFactor(1.0f), mCurrentAnimation(nullptr), mLoopAnimName(""), mRemainingLoops(-1)
+	, mAnimSpeed(1.0f), mFrameTimer(0.0f), mCurrentFrameIndex(0), mAnimOffset(Vector2::Zero)
 {
 	bool loaded = LoadAnimationData(animationName);
 	if (!loaded)
@@ -66,7 +66,8 @@ bool AnimatorComponent::LoadAnimationData(const std::string &animationName)
 		{
 			int start = frameIndices["start"].get<int>();
 			int end = frameIndices["end"].get<int>();
-			for (int i = start; i <= end; ++i) indices.push_back(i);
+			if (start <= end) for (int i = start; i <= end; ++i) indices.push_back(i);
+			else for (int i = start; i >= end; --i) indices.push_back(i);
 		}
 		AddAnimation(animName, indices);
 	}
@@ -165,8 +166,8 @@ void AnimatorComponent::Draw(Renderer *renderer)
 		bool flipV = (mOwner->GetScale().y < 0.0f);
 
 		renderer->DrawTexture(
-			mOwner->GetPosition(),
-			Vector2(mWidth, mHeight),
+			mOwner->GetPosition() + mAnimOffset,
+			mSize,
 			mOwner->GetRotation(),
 			Vector3(1.0f, 1.0f, 1.0f),
 			mSpriteTexture,
@@ -201,15 +202,13 @@ void AnimatorComponent::LoopAnimation(const std::string &name)
 {
 	if (mLoopAnimName == name) return;
 
-	SetAnimation(name, false);
-	mLoopAnimName = name;
+	if (SetAnimation(name)) mLoopAnimName = name;
 }
 
 
 void AnimatorComponent::PlayAnimation(const std::string &name, int loops, bool reset)
 {
-	SetAnimation(name, reset);
-	mRemainingLoops = loops;
+	if (SetAnimation(name, reset)) mRemainingLoops = loops;
 }
 
 void AnimatorComponent::ResetAnimation()
@@ -218,15 +217,21 @@ void AnimatorComponent::ResetAnimation()
 	mFrameTimer = 0.0f;
 }
 
-void AnimatorComponent::SetAnimation(const std::string &name, bool reset)
+bool AnimatorComponent::SetAnimation(const std::string &name, bool reset)
 {
 	auto animIter = mAnimations.find(name);
-	if (animIter == mAnimations.end()) return SDL_Log("Animation %s not found!", name.c_str());
-	if (!reset && mCurrentAnimation == &animIter->second) return;
+	if (animIter == mAnimations.end())
+	{
+		SDL_Log("AnimatorComponent: Animation '%s' not found!", name.c_str());
+		return false;
+	}
+	if (!reset && mCurrentAnimation == &animIter->second) return true;
 
 	mCurrentAnimation = &animIter->second;
 	mCurrentFrameIndex = 0;
 	mFrameTimer = 0.0f;
+
+	return true;
 }
 
 void AnimatorComponent::AddAnimation(const std::string &name, const std::vector<int> &spriteNums)

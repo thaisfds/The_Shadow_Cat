@@ -270,6 +270,9 @@ void Game::SetScene(GameScene nextScene)
 
 void Game::InitializeActors()
 {
+	mCollisionQueryActor = new Actor(this);
+	new ColliderComponent(mCollisionQueryActor, 0, 0, nullptr, CollisionFilter());
+
 	// Initialize debug actor
 	mDebugActor = new DebugActor(this);
 
@@ -1059,6 +1062,7 @@ void Game::GenerateOutput()
 	{
 		drawable->Draw(mRenderer);
 
+		auto actor = drawable->GetOwner();
 		if (mIsDebugging)
 		{
 			// Call debug draw for actor
@@ -1084,6 +1088,9 @@ void Game::GenerateOutput()
 				comp->DebugDraw(mRenderer);
 			}
 		}
+
+		for (auto comp : actor->GetComponents())
+			comp->ComponentDraw(mRenderer);
 	}
 
 	// Draw UI (TODO: unify in a single draw function and remove mDrawables, add to renderer)

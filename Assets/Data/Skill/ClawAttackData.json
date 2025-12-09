@@ -1,0 +1,28 @@
+{
+	"id": "clawAttackSkill",
+	"name": "Claw Attack",
+	"description": "Perform a ferocious pounce, slashing with your claws.",
+	"cooldown": 3.0,
+	"range": 70,
+	"areaOfEffect":
+	{
+		"type": "cone",
+		"length": "@range",
+		"angle": 60
+	},
+	"effects":
+	[
+		{
+			"type": "damage",
+			"value": 40
+		},
+		{
+			"type": "forwardSpeed",
+			"value": 600
+		},
+		{
+			"type": "backwardDistancePercentage",
+			"value": 0.7
+		}
+	]
+}

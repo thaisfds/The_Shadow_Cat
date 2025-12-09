@@ -20,7 +20,11 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     mRigidBodyComponent = new RigidBodyComponent(this);
     
     Collider *collider = new AABBCollider(48, 32);
-    mColliderComponent = new ColliderComponent(this, 0, 16, collider, GetBasePlayerFilter());
+    mColliderComponent = new ColliderComponent(this, Vector2(0, 16), collider);
+    ResetCollisionFilter();
+
+    mSkillFilter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::PlayerSkills});
+    mSkillFilter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Enemy});
     
     mSkillInputHandler = new SkillInputHandler(this);
     mRigidBodyComponent->SetApplyGravity(false);
@@ -32,7 +36,10 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     
     mAnimatorComponent->LoopAnimation("Idle");
 
-    hp = 10;
+    hp = 100;
+
+    if (mGame->GetHUD())
+        mGame->GetHUD()->UpdateMaxHealth(hp, true);
     maxHp = hp;
 }
 
@@ -142,4 +149,36 @@ void ShadowCat::TakeDamage(int damage)
 void ShadowCat::Kill()
 {
     mGame->SetGameOver(true);
+}
+
+std::vector<UpgradeInfo> ShadowCat::GetRandomUpgrades()
+{
+    std::vector<UpgradeInfo> allUpgrades;
+
+    auto assignedSkills = mSkillInputHandler->GetAssignedSkills();
+    for (auto skill : assignedSkills)
+    {
+        auto skillUpgrades = skill->GetAvailableUpgrades();
+        allUpgrades.insert(allUpgrades.end(), skillUpgrades.begin(), skillUpgrades.end());
+    }
+
+    // Shuffle the upgrades with time
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    std::random_shuffle(allUpgrades.begin(), allUpgrades.end());
+
+    std::vector<UpgradeInfo> selectedUpgrades;
+    int upgradesToSelect = std::min(GameConstants::UPGRADE_COUNT, static_cast<int>(allUpgrades.size()));
+
+    for (int i = 0; i < upgradesToSelect; ++i) selectedUpgrades.push_back(allUpgrades[i]);
+
+    return selectedUpgrades;
+}
+
+void ShadowCat::ResetCollisionFilter() const
+{
+    CollisionFilter filter;
+    filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::Player});
+    filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Environment, CollisionGroup::Enemy, CollisionGroup::EnemySkills});
+
+    mColliderComponent->SetFilter(filter);
 }

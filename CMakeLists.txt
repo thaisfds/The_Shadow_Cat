@@ -113,6 +113,15 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/FurBall.h
         Source/Debug/EnemyDebugDrawer.cpp
         Source/Debug/EnemyDebugDrawer.h
+        Source/DelayedActionSystem.cpp
+        Source/DelayedActionSystem.h
+        Source/SkillJsonParser.cpp
+        Source/SkillJsonParser.h
+        Source/Components/Skills/UpgradeInfo.h
+        Source/Components/Skills/Bomb.cpp
+        Source/Components/Skills/Bomb.h
+        Source/Components/Skills/ShadowForm.cpp
+        Source/Components/Skills/ShadowForm.h
         Source/Debug/BossDebugDrawer.cpp
         Source/Debug/BossDebugDrawer.h
 )

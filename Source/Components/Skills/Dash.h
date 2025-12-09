@@ -10,16 +10,11 @@ public:
 	
 	void Update(float deltaTime) override;
 
-	bool CanUse() const override { return !mIsDashing && SkillBase::CanUse(); }
-	
-	void Execute(Vector2 targetPosition) override;
-	void EndDash();
+	void StartSkill(Vector2 targetPosition) override;
+	void EndSkill() override;
 	
 private:
-	bool mIsDashing;
-	float mDashTimer;
-	Vector2 mDashDirection;
-	
-	float mDashDuration;
 	float mDashSpeed;
+
+	nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;
 };

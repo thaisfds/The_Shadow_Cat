@@ -194,6 +194,52 @@ void Renderer::DrawGeometry(const Vector2 &position, const Vector2 &size, float 
     Draw(mode, model, cameraPos, vertexArray, color);
 }
 
+void Renderer::DrawCircle(const Vector2 &center, float radius, const Vector3 &color,
+                            const Vector2 &cameraPos)
+{
+    int numVerts = 64;
+	float internalAngle = Math::ToRadians(360 / (float)numVerts);
+	float verts[numVerts * 4]; // 4 floats per vertex: x, y, u, v
+	unsigned int indices[numVerts];
+	for (int i = 0; i < numVerts; i++)
+	{
+		verts[i * 4 + 0] = radius * cos(internalAngle * i);  // x
+		verts[i * 4 + 1] = radius * sin(internalAngle * i);  // y
+		verts[i * 4 + 2] = 0.0f;  // u (unused)
+		verts[i * 4 + 3] = 0.0f;  // v (unused)
+	}
+	for (int i = 0; i < numVerts; i++) indices[i] = i;
+
+	VertexArray circleVerts(verts, numVerts, indices, numVerts);
+    Matrix4 model = Matrix4::CreateTranslation(Vector3(center.x, center.y, 0.0f));
+    
+    Draw(RendererMode::LINES, model, cameraPos, &circleVerts, color);
+}
+
+void Renderer::DrawPolygon(const std::vector<Vector2> &points, const Vector3 &color, const Vector2 &offset,
+                           const Vector2 &cameraPos)
+{
+    size_t numVerts = points.size();
+    if (numVerts < 2) return;
+
+    float verts[numVerts * 4]; // 4 floats per vertex: x, y, u, v
+    unsigned int indices[numVerts];
+
+    for (size_t i = 0; i < numVerts; i++)
+    {
+        verts[i * 4 + 0] = points[i].x + offset.x;  // x
+        verts[i * 4 + 1] = points[i].y + offset.y;  // y
+        verts[i * 4 + 2] = 0.0f;                     // u (unused)
+        verts[i * 4 + 3] = 0.0f;                     // v (unused)
+        indices[i] = static_cast<unsigned int>(i);
+    }
+
+    VertexArray polygonVerts(verts, static_cast<unsigned int>(numVerts), indices, static_cast<unsigned int>(numVerts));
+    Matrix4 model = Matrix4::Identity;
+
+    Draw(RendererMode::LINES, model, cameraPos, &polygonVerts, color);
+}
+
 void Renderer::DrawAllUI() {
     mSpriteVerts->SetActive();
 

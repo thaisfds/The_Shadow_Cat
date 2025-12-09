@@ -101,6 +101,7 @@ public:
 	bool IsDebugging() { return mIsDebugging; }
 	DebugActor *GetDebugActor() { return mDebugActor; }
 
+	Actor *GetCollisionQueryActor() { return mCollisionQueryActor; }
 	Actor *GetAttackTrailActor() { return mAttackTrailActor; }
 	StompActor *GetStompActor();
 	FurBallActor *GetFurBallActor();
@@ -163,6 +164,9 @@ private:
 	class TutorialHUD *mTutorialHUD;
 	class LevelPortal *mLevelPortal;
 	int **mLevelData;
+
+	// To use for colliders not attached to a collider component
+	class Actor *mCollisionQueryActor;
 
 	class std::vector<StompActor *> mStompActors;
 	class std::vector<FurBallActor *> mFurBallActors;

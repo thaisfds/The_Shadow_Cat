@@ -8,71 +8,64 @@
 Dash::Dash(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
 {
-	mName = "Dash";
-	mDescription = "Quickly dash in a direction to evade attacks.";
-	mCooldown = 4.0f;
-	mCurrentCooldown = 0.0f;
-	mIsDashing = false;
+	LoadSkillDataFromJSON("DashData");
 
-	mDashDuration = 0.5f;
-	mDashSpeed = 400.0f;
+	float dashDuration = mRange / mDashSpeed;
+	float dashEndDelay = dashDuration - mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("DashEnd");
+	AddDelayedAction(dashEndDelay, [this]() { 
+		mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("DashEnd", false); 
+	});
+	AddDelayedAction(dashDuration, [this]() { EndSkill(); });
+}
 
+nlohmann::json Dash::LoadSkillDataFromJSON(const std::string& fileName)
+{
+	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
+
+	mDashSpeed = SkillJsonParser::GetFloatEffectValue(data, "speed");
+
+	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "range", &mRange));
+	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "speed", &mDashSpeed));
+	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
+
+	return data;
 }
 
 void Dash::Update(float deltaTime)
 {
 	SkillBase::Update(deltaTime);
 
-	if (!mIsDashing) return;
+	if (!mIsUsing) return;
 	
-	mDashTimer += deltaTime;
-	
-	if (mDashDuration <= mDashTimer + mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("DashEnd"))
-		mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("DashEnd", false);
-
-	Vector2 dashVelocity = mDashDirection * mDashSpeed;
+	Vector2 dashVelocity = mTargetVector * mDashSpeed;
 	mCharacter->GetComponent<RigidBodyComponent>()->SetVelocity(dashVelocity);
-
-	if (mDashTimer >= mDashDuration) EndDash();
 }
 
-void Dash::Execute(Vector2 targetPosition)
+void Dash::StartSkill(Vector2 targetPosition)
 {
+	SkillBase::StartSkill(targetPosition);
+	mTargetVector -= mCharacter->GetPosition();
+	mTargetVector.Normalize();
+
 	mCharacter->SetAnimationLock(true);
 	AnimatorComponent* animator = mCharacter->GetComponent<AnimatorComponent>();
 	animator->LoopAnimation("DashMid");
 	animator->PlayAnimationOnce("DashBegin");	
-	SDL_Log("Dash executed");
-
-	Vector2 mouseWorldPos = mCharacter->GetGame()->GetMouseWorldPosition();
-	mDashDirection = (mouseWorldPos - mCharacter->GetPosition());
-	mDashDirection.Normalize();
-
-	if (mDashDirection.x > 0.0f)
-        mCharacter->SetScale(Vector2(1.0f, mCharacter->GetScale().y));
-    else if (mDashDirection.x < 0.0f)
-        mCharacter->SetScale(Vector2(-1.0f, mCharacter->GetScale().y));
 
 	mCharacter->SetMovementLock(true);
-	mIsDashing = true;
-	mDashTimer = 0.0f;
 
 	CollisionFilter filter = mCharacter->GetComponent<ColliderComponent>()->GetFilter();
 	filter.collidesWith = CollisionFilter::RemoveGroups(filter.collidesWith,
 		{CollisionGroup::Player, CollisionGroup::Enemy, CollisionGroup::PlayerSkills, CollisionGroup::EnemySkills});
 	mCharacter->GetComponent<ColliderComponent>()->SetFilter(filter);
-
-	StartCooldown();
 }
 
-void Dash::EndDash()
+void Dash::EndSkill()
 {
+	SkillBase::EndSkill();
+
 	mCharacter->SetAnimationLock(false);
 	mCharacter->SetMovementLock(false);
 
-	mCharacter->GetComponent<ColliderComponent>()->SetFilter(
-		Character::GetBasePlayerFilter()
-	);
-
-	mIsDashing = false;
+	mCharacter->ResetCollisionFilter();
 }

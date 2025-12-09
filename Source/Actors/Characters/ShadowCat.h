@@ -5,6 +5,7 @@
 #pragma once
 #include "Character.h"
 #include "../../UI/Screens/HUD.h"
+#include <vector>
 
 class ShadowCat : public Character
 {
@@ -18,6 +19,11 @@ public:
     void TakeDamage(int damage) override;
     void Kill() override;
 
+    void ResetCollisionFilter() const override;
+
+    std::vector<UpgradeInfo> GetRandomUpgrades();
+
 private:
     class SkillInputHandler *mSkillInputHandler;
+    int mUpgradePoints;
 };
