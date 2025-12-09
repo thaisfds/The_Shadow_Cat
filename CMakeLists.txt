@@ -114,6 +114,8 @@ add_executable(${PROJECT_NAME}
         Source/SkillJsonParser.cpp
         Source/SkillJsonParser.h
         Source/Components/Skills/UpgradeInfo.h
+        Source/Components/Skills/Bomb.cpp
+        Source/Components/Skills/Bomb.h
         Source/Components/Skills/ShadowForm.cpp
         Source/Components/Skills/ShadowForm.h
 )
