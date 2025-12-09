@@ -48,7 +48,7 @@ public:
     Vector2 SetAnimOffset(const Vector2 &offset) { mAnimOffset = offset; return mAnimOffset; }
 
 private:
-    void SetAnimation(const std::string &name, bool reset = true);
+    bool SetAnimation(const std::string &name, bool reset = true);
 
     bool LoadAnimationData(const std::string &animationName);
     bool LoadSpriteSheetData(const std::string &dataPath);

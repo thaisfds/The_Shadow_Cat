@@ -202,15 +202,13 @@ void AnimatorComponent::LoopAnimation(const std::string &name)
 {
 	if (mLoopAnimName == name) return;
 
-	SetAnimation(name, false);
-	mLoopAnimName = name;
+	if (SetAnimation(name)) mLoopAnimName = name;
 }
 
 
 void AnimatorComponent::PlayAnimation(const std::string &name, int loops, bool reset)
 {
-	SetAnimation(name, reset);
-	mRemainingLoops = loops;
+	if (SetAnimation(name, reset)) mRemainingLoops = loops;
 }
 
 void AnimatorComponent::ResetAnimation()
@@ -219,15 +217,21 @@ void AnimatorComponent::ResetAnimation()
 	mFrameTimer = 0.0f;
 }
 
-void AnimatorComponent::SetAnimation(const std::string &name, bool reset)
+bool AnimatorComponent::SetAnimation(const std::string &name, bool reset)
 {
 	auto animIter = mAnimations.find(name);
-	if (animIter == mAnimations.end()) return SDL_Log("Animation %s not found!", name.c_str());
-	if (!reset && mCurrentAnimation == &animIter->second) return;
+	if (animIter == mAnimations.end())
+	{
+		SDL_Log("AnimatorComponent: Animation '%s' not found!", name.c_str());
+		return false;
+	}
+	if (!reset && mCurrentAnimation == &animIter->second) return true;
 
 	mCurrentAnimation = &animIter->second;
 	mCurrentFrameIndex = 0;
 	mFrameTimer = 0.0f;
+
+	return true;
 }
 
 void AnimatorComponent::AddAnimation(const std::string &name, const std::vector<int> &spriteNums)
