@@ -45,6 +45,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Block.h
         Source/Actors/Spawner.cpp
         Source/Actors/Spawner.h
+        Source/Actors/LevelPortal.cpp
+        Source/Actors/LevelPortal.h
         Source/Components/Drawing/AnimatorComponent.cpp
         Source/Components/Drawing/AnimatorComponent.h
         Source/Components/Drawing/RectComponent.cpp
@@ -85,6 +87,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/SkillInputHandler.h
         Source/Actors/Characters/Enemy.cpp
         Source/Actors/Characters/Enemy.h
+        Source/Actors/Characters/Boss.cpp
+        Source/Actors/Characters/Boss.h
         Source/Actors/Characters/Character.cpp
         Source/Actors/Characters/Character.h
         Source/Actors/Characters/Dummy.cpp
@@ -109,6 +113,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/FurBall.h
         Source/Debug/EnemyDebugDrawer.cpp
         Source/Debug/EnemyDebugDrawer.h
+        Source/Debug/BossDebugDrawer.cpp
+        Source/Debug/BossDebugDrawer.h
 )
 
 configure_local_linking(${PROJECT_NAME})

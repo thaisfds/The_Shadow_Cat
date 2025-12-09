@@ -7,7 +7,8 @@
 class BasicAttack : public SkillBase
 {
 public:
-    BasicAttack(Actor* owner, CollisionFilter filter, int damage, int updateOrder = 100);
+    BasicAttack(Actor* owner, CollisionFilter filter, int damage, int updateOrder = 100,
+                float coneRadius = 50.0f, float coneAngleDegrees = 45.0f);
     
     void Update(float deltaTime) override;
 
