@@ -12,6 +12,8 @@
 #include "../../Components/Skills/SkillInputHandler.h"
 #include "Character.h"
 #include <cmath>
+#include <random>
+#include <algorithm>
 
 ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
     : Character(game, forwardSpeed)
@@ -160,8 +162,9 @@ std::vector<UpgradeInfo> ShadowCat::GetRandomUpgrades()
     }
 
     // Shuffle the upgrades with time
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
-    std::random_shuffle(allUpgrades.begin(), allUpgrades.end());
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(allUpgrades.begin(), allUpgrades.end(), g);
 
     std::vector<UpgradeInfo> selectedUpgrades;
     int upgradesToSelect = std::min(GameConstants::UPGRADE_COUNT, static_cast<int>(allUpgrades.size()));
