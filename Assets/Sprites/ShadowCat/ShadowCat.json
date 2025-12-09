@@ -366,6 +366,30 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
     "sourceSize": { "w": 32, "h": 32 },
     "duration": 100
+   },
+   "ShadowForm_46.aseprite": {
+    "frame": { "x": 1120, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 50
+   },
+   "ShadowForm_47.aseprite": {
+    "frame": { "x": 1152, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 50
+   },
+   "ShadowForm_48.aseprite": {
+    "frame": { "x": 1088, "y": 0, "w": 32, "h": 32 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 32 },
+    "sourceSize": { "w": 32, "h": 32 },
+    "duration": 2500
    }
  },
  "meta": {
@@ -373,7 +397,7 @@
   "version": "1.x-dev",
   "image": "ShadowCat.png",
   "format": "RGBA8888",
-  "size": { "w": 1120, "h": 32 },
+  "size": { "w": 1184, "h": 32 },
   "scale": "1",
   "frameTags": [
    { "name": "Idle", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
@@ -382,7 +406,7 @@
    { "name": "Dash", "from": 12, "to": 16, "direction": "pingpong", "color": "#000000ff" },
    { "name": "ClawAttack", "from": 17, "to": 32, "direction": "forward", "color": "#000000ff" },
    { "name": "FurBall", "from": 33, "to": 38, "direction": "forward", "color": "#000000ff" },
-   { "name": "ShadowForm", "from": 39, "to": 45, "direction": "pingpong", "color": "#000000ff" }
+   { "name": "ShadowForm", "from": 39, "to": 48, "direction": "pingpong", "color": "#000000ff" }
   ],
   "layers": [
    { "name": "Layer 4", "opacity": 255, "blendMode": "normal" },
