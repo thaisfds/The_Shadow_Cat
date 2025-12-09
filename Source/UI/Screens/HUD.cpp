@@ -1,5 +1,6 @@
 #include "HUD.h"
 #include "../../Game.h"
+#include "../../GameConstants.h"
 #include "../../Actors/Characters/ShadowCat.h"
 #include <string>
 
@@ -14,6 +15,9 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
 
     InitHealthIcons();
 
+    // Cursor
+    mCursorImage = AddImage("../Assets/HUD/ShadowCat/Cursor.png", Vector2(0.0f, 0.0f), 1.0f, 0.0f, 1000);
+
     // Enemy counter top right
     AddText("Enemies Left:", Vector2(500.0f, -300.0f), 0.7f);
     mEnemiesLeftCount = AddText("0", Vector2(600.0f, -300.0f), 0.7f);
@@ -26,11 +30,22 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
 
 void HUD::Update(float deltaTime)
 {
-    // Update enemies left
+    // Update cursor pos  ------------------- //
+    Vector2 mousePos = mGame->GetMouseAbsolutePosition();
+
+    // Rotate cursor based on deviation from center
+    Vector2 center(GameConstants::WINDOW_WIDTH / 2.0f, GameConstants::WINDOW_HEIGHT / 2.0f);
+    Vector2 dir = mousePos - center;
+
+    float angle = Math::Atan2(dir.y, dir.x) + Math::PiOver2;
+    mCursorImage->SetAngle(angle);
+    mCursorImage->SetAbsolutePos(mousePos);
+
+    // Update enemies left  ------------------- //
     int enemiesLeft = mGame->CountAliveEnemies();
     mEnemiesLeftCount->SetText(std::to_string(enemiesLeft));
 
-    // Update health
+    // Update health ------------------- //
     if (!mGame->GetPlayer()) return;
 
     // If new max hp update otherwise just update health

@@ -77,6 +77,7 @@ public:
 
 	// Mouse position
 	Vector2 GetMouseWorldPosition();
+	Vector2 GetMouseAbsolutePosition();
 
 	// Game specific
 	const class ShadowCat *GetPlayer() { return mShadowCat; }
