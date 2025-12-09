@@ -40,6 +40,7 @@ ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
 
     if (mGame->GetHUD())
         mGame->GetHUD()->UpdateMaxHealth(hp, true);
+    maxHp = hp;
 }
 
 void ShadowCat::OnProcessInput(const uint8_t *state)
@@ -142,9 +143,6 @@ void ShadowCat::OnUpdate(float deltaTime)
 void ShadowCat::TakeDamage(int damage)
 {
     hp -= damage;
-
-    if (mGame->GetHUD())
-        mGame->GetHUD()->SetHealth(hp);
 
     if (hp <= 0) Kill();
 }

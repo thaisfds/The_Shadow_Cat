@@ -1,5 +1,6 @@
 #include "HUD.h"
 #include "../../Game.h"
+#include "../../Actors/Characters/ShadowCat.h"
 #include <string>
 
 HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
@@ -11,6 +12,18 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
     mHealth = mMaxHealth;
 
     InitHealthIcons();
+}
+
+void HUD::Update(float deltaTime)
+{
+    if (!mGame->GetPlayer()) return;
+
+    // If new max hp update otherwise just update health
+    if (mGame->GetPlayer()->GetMaxHP() != mMaxHealth) {
+        UpdateMaxHealth(mGame->GetPlayer()->GetMaxHP(), true);
+    }
+
+    SetHealth(mGame->GetPlayer()->GetHP());
 }
 
 void HUD::InitHealthIcons() {
