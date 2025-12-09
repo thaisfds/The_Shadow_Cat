@@ -144,6 +144,10 @@ void Game::UnloadScene()
 		delete ui;
 	}
 	mUIStack.clear();
+	if (mHUD)
+		mUIStack.push_back(mHUD);
+	if (mTutorialHUD)
+		mUIStack.push_back(mTutorialHUD);
 
 	// Reset states
 	mShadowCat = nullptr;

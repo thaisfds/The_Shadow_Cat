@@ -8,14 +8,29 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
     mMaxHealth(maxHealth),
     mHealth(maxHealth)
 {   
+    // Main health icons, top left
     mMaxHealth = std::max(2, mMaxHealth); // Ensure at least 2
     mHealth = mMaxHealth;
 
     InitHealthIcons();
+
+    // Enemy counter top right
+    AddText("Enemies Left:", Vector2(500.0f, -300.0f), 0.7f);
+    mEnemiesLeftCount = AddText("0", Vector2(600.0f, -300.0f), 0.7f);
+
+    for (auto &txt : mTexts) {
+        txt->SetTextColor(Vector3::One); // White
+        txt->SetBackgroundColor(Vector4::Zero); // Transparent
+    }
 }
 
 void HUD::Update(float deltaTime)
 {
+    // Update enemies left
+    int enemiesLeft = mGame->CountAliveEnemies();
+    mEnemiesLeftCount->SetText(std::to_string(enemiesLeft));
+
+    // Update health
     if (!mGame->GetPlayer()) return;
 
     // If new max hp update otherwise just update health
@@ -48,9 +63,9 @@ void HUD::InitHealthIcons() {
     for (int i = 0; i < mMaxHealth / 2; ++i) {
         Vector2 offset(-560.0f + i * SPACING, -300.0f);
 
-        UIImage* emptyHeart = AddImage("../Assets/HUD/LifeBar_2.png", offset, SCALE, 0.0f, 1);
-        UIImage* halfHeart = AddImage("../Assets/HUD/LifeBar_1.png", offset, SCALE, 0.0f, 2);
-        UIImage* fullHeart = AddImage("../Assets/HUD/LifeBar_0.png", offset, SCALE, 0.0f, 3);
+        UIImage* emptyHeart = AddImage("../Assets/HUD/ShadowCat/LifeBar_2.png", offset, SCALE, 0.0f, 1);
+        UIImage* halfHeart = AddImage("../Assets/HUD/ShadowCat/LifeBar_1.png", offset, SCALE, 0.0f, 2);
+        UIImage* fullHeart = AddImage("../Assets/HUD/ShadowCat/LifeBar_0.png", offset, SCALE, 0.0f, 3);
 
         mEmptyHeartIcons.push_back(emptyHeart);
         mHalfHeartIcons.push_back(halfHeart);

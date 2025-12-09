@@ -15,6 +15,7 @@ public:
     void UpdateMaxHealth(int maxHealth, bool fill = false);
 
 private:
+    // Current health values
     int mHealth;
     int mMaxHealth;
 
@@ -25,4 +26,8 @@ private:
     std::vector<UIImage*> mFullHeartIcons;
     std::vector<UIImage*> mHalfHeartIcons;
     std::vector<UIImage*> mEmptyHeartIcons;
+
+    
+    // Enemies left
+    UIText* mEnemiesLeftCount;
 };
