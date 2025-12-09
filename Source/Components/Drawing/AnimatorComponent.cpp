@@ -10,7 +10,7 @@ const std::string ANIMATION_DATA_PATH = "../Assets/Data/Animation/";
 
 AnimatorComponent::AnimatorComponent(class Actor *owner, const std::string &animationName,
 									 int width, int height, int drawOrder)
-	: DrawComponent(owner, drawOrder), mIsPaused(false), mWidth(width), mHeight(height), mTextureFactor(1.0f), mCurrentAnimation(nullptr), mLoopAnimName(""), mRemainingLoops(-1)
+	: DrawComponent(owner, drawOrder), mIsPaused(false), mSize(width, height), mTextureFactor(1.0f), mCurrentAnimation(nullptr), mLoopAnimName(""), mRemainingLoops(-1)
 	, mAnimSpeed(1.0f), mFrameTimer(0.0f), mCurrentFrameIndex(0), mAnimOffset(Vector2::Zero)
 {
 	bool loaded = LoadAnimationData(animationName);
@@ -167,7 +167,7 @@ void AnimatorComponent::Draw(Renderer *renderer)
 
 		renderer->DrawTexture(
 			mOwner->GetPosition() + mAnimOffset,
-			Vector2(mWidth, mHeight),
+			mSize,
 			mOwner->GetRotation(),
 			Vector3(1.0f, 1.0f, 1.0f),
 			mSpriteTexture,

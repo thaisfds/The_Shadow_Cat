@@ -45,7 +45,8 @@ public:
     float GetAnimationDuration(const std::string &name);
     float GetCurrentAnimationDuration() const;
 
-    Vector2 SetAnimOffset(const Vector2 &offset) { mAnimOffset = offset; return mAnimOffset; }
+    void SetAnimOffset(const Vector2 &offset) { mAnimOffset = offset; }
+    void SetSize(const Vector2 &size) { mSize = size; }
 
 private:
     bool SetAnimation(const std::string &name, bool reset = true);
@@ -80,8 +81,7 @@ private:
     bool mIsPaused = false;
 
     // Size
-    int mWidth;
-    int mHeight;
+    Vector2 mSize;
 
     float mTextureFactor;
 };
