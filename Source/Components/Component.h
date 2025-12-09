@@ -13,6 +13,8 @@ public:
     virtual void Update(float deltaTime);
     // Process input for this component (if needed)
     virtual void ProcessInput(const Uint8 *keyState);
+    // Draw for this component (if needed)
+    virtual void ComponentDraw(class Renderer* renderer) {}
     // Debug draw for this component (if needed)
     virtual void DebugDraw(class Renderer *renderer);
 

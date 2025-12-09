@@ -46,9 +46,10 @@ public:
     bool IsPlayerDetected() const { return mPlayerDetected; }
     Vector2 GetForwardDirection() const;
 
+    void ResetCollisionFilter() const override { mColliderComponent->SetFilter(GetBaseEnemyFilter()); }
+
 private:
-    CollisionFilter mSkillFilter;
-    BasicAttack* mBasicAttack;
+    SkillBase* mSkill;
 
     float mDeathTimer;
     bool mIsPlayingDeathAnim;

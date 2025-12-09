@@ -2,6 +2,7 @@
 #include "../Component.h"
 #include <unordered_map>
 #include <SDL.h>
+#include <vector>
 #include "../Physics/CollisionFilter.h"
 
 enum class InputType
@@ -59,6 +60,8 @@ public:
     int GetSlotCount() const { return 4; }
     
     SkillInput GetKeyForSlot(int slot) const;
+
+    std::vector<SkillBase*> GetAssignedSkills() const;
     
 private:
     std::unordered_map<SkillInput, SkillBase*> mKeyToSkill;

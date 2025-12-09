@@ -3,30 +3,21 @@
 #include "SkillBase.h"
 #include "../../Math.h"
 #include "../Physics/ColliderComponent.h"
+#include "../../DelayedActionSystem.h"
 
 class BasicAttack : public SkillBase
 {
 public:
-    BasicAttack(Actor* owner, CollisionFilter filter, int damage, int updateOrder = 100,
-                float coneRadius = 50.0f, float coneAngleDegrees = 45.0f);
+    BasicAttack(Actor* owner, int updateOrder = 100);
     
-    void Update(float deltaTime) override;
+    void StartSkill(Vector2 targetPosition) override;
+    void EndSkill() override;
 
-    bool CanUse() const override { return !mIsAttacking && SkillBase::CanUse(); }
-    
-    void Execute(Vector2 targetPosition) override;
-    void EndAttack();
+    void Execute();
 
 private:
-    float mConeRadius;
-    float mConeAngle;
-    int mDamage;
+    float mDamage;
+    Collider* mAreaOfEffect;
 
-    bool mIsAttacking;
-    float mAttackTimer;
-    float mAttackDuration;
-    float mDamageDelay;
-    bool mDamageApplied;
-    Vector2 mAttackDirection;
-    CollisionFilter mFilter;
+    nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;
 };

@@ -6,29 +6,24 @@
 #include "../../Components/Physics/ColliderComponent.h"
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../Physics/CollisionFilter.h"
+#include "../../DelayedActionSystem.h"
 
 class FurBall : public SkillBase
 {
 public:
 	FurBall(Actor* owner, int updateOrder = 100);
 
-	void Update(float deltaTime) override;
+	void StartSkill(Vector2 targetPosition) override;
+	void EndSkill() override;
 
-	bool CanUse() const override { return SkillBase::CanUse(); }
-
-	void Execute(Vector2 targetPosition) override;
-	void EndAttack();
+	void Execute();
 
 private:
 	float mProjectileSpeed;
-	int mDamage;
+	float mDamage;
+	Collider* mAreaOfEffect;
 
-	float mDelay;
-	float mTimer;
-	float mDuration;
-	bool mIsAttacking;
-	bool mFired;
-	Vector2 mDirection;
+	nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;
 };
 
 class FurBallActor : public Actor
@@ -40,7 +35,7 @@ public:
 	void OnUpdate(float deltaTime) override;
 
 	void Kill() override;
-	void Awake(Vector2 position, Vector2 direction, float speed, int damage, float delay, CollisionFilter filter);
+	void Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter, Collider* areaOfEffect, float lifetime);
 
 	bool IsDead() const { return mDead; }
 
@@ -51,7 +46,14 @@ private:
 	int mDamage;
     Vector2 mDirection;
 
+	class DelayedActionSystem mDelayedActions;
+
 	class AnimatorComponent *mAnimatorComponent;
 	class ColliderComponent *mColliderComponent;
 	class RigidBodyComponent *mRigidBodyComponent;
+
+	void AddDelayedAction(float delay, std::function<void()> action)
+	{
+		mDelayedActions.AddDelayedAction(delay, action);
+	}
 };

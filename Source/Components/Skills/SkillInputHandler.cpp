@@ -3,6 +3,7 @@
 #include "ClawAttack.h"
 #include "Dash.h"
 #include "FurBall.h"
+#include "ShadowForm.h"
 #include "SkillBase.h"
 #include "Stomp.h"
 #include "../../Game.h"
@@ -19,7 +20,7 @@ SkillInputHandler::SkillInputHandler(Actor* owner, int updateOrder)
     SkillInput keyEInput{InputType::Keyboard, SDL_SCANCODE_E};
     SkillInput keyShiftInput{InputType::Keyboard, SDL_SCANCODE_LSHIFT};
 
-    mKeyToSkill[leftMouseInput] = new BasicAttack(owner, mSkillFilter, 10);
+    mKeyToSkill[leftMouseInput] = new BasicAttack(owner);
     mKeyToSkill[rightMouseInput] = new ClawAttack(owner);
     mKeyToSkill[keyEInput] = new FurBall(owner);
     mKeyToSkill[keyQInput] = new Stomp(owner);
@@ -35,11 +36,11 @@ void SkillInputHandler::HandleEvent(const SDL_Event& event)
         mKeyToSkill[SkillInput{InputType::Keyboard, event.key.keysym.scancode}] :
         mKeyToSkill[SkillInput{InputType::Mouse, static_cast<Uint8>(event.button.button)}];
     
-    if (skill && skill->CanUse())
+    Vector2 targetPosition = mOwner->GetGame()->GetMouseWorldPosition();
+    if (skill && skill->CanUse(targetPosition, true))
     {
         SDL_Log("Skill used: %s", skill->GetName().c_str());
-        Vector2 targetPosition = mOwner->GetGame()->GetMouseWorldPosition();
-        skill->Execute(targetPosition);
+        skill->StartSkill(targetPosition);
     }
 }
 
@@ -95,4 +96,12 @@ int SkillInputHandler::KeyToSlot(SkillInput key) const
     if (key == SkillInput(InputType::Keyboard, SDL_SCANCODE_E)) return 3;
     if (key == SkillInput(InputType::Keyboard, SDL_SCANCODE_LSHIFT)) return 4;
     return -1;
+}
+
+std::vector<SkillBase*> SkillInputHandler::GetAssignedSkills() const
+{
+    std::vector<SkillBase*> skills;
+    for (const auto& pair : mKeyToSkill)
+        if (pair.second) skills.push_back(pair.second);
+    return skills;
 }

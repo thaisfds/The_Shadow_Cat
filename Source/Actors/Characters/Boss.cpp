@@ -84,7 +84,7 @@ Boss::Boss(class Game* game, Vector2 arenaCenter, BossType type, bool playSpawnA
     mSkillFilter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::EnemySkills});
     mSkillFilter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player});
     // Boss attack: 2 damage, default update order (100), 200px cone radius, 100 degree cone angle
-    mBasicAttack = new BasicAttack(this, mSkillFilter, 2, 100, 200.0f, 100.0f);
+    mBasicAttack = new BasicAttack(this);
     
     // Register with Game for tracking
     game->RegisterBoss(this);
@@ -100,12 +100,6 @@ void Boss::OnUpdate(float deltaTime)
 {
     Character::OnUpdate(deltaTime);
     
-    // Update attack skill
-    if (mBasicAttack)
-    {
-        mBasicAttack->Update(deltaTime);
-    }
-
     // Handle death state
     if (mCurrentState == BossState::Dead)
     {
@@ -352,11 +346,9 @@ void Boss::UpdateAttacking(float deltaTime)
     Vector2 toPlayer = player->GetPosition() - mPosition;
     UpdateFacing(toPlayer);
 
-    // Execute attack if ready
-    if (mBasicAttack->CanUse())
-    {
-        mBasicAttack->Execute(player->GetPosition());
-    }
+    Vector2 playerPos = player->GetPosition();
+    if (mBasicAttack->CanUse(playerPos))
+        mBasicAttack->StartSkill(playerPos);
 }
 
 void Boss::OnDebugDraw(class Renderer* renderer)

@@ -45,8 +45,11 @@ public:
     float GetAnimationDuration(const std::string &name);
     float GetCurrentAnimationDuration() const;
 
+    void SetAnimOffset(const Vector2 &offset) { mAnimOffset = offset; }
+    void SetSize(const Vector2 &size) { mSize = size; }
+
 private:
-    void SetAnimation(const std::string &name, bool reset = true);
+    bool SetAnimation(const std::string &name, bool reset = true);
 
     bool LoadAnimationData(const std::string &animationName);
     bool LoadSpriteSheetData(const std::string &dataPath);
@@ -72,12 +75,13 @@ private:
     // How fast should the animation run
     float mAnimSpeed = 1.0f;
 
+    Vector2 mAnimOffset;
+
     // Whether or not the animation is paused (defaults to false)
     bool mIsPaused = false;
 
     // Size
-    int mWidth;
-    int mHeight;
+    Vector2 mSize;
 
     float mTextureFactor;
 };

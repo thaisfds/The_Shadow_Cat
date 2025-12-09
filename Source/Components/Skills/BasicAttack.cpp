@@ -7,86 +7,78 @@
 #include "../Drawing/DrawComponent.h"
 #include "../Physics/Physics.h"
 #include "../../Game.h"
+#include "SkillBase.h"
 
 
-BasicAttack::BasicAttack(Actor* owner, CollisionFilter filter, int damage, int updateOrder,
-                         float coneRadius, float coneAngleDegrees)
+BasicAttack::BasicAttack(Actor* owner, int updateOrder)
     : SkillBase(owner, updateOrder)
 {
-    mName = "Basic Attack";
-    mDescription = "A simple melee attack.";
-    mCooldown = 2.0f;
-    mCurrentCooldown = 0.0f;
-    mIsAttacking = false;
-    mDamageDelay = 0.53f; // Hardcoded for now, want to change later
-    mFilter = filter;
-    mDamage = damage;
+    LoadSkillDataFromJSON("BasicAttackData");
 
-    mAttackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("BasicAttack");
-    if (mAttackDuration == 0.0f) mAttackDuration = 1.0f;
-
-    mConeRadius = coneRadius;
-    mConeAngle = Math::ToRadians(coneAngleDegrees);
+    float attackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("BasicAttack");
+    if (attackDuration == 0.0f) attackDuration = 1.0f;
+    AddDelayedAction(0.53f, [this]() { Execute(); });
+    AddDelayedAction(attackDuration, [this]() { EndSkill(); });
 }
 
-void BasicAttack::Update(float deltaTime)
+nlohmann::json BasicAttack::LoadSkillDataFromJSON(const std::string& fileName)
 {
-    SkillBase::Update(deltaTime);
+    auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
-    if (!mIsAttacking) return;
+    mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
+    mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
 
-    mAttackTimer += deltaTime;
-    if (mAttackTimer >= mDamageDelay && !mDamageApplied)
-    {
-        mDamageApplied = true;
-        // This should emit particle only when damaging, not here. Also, make a playOnce for animatedParticles
-        mCharacter->GetGame()->GetAttackTrailActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
-            0.3f,
-            0.0f,
-            mCharacter->GetPosition() + mAttackDirection * mConeRadius,
-            std::atan2(mAttackDirection.y, mAttackDirection.x),
-            mCharacter->GetScale().x < 0.0f
-        );
-
-        auto hitColliders = Physics::ConeCast(mCharacter->GetGame(), mCharacter->GetPosition(), mAttackDirection, mConeAngle, mConeRadius, mFilter);
-        for (auto collider : hitColliders)
-        {
-            auto enemyActor = collider->GetOwner();
-            auto enemyCharacter = dynamic_cast<Character*>(enemyActor);
-            if (enemyCharacter)
-            {
-                enemyCharacter->TakeDamage(mDamage);
-            }
-        }
-    }
-
-    if (mAttackTimer >= mAttackDuration) EndAttack();
+    return data;
 }
 
-void BasicAttack::Execute(Vector2 targetPosition)
+void BasicAttack::StartSkill(Vector2 targetPosition)
 {
+    SkillBase::StartSkill(targetPosition);
+    mTargetVector -= mCharacter->GetPosition();
+    mTargetVector.Normalize();
+
     mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("BasicAttack");
     mCharacter->SetMovementLock(true);
     mCharacter->SetAnimationLock(true);  // Lock animations so attack anim isn't overridden
-    
-    mIsAttacking = true;
-    mAttackTimer = 0.0f;
-    mDamageApplied = false;
-    
-    mAttackDirection = targetPosition - mCharacter->GetPosition();
-    mAttackDirection.Normalize();
-
-    if (mAttackDirection.x > 0.0f)
-        mCharacter->SetScale(Vector2(1.0f, mCharacter->GetScale().y));
-    else if (mAttackDirection.x < 0.0f)
-        mCharacter->SetScale(Vector2(-1.0f, mCharacter->GetScale().y));
-    
-    StartCooldown();
 }
 
-void BasicAttack::EndAttack()
+void BasicAttack::Execute()
 {
-    mIsAttacking = false;
+    mCharacter->GetGame()->GetAttackTrailActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
+        0.3f,
+        0.0f,
+        mCharacter->GetPosition() + mTargetVector * mRange,
+        std::atan2(mTargetVector.y, mTargetVector.x),
+        mCharacter->GetScale().x < 0.0f
+    );
+
+    auto collisionActor = mCharacter->GetGame()->GetCollisionQueryActor();
+
+	((PolygonCollider*)mAreaOfEffect)->SetForward(mTargetVector);
+    collisionActor->GetComponent<ColliderComponent>()->SetCollider(mAreaOfEffect);
+    collisionActor->GetComponent<ColliderComponent>()->SetFilter(mCharacter->GetSkillFilter());
+
+    auto pos = mCharacter->GetPosition();
+    auto hitColliders = mAreaOfEffect->GetOverlappingCollidersAt(&pos);
+    for (auto collider : hitColliders)
+    {
+        auto enemyActor = collider->GetOwner();
+        auto enemyCharacter = dynamic_cast<Character*>(enemyActor);
+        enemyCharacter->TakeDamage(mDamage);
+    }
+
+    if (mCharacter->GetGame()->IsDebugging())
+	{
+		auto vertices = ((PolygonCollider*)mAreaOfEffect)->GetVertices();
+		for (auto& v : vertices) v += pos;
+		Physics::DebugDrawPolygon(mCharacter->GetGame(), vertices, 0.5f, 15);
+	}
+}
+
+void BasicAttack::EndSkill()
+{
+    SkillBase::EndSkill();
+    
     mCharacter->SetMovementLock(false);
     mCharacter->SetAnimationLock(false);  // Unlock animations
 }

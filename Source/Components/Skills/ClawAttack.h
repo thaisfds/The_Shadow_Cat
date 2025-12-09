@@ -10,20 +10,20 @@ public:
 	
 	void Update(float deltaTime) override;
 
-	bool CanUse() const override { return !mIsAttacking && SkillBase::CanUse(); }
-	
-	void Execute(Vector2 targetPosition) override;
-	void EndAttack();
+	void StartSkill(Vector2 targetPosition) override;
+	void EndSkill() override;
+
+	void Execute();
 	
 private:
-	float mConeRadius;
-	float mConeAngle;
-	int mDamage;
+	float mDamage;
+	float mForwardSpeed;
+	float mBackwardDistancePercentage;
+	float mBackwardSpeed;
 
-	bool mIsAttacking;
-	float mAttackTimer;
-	float mAttackDuration;
-	float mDamageDelay;
-	bool mDamageApplied;
-	Vector2 mAttackDirection;
+	Collider* mAreaOfEffect;
+
+	Vector2 mVelocity;
+
+	nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;
 };

@@ -40,6 +40,8 @@ public:
     float GetAttackRange() const { return mAttackRange; }
     int GetMaxHP() const { return mMaxHP; }
 
+    void ResetCollisionFilter() const override { mColliderComponent->SetFilter(GetBaseEnemyFilter()); }
+
 private:
     CollisionFilter mSkillFilter;
     BasicAttack* mBasicAttack;
