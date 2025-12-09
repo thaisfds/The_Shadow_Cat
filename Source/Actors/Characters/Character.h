@@ -25,29 +25,17 @@ public:
 
     void SetSpeedMultiplier(float multiplier);
 
-    static CollisionFilter GetBasePlayerFilter()
-    {
-        CollisionFilter filter;
-        filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::Player});
-        filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Environment, CollisionGroup::Enemy, CollisionGroup::EnemySkills});
-        return filter;
-    };
+    virtual void ResetCollisionFilter() const = 0;
+
+    CollisionFilter GetSkillFilter() const { return mSkillFilter; }
 
     static CollisionFilter GetBaseEnemyFilter()
     {
         CollisionFilter filter;
         filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::Enemy});
-        filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player, CollisionGroup::Environment, CollisionGroup::PlayerSkills});
+        filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player, CollisionGroup::Enemy, CollisionGroup::Environment, CollisionGroup::PlayerSkills});
         return filter;
     }
-
-    static CollisionFilter GetFollowerEnemyFilter()
-    {
-        CollisionFilter filter;
-        filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::Enemy});
-        filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Environment, CollisionGroup::Enemy, CollisionGroup::PlayerSkills});
-        return filter;
-    };
 
 protected:
     void ManageAnimations();
@@ -57,6 +45,7 @@ protected:
     class RigidBodyComponent *mRigidBodyComponent;
     class AnimatorComponent *mAnimatorComponent;
     class ColliderComponent *mColliderComponent;
+    class CollisionFilter mSkillFilter;
 
     float mForwardSpeed;
     float mSpeedMultiplier = 1.0f;

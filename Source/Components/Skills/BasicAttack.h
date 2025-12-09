@@ -8,7 +8,7 @@
 class BasicAttack : public SkillBase
 {
 public:
-    BasicAttack(Actor* owner, CollisionFilter filter, int damage, int updateOrder = 100);
+    BasicAttack(Actor* owner, int updateOrder = 100);
     
     void StartSkill(Vector2 targetPosition) override;
     void EndSkill() override;
@@ -17,8 +17,6 @@ public:
 
 private:
     float mDamage;
-
-    CollisionFilter mFilter;
     Collider* mAreaOfEffect;
 
     nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;

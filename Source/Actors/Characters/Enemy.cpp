@@ -10,6 +10,10 @@
 #include <cfloat>
 #include <SDL.h>
 
+#include "../../Components/Skills/ClawAttack.h"
+#include "../../Components/Skills/Dash.h"
+#include "../../Components/Skills/ShadowForm.h"
+
 namespace {
     constexpr float WAYPOINT_REACHED_DISTANCE = 10.0f;
     constexpr float PATROL_AREA_REACHED_DISTANCE = 20.0f;
@@ -88,7 +92,7 @@ Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, Enemy
 
     mSkillFilter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::EnemySkills});
     mSkillFilter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player});
-    mBasicAttack = new BasicAttack(this, mSkillFilter, 1);
+    mSkill = new BasicAttack(this);
 }
 
 Enemy::~Enemy()
@@ -354,6 +358,8 @@ void Enemy::UpdateFacing(const Vector2& direction)
 
 void Enemy::MoveToward(const Vector2& target, float speed)
 {
+    if (mIsMovementLocked) return;
+    
     Vector2 direction = target - mPosition;
     direction.Normalize();
     Vector2 velocity = direction * speed;
@@ -526,10 +532,10 @@ void Enemy::UpdateAttack(float deltaTime)
     mRigidBodyComponent->SetVelocity(Vector2::Zero);
     mMovementDirection = Vector2::Zero;
     mIsMoving = false;  // Play Idle animation
-    
+
     Vector2 playerPos = player->GetPosition();
-    if (mBasicAttack->CanUse(playerPos))
-        mBasicAttack->StartSkill(playerPos);
+    if (mSkill->CanUse(playerPos))
+        mSkill->StartSkill(playerPos);
 }
 
 void Enemy::OnDebugDraw(class Renderer* renderer)

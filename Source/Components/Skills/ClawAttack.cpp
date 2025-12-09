@@ -52,15 +52,11 @@ void ClawAttack::Execute()
 {
 	mVelocity = Vector2::Zero;
 
-	CollisionFilter filter;
-	filter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::PlayerSkills});
-	filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Enemy});
-
 	auto collisionActor = mCharacter->GetGame()->GetCollisionQueryActor();
 
 	((PolygonCollider*)mAreaOfEffect)->SetForward(mTargetVector);
 	collisionActor->GetComponent<ColliderComponent>()->SetCollider(mAreaOfEffect);
-	collisionActor->GetComponent<ColliderComponent>()->SetFilter(filter);
+	collisionActor->GetComponent<ColliderComponent>()->SetFilter(mCharacter->GetSkillFilter());
 
 	auto pos = mCharacter->GetPosition();
 	auto hitColliders = mAreaOfEffect->GetOverlappingCollidersAt(&pos);
@@ -83,6 +79,8 @@ void ClawAttack::Execute()
 void ClawAttack::StartSkill(Vector2 targetPosition)
 {
 	SkillBase::StartSkill(targetPosition);
+	mTargetVector -= mCharacter->GetPosition();
+	mTargetVector.Normalize();
 
 	mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("ClawAttack");
 	mCharacter->SetMovementLock(true);

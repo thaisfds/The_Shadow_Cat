@@ -44,6 +44,8 @@ void Dash::Update(float deltaTime)
 void Dash::StartSkill(Vector2 targetPosition)
 {
 	SkillBase::StartSkill(targetPosition);
+	mTargetVector -= mCharacter->GetPosition();
+	mTargetVector.Normalize();
 
 	mCharacter->SetAnimationLock(true);
 	AnimatorComponent* animator = mCharacter->GetComponent<AnimatorComponent>();
@@ -65,7 +67,5 @@ void Dash::EndSkill()
 	mCharacter->SetAnimationLock(false);
 	mCharacter->SetMovementLock(false);
 
-	mCharacter->GetComponent<ColliderComponent>()->SetFilter(
-		Character::GetBasePlayerFilter()
-	);
+	mCharacter->ResetCollisionFilter();
 }

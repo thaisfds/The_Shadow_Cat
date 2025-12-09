@@ -13,6 +13,16 @@ ColliderComponent::ColliderComponent(class Actor *owner, int dx, int dy, Collide
 	GetGame()->AddCollider(this);
 }
 
+ColliderComponent::ColliderComponent(class Actor *owner, Vector2 offset, Collider* collider, bool isStatic, int updateOrder)
+	: Component(owner, updateOrder)
+	  , mOffset(offset)
+	  , mIsStatic(isStatic)
+	  , mCollider(collider)
+{
+	if (mCollider) mCollider->SetComponent(this);
+	GetGame()->AddCollider(this);
+}
+
 ColliderComponent::~ColliderComponent()
 {
 	GetGame()->RemoveCollider(this);

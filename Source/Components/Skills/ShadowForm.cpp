@@ -62,7 +62,5 @@ void ShadowForm::EndSkill()
 	mCharacter->SetAnimationLock(false);
 	mCharacter->SetMovementLock(false);
 
-	mCharacter->GetComponent<ColliderComponent>()->SetFilter(
-		Character::GetBasePlayerFilter()
-	);
+	mCharacter->ResetCollisionFilter();
 }

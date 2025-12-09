@@ -11,6 +11,7 @@ class ColliderComponent : public Component
 {
 public:
 	ColliderComponent(class Actor *owner, int dx, int dy, Collider* collider, CollisionFilter filter, bool isStatic = false, int updateOrder = 10);
+	ColliderComponent(class Actor *owner, Vector2 offset, Collider* collider, bool isStatic = false, int updateOrder = 10);
 
 	~ColliderComponent() override;
 

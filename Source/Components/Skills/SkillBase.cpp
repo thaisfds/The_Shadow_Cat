@@ -53,11 +53,9 @@ void SkillBase::StartSkill(Vector2 targetPosition)
 	mCurrentCooldown = mCooldown;
 	mIsUsing = true;
 	mDelayedActions.Reset();
+	mTargetVector = targetPosition;
 
-	mTargetVector = targetPosition - mCharacter->GetPosition();
-	mTargetVector.Normalize();
-
-	if (mTargetVector.x < 0.0f) mCharacter->SetScale(Vector2(-1.0f, 1.0f));
+	if (mTargetVector.x - mCharacter->GetPosition().x < 0.0f) mCharacter->SetScale(Vector2(-1.0f, 1.0f));
 	else mCharacter->SetScale(Vector2(1.0f, 1.0f));
 }
 

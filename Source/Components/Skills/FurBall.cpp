@@ -36,10 +36,6 @@ nlohmann::json FurBall::LoadSkillDataFromJSON(const std::string& fileName)
 
 void FurBall::Execute()
 {
-	CollisionFilter filter;
-	filter.belongsTo = CollisionFilter::GroupMask({ CollisionGroup::PlayerSkills });
-	filter.collidesWith = CollisionFilter::GroupMask({ CollisionGroup::Enemy });
-
 	float lifetime = mRange / mProjectileSpeed;
 
 	mCharacter->GetGame()->GetFurBallActor()->Awake(
@@ -47,7 +43,7 @@ void FurBall::Execute()
 		mTargetVector,
 		mProjectileSpeed,
 		mDamage,
-		filter,
+		mCharacter->GetSkillFilter(),
 		mAreaOfEffect,
 		lifetime
 	);
@@ -56,6 +52,8 @@ void FurBall::Execute()
 void FurBall::StartSkill(Vector2 targetPosition)
 {
 	SkillBase::StartSkill(targetPosition);
+	mTargetVector -= mCharacter->GetPosition();
+	mTargetVector.Normalize();
 
 	mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("FurBall");
 	mCharacter->SetMovementLock(true);
@@ -128,6 +126,9 @@ void FurBallActor::Awake(Vector2 position, Vector2 direction, float speed, int d
 	mColliderComponent->SetCollider(areaOfEffect);
 	mColliderComponent->SetDebugDrawIfDisabled(true);
 	mRigidBodyComponent->SetEnabled(true);
+
+	int dim = ((CircleCollider*)areaOfEffect)->GetRadius() * 3.0f;
+	mAnimatorComponent->SetSize(Vector2(dim, dim));
 	
 	SetPosition(position);
 	mDirection = direction;

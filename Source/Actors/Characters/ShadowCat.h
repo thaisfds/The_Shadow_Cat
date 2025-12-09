@@ -19,6 +19,8 @@ public:
     void TakeDamage(int damage) override;
     void Kill() override;
 
+    void ResetCollisionFilter() const override;
+
     std::vector<UpgradeInfo> GetRandomUpgrades();
 
 private:

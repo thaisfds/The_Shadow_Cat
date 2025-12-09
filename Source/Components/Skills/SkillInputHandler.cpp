@@ -20,11 +20,11 @@ SkillInputHandler::SkillInputHandler(Actor* owner, int updateOrder)
     SkillInput keyEInput{InputType::Keyboard, SDL_SCANCODE_E};
     SkillInput keyShiftInput{InputType::Keyboard, SDL_SCANCODE_LSHIFT};
 
-    mKeyToSkill[leftMouseInput] = new BasicAttack(owner, mSkillFilter, 10);
+    mKeyToSkill[leftMouseInput] = new BasicAttack(owner);
     mKeyToSkill[rightMouseInput] = new ClawAttack(owner);
     mKeyToSkill[keyEInput] = new FurBall(owner);
     mKeyToSkill[keyQInput] = new Stomp(owner);
-    mKeyToSkill[keyShiftInput] = new ShadowForm(owner);
+    mKeyToSkill[keyShiftInput] = new Dash(owner);
 }
 
 void SkillInputHandler::HandleEvent(const SDL_Event& event)

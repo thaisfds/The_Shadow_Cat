@@ -10,13 +10,11 @@
 #include "SkillBase.h"
 
 
-BasicAttack::BasicAttack(Actor* owner, CollisionFilter filter, int damage, int updateOrder)
+BasicAttack::BasicAttack(Actor* owner, int updateOrder)
     : SkillBase(owner, updateOrder)
 {
     LoadSkillDataFromJSON("BasicAttackData");
 
-    mFilter = filter;
-    
     float attackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("BasicAttack");
     if (attackDuration == 0.0f) attackDuration = 1.0f;
     AddDelayedAction(0.53f, [this]() { Execute(); });
@@ -33,6 +31,17 @@ nlohmann::json BasicAttack::LoadSkillDataFromJSON(const std::string& fileName)
     return data;
 }
 
+void BasicAttack::StartSkill(Vector2 targetPosition)
+{
+    SkillBase::StartSkill(targetPosition);
+    mTargetVector -= mCharacter->GetPosition();
+    mTargetVector.Normalize();
+
+    mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("BasicAttack");
+    mCharacter->SetMovementLock(true);
+    mCharacter->SetAnimationLock(true);  // Lock animations so attack anim isn't overridden
+}
+
 void BasicAttack::Execute()
 {
     mCharacter->GetGame()->GetAttackTrailActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
@@ -47,7 +56,7 @@ void BasicAttack::Execute()
 
 	((PolygonCollider*)mAreaOfEffect)->SetForward(mTargetVector);
     collisionActor->GetComponent<ColliderComponent>()->SetCollider(mAreaOfEffect);
-    collisionActor->GetComponent<ColliderComponent>()->SetFilter(mFilter);
+    collisionActor->GetComponent<ColliderComponent>()->SetFilter(mCharacter->GetSkillFilter());
 
     auto pos = mCharacter->GetPosition();
     auto hitColliders = mAreaOfEffect->GetOverlappingCollidersAt(&pos);
@@ -64,15 +73,6 @@ void BasicAttack::Execute()
 		for (auto& v : vertices) v += pos;
 		Physics::DebugDrawPolygon(mCharacter->GetGame(), vertices, 0.5f, 15);
 	}
-}
-
-void BasicAttack::StartSkill(Vector2 targetPosition)
-{
-    SkillBase::StartSkill(targetPosition);
-
-    mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("BasicAttack");
-    mCharacter->SetMovementLock(true);
-    mCharacter->SetAnimationLock(true);  // Lock animations so attack anim isn't overridden
 }
 
 void BasicAttack::EndSkill()

@@ -36,17 +36,13 @@ void Stomp::StartSkill(Vector2 targetPosition)
 {
 	mCurrentCooldown = mCooldown;
 
-	CollisionFilter filter;
-	filter.belongsTo = CollisionFilter::GroupMask({ CollisionGroup::PlayerSkills });
-	filter.collidesWith = CollisionFilter::GroupMask({ CollisionGroup::Enemy });
-
 	((CircleCollider*)mAreaOfEffect)->SetRadius(mRadius);
 
 	mCharacter->GetGame()->GetStompActor()->Awake(
-		mCharacter->GetGame()->GetMouseWorldPosition(),
+		targetPosition,
 		mDamage,
 		0.65f,
-		filter,
+		mCharacter->GetSkillFilter(),
 		mAreaOfEffect
 	);
 }
@@ -114,6 +110,9 @@ void StompActor::Awake(Vector2 position, int damage, float delay, CollisionFilte
 	mColliderComponent->SetFilter(filter);
 	mColliderComponent->SetCollider(areaOfEffect);
 	mColliderComponent->SetDebugDrawIfDisabled(true);
+
+	int dim = ((CircleCollider*)areaOfEffect)->GetRadius() * 2;
+	mAnimatorComponent->SetSize(Vector2(dim, dim));
 	
 	mDamage = damage;
 	mDead = false;

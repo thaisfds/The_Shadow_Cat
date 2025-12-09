@@ -7,7 +7,7 @@
 	"areaOfEffect":
 	{
 		"type": "circle",
-		"radius": 20
+		"radius": 30
 	},
 	"effects":
 	[
