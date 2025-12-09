@@ -9,6 +9,8 @@ class HUD : public UIScreen
 public:
     HUD(class Game* game, const std::string& fontName, int maxHealth = 6);
 
+    void Update(float deltaTime) override;
+
     void SetHealth(int health);
     void UpdateMaxHealth(int maxHealth, bool fill = false);
 
