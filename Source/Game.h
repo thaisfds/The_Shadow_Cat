@@ -15,8 +15,11 @@ enum class GameScene
 	MainMenu,
 	Lobby,
 	Level1,
+	Level1_Boss,
 	Level2,
-	Level3
+	Level2_Boss,
+	Level3,
+	Level3_Boss
 };
 
 class Game
@@ -46,13 +49,13 @@ public:
 	void SetScene(GameScene scene);
 	void UnloadScene();
 
-    // Pause Handling
-    void PauseGame();
-    void ResumeGame();
-    void ResetGame();
+	// Pause Handling
+	void PauseGame();
+	void ResumeGame();
+	void ResetGame();
 
-    void SetGameOver(bool isOver) { mIsGameOver = isOver; }
-    void SetGameWon(bool isWon) { mIsGameWon = isWon; }
+	void SetGameOver(bool isOver) { mIsGameOver = isOver; }
+	void SetGameWon(bool isWon) { mIsGameWon = isWon; }
 
 	// Renderer
 	class Renderer *GetRenderer() { return mRenderer; }
@@ -138,11 +141,11 @@ private:
 	bool mIsFullscreen;
 	GameScene mCurrentScene;
 
-    bool mIsPaused;
+	bool mIsPaused;
 
-    // End condition
-    bool mIsGameOver;
-    bool mIsGameWon;
+	// End condition
+	bool mIsGameOver;
+	bool mIsGameWon;
 
 	// Game-specific
 	class ShadowCat *mShadowCat;
