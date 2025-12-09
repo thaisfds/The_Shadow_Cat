@@ -80,6 +80,7 @@ public:
 
 	// Game specific
 	const class ShadowCat *GetPlayer() { return mShadowCat; }
+	class Boss *GetCurrentBoss() const { return mCurrentBoss; }
 	class HUD *GetHUD() { return mHUD; }
 
 	// Enemy and Boss tracking
@@ -172,6 +173,7 @@ private:
 	// Enemy and Boss tracking
 	std::vector<class Enemy *> mEnemies;
 	std::vector<class Boss *> mBosses;
+	class Boss *mCurrentBoss;  // Pointer to active boss in current room (null when no boss)
 
 	// Boss spawn data (stored until enemies are defeated)
 	struct BossSpawnData

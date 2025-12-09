@@ -38,6 +38,7 @@ Game::Game()
 	  mHUD(nullptr),
 	  mTutorialHUD(nullptr),
 	  mLevelPortal(nullptr),
+	  mCurrentBoss(nullptr),
 	  mIsPaused(false),
 	  mIsGameOver(false),
 	  mIsGameWon(false),
@@ -147,6 +148,7 @@ void Game::UnloadScene()
 	// Reset states
 	mShadowCat = nullptr;
 	mLevelPortal = nullptr;
+	mCurrentBoss = nullptr;
 }
 
 void Game::PauseGame()
@@ -1191,7 +1193,19 @@ void Game::RegisterEnemy(Enemy *enemy)
 void Game::RegisterBoss(Boss *boss)
 {
 	if (boss)
+	{
 		mBosses.push_back(boss);
+		
+		// Set as current boss if in a boss level
+		bool isBossLevel = (mCurrentScene == GameScene::Level1_Boss ||
+							mCurrentScene == GameScene::Level2_Boss ||
+							mCurrentScene == GameScene::Level3_Boss);
+		
+		if (isBossLevel && !mCurrentBoss)
+		{
+			mCurrentBoss = boss;
+		}
+	}
 }
 
 void Game::UnregisterEnemy(Enemy *enemy)
@@ -1203,6 +1217,12 @@ void Game::UnregisterEnemy(Enemy *enemy)
 
 void Game::UnregisterBoss(Boss *boss)
 {
+	// Clear current boss pointer if this is the current boss
+	if (mCurrentBoss == boss)
+	{
+		mCurrentBoss = nullptr;
+	}
+	
 	auto iter = std::find(mBosses.begin(), mBosses.end(), boss);
 	if (iter != mBosses.end())
 		mBosses.erase(iter);
