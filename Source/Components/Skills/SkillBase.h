@@ -33,6 +33,7 @@ public:
     
     const std::string& GetName() const { return mName; }
     const std::string& GetDescription() const { return mDescription; }
+    const std::string& GetIconPath() const { return mIconPath; }
     std::vector<UpgradeInfo> GetAvailableUpgrades() const;
 
 protected:
@@ -40,6 +41,7 @@ protected:
 
     std::string mName;
     std::string mDescription;
+    std::string mIconPath;
     float mCooldown;
     float mCurrentCooldown;
     float mRange;

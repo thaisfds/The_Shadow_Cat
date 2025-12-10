@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Components/Skills/SkillBase.h"
 #include "Json.h"
 #include "Components/Physics/Collider.h"
 #include "Components/Skills/UpgradeInfo.h"
@@ -23,7 +24,7 @@ public:
 	// SkillData specific methods
 	static float GetFloatEffectValue(const nlohmann::json& skillData, const std::string& effectName);
 	static Collider* GetAreaOfEffect(const nlohmann::json& skillData);
-	static UpgradeInfo GetUpgradeInfo(const nlohmann::json& skillData, const std::string& upgradeType, float *upgradeTarget);
+	static UpgradeInfo GetUpgradeInfo(const SkillBase *skill, const nlohmann::json& skillData, const std::string& upgradeType, float *upgradeTarget);
 
 private:
 	template<typename T>

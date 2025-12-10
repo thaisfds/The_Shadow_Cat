@@ -145,6 +145,7 @@ private:
 
 	// Audio system
 	AudioSystem *mAudio;
+	SoundHandle mBackgroundMusic;
 
 	// Track elapsed time since game start
 	Uint32 mTicksCount;

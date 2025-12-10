@@ -129,6 +129,13 @@ bool Game::Initialize()
 
 void Game::UnloadScene()
 {
+	// Stop background music
+	if (mBackgroundMusic.IsValid())
+	{
+		mAudio->StopSound(mBackgroundMusic);
+		mBackgroundMusic.Reset();
+	}
+
 	// Use state so we can call this from within an actor update
 	for (auto *actor : mActors)
 	{
@@ -193,14 +200,17 @@ void Game::SetScene(GameScene nextScene)
 	case GameScene::MainMenu:
 		mCurrentScene = GameScene::MainMenu;
 
-		// Main menu back music
-		// mAudio->PlaySound("Music.ogg", true);
+		// Main menu background music
+		mBackgroundMusic = mAudio->PlaySound("m01_main_menu.mp3", true, 0.8f);
 
 		new MainMenu(this, "../Assets/Fonts/Pixellari.ttf");
 		break;
 
 	case GameScene::Lobby:
 		mCurrentScene = GameScene::Lobby;
+
+		// Lobby background music
+		mBackgroundMusic = mAudio->PlaySound("m04_tutorial.mp3", true);
 
 		// Toggleable tutorial HUD
 		if (!mTutorialHUD)
@@ -219,6 +229,9 @@ void Game::SetScene(GameScene nextScene)
 	case GameScene::Level1:
 		mCurrentScene = GameScene::Level1;
 
+		// Level 1 background music
+		mBackgroundMusic = mAudio->PlaySound("m05_level1.mp3", true);
+
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
 			mTutorialHUD->HideControls();
@@ -228,6 +241,9 @@ void Game::SetScene(GameScene nextScene)
 
 	case GameScene::Level1_Boss:
 		mCurrentScene = GameScene::Level1_Boss;
+
+		// Boss 1 background music
+		mBackgroundMusic = mAudio->PlaySound("m08_boss1_grass.mp3", true);
 
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
@@ -239,6 +255,9 @@ void Game::SetScene(GameScene nextScene)
 	case GameScene::Level2:
 		mCurrentScene = GameScene::Level2;
 
+		// Level 2 background music
+		mBackgroundMusic = mAudio->PlaySound("m06_level2.mp3", true);
+
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
 			mTutorialHUD->HideControls();
@@ -248,6 +267,9 @@ void Game::SetScene(GameScene nextScene)
 
 	case GameScene::Level2_Boss:
 		mCurrentScene = GameScene::Level2_Boss;
+
+		// Boss 2 background music
+		mBackgroundMusic = mAudio->PlaySound("m09_boss2_bricks.mp3", true);
 
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
@@ -259,6 +281,9 @@ void Game::SetScene(GameScene nextScene)
 	case GameScene::Level3:
 		mCurrentScene = GameScene::Level3;
 
+		// Level 3 background music
+		mBackgroundMusic = mAudio->PlaySound("m07_level3.mp3", true);
+
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
 			mTutorialHUD->HideControls();
@@ -268,6 +293,9 @@ void Game::SetScene(GameScene nextScene)
 
 	case GameScene::Level3_Boss:
 		mCurrentScene = GameScene::Level3_Boss;
+
+		// Boss 3 background music
+		mBackgroundMusic = mAudio->PlaySound("m10_boss3_stone.mp3", true);
 
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
