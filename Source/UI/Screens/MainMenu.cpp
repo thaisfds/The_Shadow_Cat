@@ -9,6 +9,9 @@ MainMenu::MainMenu(class Game* game, const std::string& fontName)
 
     AddImage("../Assets/HUD/Menu/Scroll2.png", Vector2(0.0f, 0.0f), 3.0f, 0.0f, 0);
 
+    UIText* titleDrop = AddText("The Shadow Cat", Vector2(4.0f, -236.0f), 1.2f, 0.0f, 60);
+    UIText* title = AddText("The Shadow Cat", Vector2(0.0f, -240.0f), 1.2f, 0.0f, 60);
+
     // Drop shadow on text
     AddText("    New\nAdventure", Vector2(303.0f, -17.0f), SCALE);
     AddText("Quit", Vector2(3.0f, 43.0f), SCALE);
@@ -44,6 +47,12 @@ MainMenu::MainMenu(class Game* game, const std::string& fontName)
         button->SetTextHighlightColor(Vector3(0.9f, 0.0f, 0.9f)); // violet
         button->SetBackgroundColor(Vector4::Zero); // transparent
     }
+
+    title->SetTextColor(Vector3::Zero);
+    title->SetBackgroundColor(Vector4::Zero); // transparent
+
+    titleDrop->SetTextColor(Vector3(0.9f, 0.0f, 0.9f));
+    titleDrop->SetBackgroundColor(Vector4::Zero); // transparent
 }
 
 void MainMenu::HandleKeyPress(int key)
