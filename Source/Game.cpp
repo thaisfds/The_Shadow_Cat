@@ -148,10 +148,10 @@ void Game::UnloadScene()
 		delete ui;
 	}
 	mUIStack.clear();
-	if (mHUD)
-		mUIStack.push_back(mHUD);
 	if (mTutorialHUD)
 		mUIStack.push_back(mTutorialHUD);
+	if (mHUD)
+		mUIStack.push_back(mHUD);
 
 	// Reset states
 	mShadowCat = nullptr;
@@ -200,12 +200,12 @@ void Game::SetScene(GameScene nextScene)
 	case GameScene::Lobby:
 		mCurrentScene = GameScene::Lobby;
 
-		// Always shown
-		mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf");
-
 		// Toggleable tutorial HUD
 		if (!mTutorialHUD)
 			mTutorialHUD = new TutorialHUD(this, "../Assets/Fonts/Pixellari.ttf");
+
+		// Always shown
+		mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf");
 
 		// Show tutorial in Lobby
 		if (mTutorialHUD)

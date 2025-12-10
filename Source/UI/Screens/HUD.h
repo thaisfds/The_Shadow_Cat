@@ -28,6 +28,7 @@ private:
 
     // Enemies left
     UIText* mEnemiesLeftCount;
+    UIText* mAreaClearTxt;
 
     // Cursor
     UIImage* mCursorImage;

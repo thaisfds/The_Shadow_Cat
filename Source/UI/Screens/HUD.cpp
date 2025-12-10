@@ -16,11 +16,13 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
     InitHealthIcons();
 
     // Cursor
-    mCursorImage = AddImage("../Assets/HUD/ShadowCat/Cursor.png", Vector2(0.0f, 0.0f), 1.0f, 0.0f, 1000);
+    mCursorImage = AddImage("../Assets/HUD/ShadowCat/Cursor.png", Vector2(0.0f, 0.0f), 1.0f, 0.0f, 20000);
 
     // Enemy counter top right
     AddText("Enemies Left:", Vector2(500.0f, -300.0f), 0.7f);
     mEnemiesLeftCount = AddText("0", Vector2(600.0f, -300.0f), 0.7f);
+
+    mAreaClearTxt = AddText("            Area clear!\nProceed to the red carpet!", Vector2(630.0f, -220.0f), 0.5f);
 
     for (auto &txt : mTexts) {
         txt->SetTextColor(Vector3::One); // White
@@ -44,16 +46,20 @@ void HUD::Update(float deltaTime)
     // Update enemies left  ------------------- //
     int enemiesLeft = mGame->CountAliveEnemies();
     mEnemiesLeftCount->SetText(std::to_string(enemiesLeft));
+    if (enemiesLeft == 0)
+        mAreaClearTxt->SetIsVisible(true);
+    else
+        mAreaClearTxt->SetIsVisible(false);
 
     // Update health ------------------- //
     if (!mGame->GetPlayer()) return;
 
     // If new max hp update otherwise just update health
     if (mGame->GetPlayer()->GetMaxHP() != mMaxHealth) {
-        UpdateMaxHealth(mGame->GetPlayer()->GetMaxHP(), true);
+        UpdateMaxHealth(mGame->GetPlayer()->GetMaxHP() / 10, true);
     }
 
-    SetHealth(mGame->GetPlayer()->GetHP());
+    SetHealth(mGame->GetPlayer()->GetHP() / 10);
 }
 
 void HUD::InitHealthIcons() {
@@ -72,11 +78,16 @@ void HUD::InitHealthIcons() {
     mEmptyHeartIcons.clear();
 
     // Create new icons based on mMaxHealth
-    const float SCALE = 1.5f;
+    const float SCALE = 1.0f;
     const float SPACING = 35.0f * SCALE;
+    const float VERTICAL_SPACING = 30.0f;
+
+    // Draw two equal rows if more than 10 health
+    int rows = (mMaxHealth > 10) ? 2 : 1;
 
     for (int i = 0; i < mMaxHealth / 2; ++i) {
-        Vector2 offset(-560.0f + i * SPACING, -300.0f);
+        int row = i > mMaxHealth / 4 - 1 ? 1 : 0;
+        Vector2 offset(-580.0f + (i - row * (mMaxHealth / 4)) * SPACING, +300.0f - row * VERTICAL_SPACING);
 
         UIImage* emptyHeart = AddImage("../Assets/HUD/ShadowCat/LifeBar_2.png", offset, SCALE, 0.0f, 1);
         UIImage* halfHeart = AddImage("../Assets/HUD/ShadowCat/LifeBar_1.png", offset, SCALE, 0.0f, 2);
