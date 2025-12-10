@@ -1,5 +1,4 @@
 #include "ChaseBehavior.h"
-#include "../../Actors/Characters/Enemy.h"
 #include "../../Actors/Characters/ShadowCat.h"
 
 namespace

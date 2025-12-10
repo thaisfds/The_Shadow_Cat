@@ -85,8 +85,6 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/BasicAttack.h
         Source/Components/Skills/SkillInputHandler.cpp
         Source/Components/Skills/SkillInputHandler.h
-        Source/Actors/Characters/Enemy.cpp
-        Source/Actors/Characters/Enemy.h
         Source/Actors/Characters/Boss.cpp
         Source/Actors/Characters/Boss.h
         Source/Actors/Characters/Character.cpp

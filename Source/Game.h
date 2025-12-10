@@ -4,6 +4,7 @@
 #include <SDL_mixer.h>
 #include <vector>
 #include "Actors/Actor.h"
+#include "Actors/Characters/EnemyBase.h"
 #include "Actors/DebugActor.h"
 #include "Actors/Characters/Boss.h"
 #include "Renderer/Renderer.h"
@@ -85,9 +86,9 @@ public:
 	class HUD *GetHUD() { return mHUD; }
 
 	// Enemy and Boss tracking
-	void RegisterEnemy(class Enemy *enemy);
+	void RegisterEnemy(class EnemyBase *enemy);
 	void RegisterBoss(class Boss *boss);
-	void UnregisterEnemy(class Enemy *enemy);
+	void UnregisterEnemy(class EnemyBase *enemy);
 	void UnregisterBoss(class Boss *boss);
 	int CountAliveEnemies() const;
 	int CountAliveBosses() const;
@@ -177,7 +178,7 @@ private:
 	class Actor *mAttackTrailActor;
 
 	// Enemy and Boss tracking
-	std::vector<class Enemy *> mEnemies;
+	std::vector<class EnemyBase *> mEnemies;
 	std::vector<class Boss *> mBosses;
 	class Boss *mCurrentBoss;  // Pointer to active boss in current room (null when no boss)
 
