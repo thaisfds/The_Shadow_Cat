@@ -46,6 +46,11 @@ void HUD::Update(float deltaTime)
     mCursorImage->SetAngle(angle);
     mCursorImage->SetAbsolutePos(mouseAbsPos);
 
+    if (mGame->IsPaused())
+        mCursorImage->SetIsVisible(false);
+    else
+        mCursorImage->SetIsVisible(true);
+
     // Update enemies left  ------------------- //
     int enemiesLeft = mGame->CountAliveEnemies();
     mEnemiesLeftCount->SetText(std::to_string(enemiesLeft));
