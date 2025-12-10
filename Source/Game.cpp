@@ -35,7 +35,7 @@ Game::Game()
 	  mTicksCount(0),
 	  mIsRunning(true),
 	  mIsDebugging(false),
-	  mIsGodMode(true),
+	  mIsGodMode(false),
 	  mUpdatingActors(false),
 	  mCameraPos(Vector2::Zero),
 	  mLevelData(nullptr),
@@ -658,10 +658,10 @@ void Game::ProcessInput()
 				mUIStack.back()->HandleKeyPress(event.key.keysym.sym);
 			}
 
-			if (event.key.keysym.sym == SDLK_n && event.key.repeat == 0)
-			{
-				SetScene(GameScene::Level1);
-			}
+			// if (event.key.keysym.sym == SDLK_n && event.key.repeat == 0)
+			// {
+			// 	SetScene(GameScene::Level1);
+			// }
 
 			// Fullscreen toggle
 			if (event.key.keysym.sym == SDLK_F11 && event.key.repeat == 0)
@@ -688,11 +688,11 @@ void Game::ProcessInput()
 				mIsDebugging = !mIsDebugging;
 
 			// God Mode toggle
-			if (event.key.keysym.sym == SDLK_F2 && event.key.repeat == 0)
-			{
-				mIsGodMode = !mIsGodMode;
-				SDL_Log("[GOD MODE] %s", mIsGodMode ? "ENABLED" : "DISABLED");
-			}
+			// if (event.key.keysym.sym == SDLK_F2 && event.key.repeat == 0)
+			// {
+			// 	mIsGodMode = !mIsGodMode;
+			// 	SDL_Log("[GOD MODE] %s", mIsGodMode ? "ENABLED" : "DISABLED");
+			// }
 
 			// Tutorial HUD toggle
 			if (event.key.keysym.sym == SDLK_h && event.key.repeat == 0)
