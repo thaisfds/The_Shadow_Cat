@@ -66,6 +66,11 @@ void Character::TakeDamage(int damage)
     if (hp <= 0) Kill();
 }
 
+void Character::Heal(int amount)
+{
+    hp = Math::Min(hp + amount, maxHp);
+}
+
 void Character::Kill()
 {
     mIsDead = true;

@@ -1,12 +1,16 @@
 {
 	"id": "WhiteBoss",
 	"name": "White Boss",
-	"hp": 500,
+	"hp": 200,
 	"speed": 150,
 	"dropChance": 1.0,
 	"skills":
 	[
-		"BasicAttackSkill"
+		"WhiteSlashSkill",
+		"WhiteBombSkill",
+		"WhiteBubbleSkill",
+		"BossHealingSkill",
+		"basicAttackSkill"
 	],
 	"aiBehaviors":
 	{

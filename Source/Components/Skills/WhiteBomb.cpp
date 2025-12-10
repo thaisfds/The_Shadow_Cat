@@ -1,4 +1,4 @@
-#include "FurBall.h"
+#include "WhiteBomb.h"
 #include "../../Game.h"
 #include "../../GameConstants.h"
 #include "../Drawing/AnimatorComponent.h"
@@ -6,20 +6,21 @@
 #include "../Physics/ColliderComponent.h"
 #include "../Physics/Physics.h"
 #include "../../SkillFactory.h"
+#include "../../Actors/Characters/ShadowCat.h"
 
-FurBall::FurBall(Actor* owner, int updateOrder)
+WhiteBomb::WhiteBomb(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
 {
-	LoadSkillDataFromJSON("FurBallData");
+	LoadSkillDataFromJSON("WhiteBombData");
 
-	float duration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("FurBall");
+	float duration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("WhiteBomb");
 	if (duration == 0.0f) duration = 1.0f;
 	
 	AddDelayedAction(0.5f, [this]() { Execute(); });
 	AddDelayedAction(duration, [this]() { EndSkill(); });
 }
 
-nlohmann::json FurBall::LoadSkillDataFromJSON(const std::string& fileName)
+nlohmann::json WhiteBomb::LoadSkillDataFromJSON(const std::string& fileName)
 {
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
@@ -27,71 +28,110 @@ nlohmann::json FurBall::LoadSkillDataFromJSON(const std::string& fileName)
 	mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
 	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
 	auto id = GameJsonParser::GetStringValue(data, "id");
-
-	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "projectileSpeed", &mProjectileSpeed));
-	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "damage", &mDamage));
-	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "cooldown", &mCooldown));
-	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "range", &mRange));
+	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new WhiteBomb(owner); });
 
 	return data;
 }
 
-void FurBall::Execute()
+void WhiteBomb::Execute()
 {
 	float lifetime = mRange / mProjectileSpeed;
 
-	// Play furball sound
+	// Play bomb sound
 	mCharacter->GetGame()->GetAudio()->PlaySound("s05_furball_launch1.wav", false, 0.7f);
 
-	mCharacter->GetGame()->GetFurBallActor()->Awake(
+	mCharacter->GetGame()->GetWhiteBombActor()->Awake(
 		mCharacter->GetPosition() + mTargetVector * 20.0f,
 		mTargetVector,
 		mProjectileSpeed,
 		mDamage,
 		mCharacter->GetSkillFilter(),
 		mAreaOfEffect,
-		lifetime,
-		mAnim
+		lifetime
 	);
 }
 
-void FurBall::StartSkill(Vector2 targetPosition)
+void WhiteBomb::StartSkill(Vector2 targetPosition)
 {
 	SkillBase::StartSkill(targetPosition);
 	mTargetVector -= mCharacter->GetPosition();
 	mTargetVector.Normalize();
 
-	mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("FurBall");
+	mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("WhiteBomb");
 	mCharacter->SetMovementLock(true);
 }
 
-void FurBall::EndSkill()
+void WhiteBomb::EndSkill()
 {
 	SkillBase::EndSkill();
 
 	mCharacter->SetMovementLock(false);
 }
 
-FurBallActor::FurBallActor(class Game* game)
+bool WhiteBomb::EnemyShouldUse()
+{
+	auto player = mCharacter->GetGame()->GetPlayer();
+	if (!player) return false;
+
+	Vector2 toPlayer = player->GetPosition() - mCharacter->GetPosition();
+	float distanceToPlayer = toPlayer.Length();
+
+	return distanceToPlayer <= mRange;
+}
+
+WhiteBombActor::WhiteBombActor(class Game* game)
 	: Actor(game)
 {
-	mAnimatorComponent = new AnimatorComponent(this, "FurBallAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+	mAnimatorComponent = new AnimatorComponent(this, "WhiteBombAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
 	CollisionFilter filter;
 	mColliderComponent = new ColliderComponent(this, 0, 0, nullptr, filter);
 	mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 0.0f, false);
 	Kill();
 }
 
-FurBallActor::~FurBallActor()
+WhiteBombActor::~WhiteBombActor()
 {
 }
 
-void FurBallActor::OnUpdate(float deltaTime)
+void WhiteBombActor::OnUpdate(float deltaTime)
 {
 	if (mDead) return;
 
-	Vector2 velocity = mDirection * mSpeed;
-	mRigidBodyComponent->SetVelocity(velocity);
+	mLifetime -= deltaTime;
+	if (mLifetime <= 0.0f)
+	{
+		Kill();
+		return;
+	}
+
+	// Always follow the player
+	auto player = GetGame()->GetPlayer();
+	if (player && !player->IsDead())
+	{
+		Vector2 toPlayer = player->GetPosition() - GetPosition();
+		float distance = toPlayer.Length();
+		
+		if (distance > 0.1f)
+		{
+			Vector2 direction = toPlayer;
+			direction.Normalize();
+			Vector2 velocity = direction * mSpeed;
+			mRigidBodyComponent->SetVelocity(velocity);
+		}
+		else
+		{
+			// Hit player, deal damage
+			player->TakeDamage(mDamage);
+			Kill();
+			return;
+		}
+	}
+	else
+	{
+		// Player is dead or doesn't exist, continue in current direction
+		Vector2 velocity = mDirection * mSpeed;
+		mRigidBodyComponent->SetVelocity(velocity);
+	}
 
 	// Check for collisions
 	ColliderComponent* colliderComp = GetComponent<ColliderComponent>();
@@ -99,10 +139,10 @@ void FurBallActor::OnUpdate(float deltaTime)
 	for (auto collider : hitColliders)
 	{
 		auto enemyActor = collider->GetOwner();
-		auto enemyCharacter = dynamic_cast<Character*>(enemyActor);
-		if (enemyCharacter)
+		auto playerCharacter = dynamic_cast<ShadowCat*>(enemyActor);
+		if (playerCharacter)
 		{
-			enemyCharacter->TakeDamage(mDamage);
+			playerCharacter->TakeDamage(mDamage);
 			Kill();
 			return;
 		}
@@ -111,7 +151,7 @@ void FurBallActor::OnUpdate(float deltaTime)
 	mDelayedActions.Update(deltaTime);
 }
 
-void FurBallActor::Kill()
+void WhiteBombActor::Kill()
 {
 	mAnimatorComponent->SetVisible(false);
 	mAnimatorComponent->SetEnabled(false);
@@ -124,11 +164,11 @@ void FurBallActor::Kill()
 	mDelayedActions.Clear();
 }
 
-void FurBallActor::Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter, Collider* areaOfEffect, float lifetime, std::string anim)
+void WhiteBombActor::Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter, Collider* areaOfEffect, float lifetime)
 {
 	mAnimatorComponent->SetEnabled(true);
 	mAnimatorComponent->SetVisible(true);
-	mAnimatorComponent->LoopAnimation(anim);
+	mColliderComponent->SetEnabled(true);
 	mColliderComponent->SetFilter(filter);
 	mColliderComponent->SetCollider(areaOfEffect);
 	mColliderComponent->SetDebugDrawIfDisabled(true);
@@ -141,8 +181,9 @@ void FurBallActor::Awake(Vector2 position, Vector2 direction, float speed, int d
 	mDirection = direction;
 	mSpeed = speed;
 	mDamage = damage;
+	mLifetime = lifetime;
 	mDead = false;
 	
 	mDelayedActions.Reset();
-	AddDelayedAction(lifetime, [this]() { Kill(); });
 }
+

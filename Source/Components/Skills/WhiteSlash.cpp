@@ -1,68 +1,58 @@
-#include "BasicAttack.h"
+#include "WhiteSlash.h"
 
 #include "../AnimatedParticleSystemComponent.h"
 #include "../../Actors/Actor.h"
 #include "../../Actors/Characters/Character.h"
-#include "../../Actors/Characters/Boss.h"
-#include "../../Actors/Characters/BossBase.h"
 #include "../Drawing/AnimatorComponent.h"
-#include "../Drawing/DrawComponent.h"
 #include "../Physics/Physics.h"
 #include "../../Game.h"
-#include "SkillBase.h"
 #include "../../SkillFactory.h"
 #include "../../Actors/Characters/ShadowCat.h"
 
-
-BasicAttack::BasicAttack(Actor* owner, int updateOrder)
+WhiteSlash::WhiteSlash(Actor* owner, int updateOrder)
     : SkillBase(owner, updateOrder)
 {
-    LoadSkillDataFromJSON("BasicAttackData");
+    LoadSkillDataFromJSON("WhiteSlashData");
 
-    float attackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("BasicAttack");
-    if (attackDuration == 0.0f) attackDuration = 1.0f;
-    AddDelayedAction(0.53f, [this]() { Execute(); });
+    float attackDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("WhiteSlash");
+    if (attackDuration == 0.0f) attackDuration = 0.5f;
+    AddDelayedAction(0.3f, [this]() { Execute(); });
     AddDelayedAction(attackDuration, [this]() { EndSkill(); });
 }
 
-nlohmann::json BasicAttack::LoadSkillDataFromJSON(const std::string& fileName)
+nlohmann::json WhiteSlash::LoadSkillDataFromJSON(const std::string& fileName)
 {
     auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
     mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
     mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
     auto id = GameJsonParser::GetStringValue(data, "id");
+    SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new WhiteSlash(owner); });
 
     return data;
 }
 
-void BasicAttack::StartSkill(Vector2 targetPosition)
+void WhiteSlash::StartSkill(Vector2 targetPosition)
 {
     SkillBase::StartSkill(targetPosition);
     mTargetVector -= mCharacter->GetPosition();
     mTargetVector.Normalize();
 
-    mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("BasicAttack");
+    mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("WhiteSlash");
     mCharacter->SetMovementLock(true);
+    mCharacter->SetAnimationLock(true);
     
-    // Play appropriate sound based on character type
-    std::string sound;
-    if (dynamic_cast<Boss*>(mCharacter) || dynamic_cast<BossBase*>(mCharacter))
-    {
-        // Bosses use only s08_boss_simple_attack1.wav
-        sound = "s08_boss_simple_attack1.wav";
-    }
-    else
-    {
-        // Regular enemies and player use basic attack sounds
-        sound = rand() % 2 ? "s01_basic_attack1.wav" : "s02_basic_attack2.wav";
-    }
+    // Play boss attack sound
+    int choice = rand() % 3;
+    std::string sound = choice == 0 ? "s08_boss_simple_attack1.wav" : 
+                        choice == 1 ? "s09_boss_simple_attack2.wav" : "s10_boss_simple_attack3.wav";
     mCharacter->GetGame()->GetAudio()->PlaySound(sound, false, 0.5f);
 }
 
-void BasicAttack::Execute()
+void WhiteSlash::Execute()
 {
-    mCharacter->GetGame()->GetAttackTrailActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
+    // Emit WhiteSlash particle effect (similar to AttackTrail)
+    mCharacter->GetGame()->GetWhiteSlashActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
         0.3f,
         0.0f,
         mCharacter->GetPosition() + mTargetVector * mRange,
@@ -72,7 +62,7 @@ void BasicAttack::Execute()
 
     auto collisionActor = mCharacter->GetGame()->GetCollisionQueryActor();
 
-	((PolygonCollider*)mAreaOfEffect)->SetForward(mTargetVector);
+    ((PolygonCollider*)mAreaOfEffect)->SetForward(mTargetVector);
     collisionActor->GetComponent<ColliderComponent>()->SetCollider(mAreaOfEffect);
     collisionActor->GetComponent<ColliderComponent>()->SetFilter(mCharacter->GetSkillFilter());
 
@@ -82,26 +72,29 @@ void BasicAttack::Execute()
     {
         auto enemyActor = collider->GetOwner();
         auto enemyCharacter = dynamic_cast<Character*>(enemyActor);
-        enemyCharacter->TakeDamage(mDamage);
+        if (enemyCharacter)
+        {
+            enemyCharacter->TakeDamage(mDamage);
+        }
     }
 
     if (mCharacter->GetGame()->IsDebugging())
-	{
-		auto vertices = ((PolygonCollider*)mAreaOfEffect)->GetVertices();
-		for (auto& v : vertices) v += pos;
-		Physics::DebugDrawPolygon(mCharacter->GetGame(), vertices, 0.5f, 15);
-	}
+    {
+        auto vertices = ((PolygonCollider*)mAreaOfEffect)->GetVertices();
+        for (auto& v : vertices) v += pos;
+        Physics::DebugDrawPolygon(mCharacter->GetGame(), vertices, 0.5f, 15);
+    }
 }
 
-void BasicAttack::EndSkill()
+void WhiteSlash::EndSkill()
 {
     SkillBase::EndSkill();
     
     mCharacter->SetMovementLock(false);
-    mCharacter->SetAnimationLock(false);  // Unlock animations
+    mCharacter->SetAnimationLock(false);
 }
 
-bool BasicAttack::EnemyShouldUse()
+bool WhiteSlash::EnemyShouldUse()
 {
     auto player = mCharacter->GetGame()->GetPlayer();
     if (!player) return false;
@@ -111,3 +104,4 @@ bool BasicAttack::EnemyShouldUse()
 
     return distanceToPlayer <= mRange;
 }
+
