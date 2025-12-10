@@ -696,6 +696,15 @@ void Game::ProcessInput()
 				if (mTutorialHUD)
 					mTutorialHUD->ToggleControlVisibility(); // Pass event to actors
 
+			// Pause toggle
+			if (event.key.keysym.sym == SDLK_ESCAPE && event.key.repeat == 0)
+				if (mCurrentScene > GameScene::MainMenu && mShadowCat && mShadowCat->GetUpgradePoints() == 0) {
+					if (mIsPaused)
+						ResumeGame();
+					else
+						PauseGame();
+				}
+
 			for (auto actor : mActors)
 				actor->OnHandleEvent(event);
 			break;

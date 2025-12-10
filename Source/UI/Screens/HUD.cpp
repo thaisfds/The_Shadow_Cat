@@ -9,6 +9,13 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
     mMaxHealth(maxHealth),
     mHealth(maxHealth)
 {   
+    // Pause stuff, persistent
+    mPauseText = AddText("Game Paused", Vector2(0.0f, 0.0f), 1.0f, 0.0f, 60, 1024, 10000);
+    mPauseFade = AddImage("../Assets/HUD/Background/UpgradeBackground.png", Vector2::Zero, 1.0f, 0.0f, -1);
+    
+    mPauseFade->SetIsVisible(false);
+    mPauseText->SetIsVisible(false);
+
     // Main health icons, top left
     mMaxHealth = std::max(2, mMaxHealth); // Ensure at least 2
     mHealth = mMaxHealth;
@@ -132,10 +139,21 @@ void HUD::Update(float deltaTime)
     mCursorImage->SetAngle(angle);
     mCursorImage->SetAbsolutePos(mouseAbsPos);
 
-    if (mGame->IsPaused())
+    // Pause handlers
+    if (mGame->IsPaused()) {
         mCursorImage->SetIsVisible(false);
-    else
+    } else {
         mCursorImage->SetIsVisible(true);
+    }
+
+    // Pause with no upgrades is normal pause
+    if (mGame->IsPaused() && mGame->GetPlayer() && mGame->GetPlayer()->GetUpgradePoints() == 0) {
+        mPauseFade->SetIsVisible(true);
+        mPauseText->SetIsVisible(true);
+    } else {
+        mPauseFade->SetIsVisible(false);
+        mPauseText->SetIsVisible(false);
+    }
 
     // Update enemies left  ------------------- //
     int enemiesLeft = mGame->CountAliveEnemies();

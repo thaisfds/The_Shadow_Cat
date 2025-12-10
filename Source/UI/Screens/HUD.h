@@ -40,4 +40,7 @@ private:
     std::vector<UIImage*> mSkillIcons;
     std::vector<UIImage*> mSkillHints;
     std::vector<UIText*> mSkillCDText;
+
+    UIText* mPauseText = nullptr;
+    UIImage* mPauseFade = nullptr;
 };
