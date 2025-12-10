@@ -22,12 +22,12 @@ nlohmann::json ShadowForm::LoadSkillDataFromJSON(const std::string& fileName)
 {
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
-	mDuration = SkillJsonParser::GetFloatValue(data, "duration");
-	mSpeed = SkillJsonParser::GetFloatEffectValue(data, "speedMultiplier");
+	mDuration = GameJsonParser::GetFloatValue(data, "duration");
+	mSpeed = GameJsonParser::GetFloatEffectValue(data, "speedMultiplier");
 
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "duration", &mDuration));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "speedMultiplier", &mSpeed));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "duration", &mDuration));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "speedMultiplier", &mSpeed));
 	return data;
 }
 

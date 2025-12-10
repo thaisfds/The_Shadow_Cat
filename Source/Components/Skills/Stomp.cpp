@@ -20,14 +20,14 @@ nlohmann::json Stomp::LoadSkillDataFromJSON(const std::string& fileName)
 {
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
-	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
-	mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
+	mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
+	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
 	mRadius = mAreaOfEffect ? ((CircleCollider*)mAreaOfEffect)->GetRadius() : 0.0f;
 
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "damage", &mDamage));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "range", &mRange));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "radius", &mRadius));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "damage", &mDamage));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "range", &mRange));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "radius", &mRadius));
 
 	return data;
 }

@@ -115,8 +115,8 @@ add_executable(${PROJECT_NAME}
         Source/Debug/EnemyDebugDrawer.h
         Source/DelayedActionSystem.cpp
         Source/DelayedActionSystem.h
-        Source/SkillJsonParser.cpp
-        Source/SkillJsonParser.h
+        Source/GameJsonParser.cpp
+        Source/GameJsonParser.h
         Source/Components/Skills/UpgradeInfo.h
         Source/Components/Skills/Bomb.cpp
         Source/Components/Skills/Bomb.h

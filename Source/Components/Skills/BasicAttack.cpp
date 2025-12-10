@@ -25,8 +25,8 @@ nlohmann::json BasicAttack::LoadSkillDataFromJSON(const std::string& fileName)
 {
     auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
-    mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
-    mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
+    mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
+    mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
 
     return data;
 }

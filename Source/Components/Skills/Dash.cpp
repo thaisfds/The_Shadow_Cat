@@ -22,11 +22,11 @@ nlohmann::json Dash::LoadSkillDataFromJSON(const std::string& fileName)
 {
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
-	mDashSpeed = SkillJsonParser::GetFloatEffectValue(data, "speed");
+	mDashSpeed = GameJsonParser::GetFloatEffectValue(data, "speed");
 
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "range", &mRange));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "speed", &mDashSpeed));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "range", &mRange));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "speed", &mDashSpeed));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
 
 	return data;
 }

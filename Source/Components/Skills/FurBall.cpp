@@ -22,14 +22,14 @@ nlohmann::json FurBall::LoadSkillDataFromJSON(const std::string& fileName)
 {
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
-	mProjectileSpeed = SkillJsonParser::GetFloatEffectValue(data, "projectileSpeed");
-	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
-	mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
+	mProjectileSpeed = GameJsonParser::GetFloatEffectValue(data, "projectileSpeed");
+	mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
+	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
 
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "projectileSpeed", &mProjectileSpeed));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "damage", &mDamage));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "range", &mRange));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "projectileSpeed", &mProjectileSpeed));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "damage", &mDamage));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "range", &mRange));
 
 	return data;
 }

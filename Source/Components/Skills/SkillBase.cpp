@@ -29,10 +29,10 @@ nlohmann::json SkillBase::LoadSkillDataFromJSON(const std::string& fileName)
 		return nullptr;
 	}
 
-	mName = SkillJsonParser::GetStringValue(skillData, "name");
-	mDescription = SkillJsonParser::GetStringValue(skillData, "description");
-	mCooldown = SkillJsonParser::GetFloatValue(skillData, "cooldown");
-	mRange = SkillJsonParser::GetFloatValue(skillData, "range");
+	mName = GameJsonParser::GetStringValue(skillData, "name");
+	mDescription = GameJsonParser::GetStringValue(skillData, "description");
+	mCooldown = GameJsonParser::GetFloatValue(skillData, "cooldown");
+	mRange = GameJsonParser::GetFloatValue(skillData, "range");
 
 	return skillData;
 }

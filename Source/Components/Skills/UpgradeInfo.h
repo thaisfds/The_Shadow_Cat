@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SkillBase.h"
 #include <functional>
 #include <string>
 
@@ -10,5 +11,6 @@ struct UpgradeInfo
     int currentLevel = 0;
     int maxLevel = -1;
 
+    SkillBase *skill = nullptr;
     float *upgradeTarget = nullptr;
 };

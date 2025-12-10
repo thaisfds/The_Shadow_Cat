@@ -1,10 +1,10 @@
-#include "SkillJsonParser.h"
+#include "GameJsonParser.h"
 #include "Components/Physics/Collider.h"
 #include "Components/Physics/Physics.h"
 #include "Components/Skills/SkillBase.h"
 #include <SDL.h>
 
-float SkillJsonParser::GetFloatEffectValue(const nlohmann::json &skillData, const std::string &effectName)
+float GameJsonParser::GetFloatEffectValue(const nlohmann::json &skillData, const std::string &effectName)
 {
 	if (skillData.contains("effects") && skillData["effects"].is_array())
 	{
@@ -22,7 +22,7 @@ float SkillJsonParser::GetFloatEffectValue(const nlohmann::json &skillData, cons
 	return 0.0f;
 }
 
-float SkillJsonParser::GetFloatValue(const nlohmann::json& skillData, const std::string& key)
+float GameJsonParser::GetFloatValue(const nlohmann::json& skillData, const std::string& key)
 {
 	if (skillData.contains(key))
 		return ExtractFloatValue(skillData, skillData[key]);
@@ -31,7 +31,7 @@ float SkillJsonParser::GetFloatValue(const nlohmann::json& skillData, const std:
 	return 0.0f;
 }
 
-float SkillJsonParser::ResolveReference(const nlohmann::json& skillData, const std::string& reference)
+float GameJsonParser::ResolveReference(const nlohmann::json& skillData, const std::string& reference)
 {
 	// Handle nested paths with dot notation (e.g., "effects.range")
 	size_t dotPos = reference.find('.');
@@ -51,7 +51,7 @@ float SkillJsonParser::ResolveReference(const nlohmann::json& skillData, const s
 	return 0.0f;
 }
 
-float SkillJsonParser::ExtractFloatValue(const nlohmann::json& skillData, const nlohmann::json& value)
+float GameJsonParser::ExtractFloatValue(const nlohmann::json& skillData, const nlohmann::json& value)
 {
 	if (value.is_number())
 		return value.get<float>();
@@ -68,7 +68,7 @@ float SkillJsonParser::ExtractFloatValue(const nlohmann::json& skillData, const 
 	return 0.0f;
 }
 
-std::string SkillJsonParser::GetStringValue(const nlohmann::json& skillData, const std::string& key)
+std::string GameJsonParser::GetStringValue(const nlohmann::json& skillData, const std::string& key)
 {
 	if (skillData.contains(key) && skillData[key].is_string())
 		return skillData[key].get<std::string>();
@@ -77,7 +77,7 @@ std::string SkillJsonParser::GetStringValue(const nlohmann::json& skillData, con
 	return "";
 }
 
-Collider* SkillJsonParser::GetAreaOfEffect(const nlohmann::json& skillData)
+Collider* GameJsonParser::GetAreaOfEffect(const nlohmann::json& skillData)
 {
 	if (skillData.contains("areaOfEffect") && skillData["areaOfEffect"].is_object())
 	{
@@ -116,7 +116,7 @@ Collider* SkillJsonParser::GetAreaOfEffect(const nlohmann::json& skillData)
 	return nullptr;
 }
 
-UpgradeInfo SkillJsonParser::GetUpgradeInfo(const nlohmann::json& skillData, const std::string& upgradeType, float *upgradeTarget)
+UpgradeInfo GameJsonParser::GetUpgradeInfo(const SkillBase *skill, const nlohmann::json& skillData, const std::string& upgradeType, float *upgradeTarget)
 {
 	UpgradeInfo info;
 	if (skillData.contains("upgrades") && skillData["upgrades"].is_array())
@@ -132,6 +132,7 @@ UpgradeInfo SkillJsonParser::GetUpgradeInfo(const nlohmann::json& skillData, con
 				return info;
 			}
 		}
+		info.skill = skill;
 		info.upgradeTarget = upgradeTarget;
 	}
 

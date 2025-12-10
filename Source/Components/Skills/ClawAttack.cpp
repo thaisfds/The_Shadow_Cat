@@ -31,10 +31,10 @@ nlohmann::json ClawAttack::LoadSkillDataFromJSON(const std::string& fileName)
 {
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
-	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
-	mForwardSpeed = SkillJsonParser::GetFloatEffectValue(data, "forwardSpeed");
-	mBackwardDistancePercentage = SkillJsonParser::GetFloatEffectValue(data, "backwardDistancePercentage");
-	mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
+	mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
+	mForwardSpeed = GameJsonParser::GetFloatEffectValue(data, "forwardSpeed");
+	mBackwardDistancePercentage = GameJsonParser::GetFloatEffectValue(data, "backwardDistancePercentage");
+	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
 
 	return data;
 }
