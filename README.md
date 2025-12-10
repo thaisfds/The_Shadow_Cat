@@ -12,7 +12,7 @@ A progressão acontece através da derrota dos inimigos que podem conceder novas
 
 ## Vídeo de Demonstração
 
-🎬 **[Assista ao gameplay no YouTube](LINK_DO_VIDEO_AQUI)**
+🎬 **[Assista ao gameplay no YouTube](https://youtu.be/D6KMm25wgSw)**
 
 ---
 
