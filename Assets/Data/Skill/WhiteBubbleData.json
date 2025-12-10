@@ -1,5 +1,5 @@
 {
-	"id": "WhiteBubbleSkill",
+	"id": "whiteBubbleSkill",
 	"name": "White Bubble",
 	"description": "Creates a circular area that damages the player over time.",
 	"iconPath": "../Assets/Icons/BombAttackCard.png",

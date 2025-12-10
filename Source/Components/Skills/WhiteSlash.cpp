@@ -26,8 +26,6 @@ nlohmann::json WhiteSlash::LoadSkillDataFromJSON(const std::string& fileName)
 
     mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
     mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
-    auto id = GameJsonParser::GetStringValue(data, "id");
-    SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new WhiteSlash(owner); });
 
     return data;
 }

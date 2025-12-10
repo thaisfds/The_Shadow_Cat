@@ -177,9 +177,12 @@ void Game::UnloadScene()
 		delete actor;
 	}
 
+	mUpgradeTreatActors.clear();
 	mStompActors.clear();
 	mFurBallActors.clear();
 	mEnemies.clear();
+	mWhiteBombActors.clear();
+	mWhiteBubbleActors.clear();
 
 	// Delete UI screens
 	for (auto ui : mUIStack)
@@ -404,27 +407,6 @@ void Game::InitializeActors()
 
 	mWhiteSlashActor = new Actor(this);
 	new AnimatedParticleSystemComponent(mWhiteSlashActor, "WhiteSlashAnim", false);
-
-	// Pre-register boss skills before any enemies are created
-	// This ensures they are registered in SkillFactory before EnemyBase tries to create them
-	// Create temporary Character (Dummy) and skills just for registration
-	// The skills will register themselves in SkillFactory during construction
-	// Then delete the temporary Character (it will automatically clean up the skill components)
-	// Note: Skills are NOT added to the Character's mSkills vector, only registered in SkillFactory
-	{
-		Dummy *tempCharacter = new Dummy(this, Vector2::Zero, 0.0f);
-
-		// Create temporary instances to trigger registration
-		// These will register themselves in SkillFactory during construction
-		new WhiteSlash(tempCharacter);
-		new WhiteBomb(tempCharacter);
-		new WhiteBubble(tempCharacter);
-		new BossHealing(tempCharacter);
-
-		// Skills are now registered in SkillFactory
-		// Delete the temporary character (it will clean up the skill components automatically)
-		delete tempCharacter;
-	}
 
 	std::string levelPath;
 
@@ -1372,16 +1354,14 @@ int Game::CountAliveBosses() const
 
 void Game::InitializeSkills()
 {
-	SkillFactory::Instance().RegisterSkill("basicAttackSkill", [](Actor *owner)
-										   { return new BasicAttack(owner); });
-	SkillFactory::Instance().RegisterSkill("clawAttackSkill", [](Actor *owner)
-										   { return new ClawAttack(owner); });
-	SkillFactory::Instance().RegisterSkill("dashSkill", [](Actor *owner)
-										   { return new Dash(owner); });
-	SkillFactory::Instance().RegisterSkill("shadowFormSkill", [](Actor *owner)
-										   { return new ShadowForm(owner); });
-	SkillFactory::Instance().RegisterSkill("stompSkill", [](Actor *owner)
-										   { return new Stomp(owner); });
-	SkillFactory::Instance().RegisterSkill("furBallSkill", [](Actor *owner)
-										   { return new FurBall(owner); });
+	SkillFactory::Instance().RegisterSkill("basicAttackSkill", [](Actor *owner) { return new BasicAttack(owner); });
+	SkillFactory::Instance().RegisterSkill("clawAttackSkill", [](Actor *owner){ return new ClawAttack(owner); });
+	SkillFactory::Instance().RegisterSkill("dashSkill", [](Actor *owner) { return new Dash(owner); });
+	SkillFactory::Instance().RegisterSkill("shadowFormSkill", [](Actor *owner) { return new ShadowForm(owner); });
+	SkillFactory::Instance().RegisterSkill("stompSkill", [](Actor *owner) { return new Stomp(owner); });
+	SkillFactory::Instance().RegisterSkill("furBallSkill", [](Actor *owner) { return new FurBall(owner); });
+	SkillFactory::Instance().RegisterSkill("whiteSlashSkill", [](Actor *owner) { return new WhiteSlash(owner); });
+	SkillFactory::Instance().RegisterSkill("whiteBombSkill", [](Actor *owner) { return new WhiteBomb(owner); });
+	SkillFactory::Instance().RegisterSkill("whiteBubbleSkill", [](Actor *owner) { return new WhiteBubble(owner); });
+	SkillFactory::Instance().RegisterSkill("bossHealingSkill", [](Actor *owner) { return new BossHealing(owner); });
 }

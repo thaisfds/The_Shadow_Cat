@@ -1,5 +1,5 @@
 {
-	"id": "BossHealingSkill",
+	"id": "bossHealingSkill",
 	"name": "Boss Healing",
 	"description": "Automatically heals the boss when reaching health thresholds.",
 	"iconPath": "../Assets/Icons/HealCard.png",
