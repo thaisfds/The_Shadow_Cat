@@ -4,6 +4,7 @@
 #include "../../Actors/Actor.h"
 #include "../../Actors/Characters/Character.h"
 #include "../../Actors/Characters/Boss.h"
+#include "../../Actors/Characters/BossBase.h"
 #include "../Drawing/AnimatorComponent.h"
 #include "../Drawing/DrawComponent.h"
 #include "../Physics/Physics.h"
@@ -48,12 +49,10 @@ void BasicAttack::StartSkill(Vector2 targetPosition)
     
     // Play appropriate sound based on character type
     std::string sound;
-    if (dynamic_cast<Boss*>(mCharacter))
+    if (dynamic_cast<Boss*>(mCharacter) || dynamic_cast<BossBase*>(mCharacter))
     {
-        // Bosses use boss attack sounds
-        int choice = rand() % 3;
-        sound = choice == 0 ? "s08_boss_simple_attack1.wav" : 
-                choice == 1 ? "s09_boss_simple_attack2.wav" : "s10_boss_simple_attack3.wav";
+        // Bosses use only s08_boss_simple_attack1.wav
+        sound = "s08_boss_simple_attack1.wav";
     }
     else
     {
