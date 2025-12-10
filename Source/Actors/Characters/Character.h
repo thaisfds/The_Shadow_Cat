@@ -31,6 +31,7 @@ public:
     void SetAnimationLock(bool isLocked);
 
     int GetHP() const { return hp; }
+    int SetHP(int newHP) { hp = std::clamp(newHP, 0, maxHp); return hp; }
     int GetMaxHP() const { return maxHp; }
 
     bool GetMovementLock() const { return mIsMovementLocked; }
@@ -39,7 +40,7 @@ public:
     bool IsUsingSkill() const { return mIsUsingSkill; }
     void SetIsUsingSkill(bool isUsing) { mIsUsingSkill = isUsing; }
 
-    std::vector<SkillBase*> GetSkills() const { return mSkills; }
+    virtual std::vector<SkillBase*> GetSkills() const { return mSkills; }
     
     bool IsDead() const { return mIsDead; }
 

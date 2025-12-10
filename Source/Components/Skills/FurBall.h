@@ -16,12 +16,17 @@ public:
 	void StartSkill(Vector2 targetPosition) override;
 	void EndSkill() override;
 
+	bool EnemyShouldUse() override { return true; }
+
 	void Execute();
+
+	void SetAnimation(std::string anim) { mAnim = anim; }
 
 private:
 	float mProjectileSpeed;
 	float mDamage;
 	Collider* mAreaOfEffect;
+	std::string mAnim = "shadow";
 
 	nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;
 };
@@ -35,7 +40,7 @@ public:
 	void OnUpdate(float deltaTime) override;
 
 	void Kill() override;
-	void Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter, Collider* areaOfEffect, float lifetime);
+	void Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter, Collider* areaOfEffect, float lifetime, std::string anim);
 
 	bool IsDead() const { return mDead; }
 

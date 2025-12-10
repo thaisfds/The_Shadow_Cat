@@ -21,12 +21,17 @@ TutorialHUD::TutorialHUD(class Game* game, const std::string& fontName)
     AddImage("../Assets/HUD/Menu/KeyboardE.png", Vector2(40.0f, -215.0f), 0.8f, 0.0f);
     AddImage("../Assets/HUD/Menu/KeyboardSHIFT.png", Vector2(40.0f, -190.0f), 1.0f, 0.0f);
 
+    // Mouse aim
+    AddImage("../Assets/Icons/Cursor.png", Vector2(255.0f, -240.0f), 0.6f, 0.0f);
+    AddImage("../Assets/Icons/Cursor.png", Vector2(255.0f, -215.0f), 0.6f, 0.0f);
+    AddImage("../Assets/Icons/Cursor.png", Vector2(255.0f, -190.0f), 0.6f, 0.0f);
+
     AddText("Move", Vector2(-110.0f, -240.0f), 0.4f);
     AddText("Basic Attack", Vector2(-165.0f, -200.0f), 0.4f);
     AddText("Claw Attack", Vector2(-45.0f, -200.0f), 0.4f);
 
-    AddText("Furball - Aim with mouse", Vector2(150.0f, -240.0f), 0.4f);
-    AddText("Stomp - Aim with mouse", Vector2(150.0f, -215.0f), 0.4f);
+    AddText("Stomp - Aim with mouse", Vector2(150.0f, -240.0f), 0.4f);
+    AddText("Furball - Aim with mouse", Vector2(150.0f, -215.0f), 0.4f);
     AddText("Dash - Aim with mouse", Vector2(150.0f, -190.0f), 0.4f);
 
     // Toggle visibility instruction

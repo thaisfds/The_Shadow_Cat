@@ -37,4 +37,6 @@ private:
 
     // Upgrade Info copy
     std::vector<UpgradeInfo> mCurrentUpgradeInfo;
+
+    UIText* mInfoText = nullptr;
 };

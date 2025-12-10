@@ -37,7 +37,6 @@ nlohmann::json ClawAttack::LoadSkillDataFromJSON(const std::string& fileName)
 	mBackwardDistancePercentage = GameJsonParser::GetFloatEffectValue(data, "backwardDistancePercentage");
 	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
 	auto id = GameJsonParser::GetStringValue(data, "id");
-	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new ClawAttack(owner); });
 
 	return data;
 }

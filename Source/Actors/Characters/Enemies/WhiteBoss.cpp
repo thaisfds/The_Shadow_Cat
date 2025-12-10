@@ -12,18 +12,19 @@
 
 WhiteBoss::WhiteBoss(class Game* game, Vector2 position, float forwardSpeed)
 	: BossBase(game, position, forwardSpeed)
+	, mFootstepTimer(0.0f)
 {
 	mAnimatorComponent = new AnimatorComponent(this, "WhiteBossAnim", GameConstants::TILE_SIZE * 2.0f, GameConstants::TILE_SIZE * 2.0f);
 
 	// Boss sprite is 128x128 (TILE_SIZE * 2.0f), so we need a larger collider
 	// Replace the default Character collider (48x32) with a boss-sized one (112x96)
 	// This matches the size used in the old Boss class
-	Collider* oldCollider = mColliderComponent->GetCollider();
+	Collider *oldCollider = mColliderComponent->GetCollider();
 	if (oldCollider)
 	{
 		delete oldCollider;
 	}
-	Collider* bossCollider = new AABBCollider(112, 96);
+	Collider *bossCollider = new AABBCollider(112, 96);
 	mColliderComponent->SetCollider(bossCollider);
 
 	// Load additional animations for skills
@@ -37,25 +38,50 @@ WhiteBoss::WhiteBoss(class Game* game, Vector2 position, float forwardSpeed)
 void WhiteBoss::OnUpdate(float deltaTime)
 {
 	EnemyBase::OnUpdate(deltaTime);
-	
-	if (mIsDead) return;
-	
+
+	if (mIsDead)
+		return;
+
 	// Check if healing should trigger
 	CheckAndTriggerHealing();
+
+	// Play footstep sounds when moving
+	if (mIsMoving && !mIsDead)
+	{
+		mFootstepTimer -= deltaTime;
+
+		if (mFootstepTimer <= 0.0f)
+		{
+			mFootstepTimer = 0.4f; // Reset timer (slower than player)
+
+			// Use grass sounds for Boss 1
+			std::string sound1 = "e10_boss_step_on_grass1.wav";
+			std::string sound2 = "e11_boss_step_on_grass2.wav";
+
+			// Play random one of the two sounds
+			GetGame()->GetAudio()->PlaySound(rand() % 2 ? sound1 : sound2, false, 1.0f);
+		}
+	}
+	else
+	{
+		mFootstepTimer = 0.0f; // Reset when not moving
+	}
 }
 
 void WhiteBoss::CheckAndTriggerHealing()
 {
 	// Find BossHealing skill
-	BossHealing* healingSkill = nullptr;
+	BossHealing *healingSkill = nullptr;
 	for (auto skill : mSkills)
 	{
-		healingSkill = dynamic_cast<BossHealing*>(skill);
-		if (healingSkill) break;
+		healingSkill = dynamic_cast<BossHealing *>(skill);
+		if (healingSkill)
+			break;
 	}
-	
-	if (!healingSkill) return;
-	
+
+	if (!healingSkill)
+		return;
+
 	// Check if healing should trigger
 	if (healingSkill->ShouldTriggerHealing())
 	{

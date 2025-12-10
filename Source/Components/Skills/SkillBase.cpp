@@ -89,7 +89,7 @@ void SkillBase::RegisterUpgrade(const std::string& type, float value, int maxLev
 	mUpgrades.push_back(info);
 }
 
-void SkillBase::ApplyUpgrade(const std::string& upgradeType)
+void SkillBase::ApplyUpgrade(const std::string& upgradeType, int levels)
 {
     auto it = std::find_if(mUpgrades.begin(), mUpgrades.end(), [&](const UpgradeInfo& upgrade)
 	{
@@ -98,9 +98,9 @@ void SkillBase::ApplyUpgrade(const std::string& upgradeType)
     if (it == mUpgrades.end()) return;
     
     auto& upgrade = *it;
-    upgrade.currentLevel++;
+    upgrade.currentLevel += levels;
     
-    *(upgrade.upgradeTarget) += upgrade.value;
+    *(upgrade.upgradeTarget) += upgrade.value * levels;
 }
 
 bool SkillBase::CanUpgrade(const std::string& upgradeType) const

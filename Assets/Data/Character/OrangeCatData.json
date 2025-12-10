@@ -1,0 +1,30 @@
+{
+	"id": "OrangeCat",
+	"name": "Orange Cat",
+	"hp": 70,
+	"speed": 120,
+	"dropChance": 0.5,
+	"skills":
+	[
+		"dashSkill",
+		"furBallSkill"
+	],
+	"aiBehaviors":
+	{
+		"patrol":
+		{
+			"radius": 250.0,
+			"pauseMinDuration": 1.0,
+			"pauseMaxDuration": 2.0,
+			"detectionRange": 250.0,
+			"visionRange": 400.0,
+			"detectionAngleDegrees": 75.0
+		},
+		"flee":
+		{
+			"distance": 400.0,
+			"speedMultiplier": 1.5,
+			"cooldown": 3.0
+		}
+	}
+}

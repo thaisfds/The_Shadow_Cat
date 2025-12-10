@@ -21,6 +21,8 @@ Character::Character(class Game *game, Vector2 position, float forwardSpeed)
     
     Collider *collider = new AABBCollider(48, 32);
     mColliderComponent = new ColliderComponent(this, Vector2(0, 16), collider);
+
+    maxHp = hp;
 }
 
 Character::Character(class Game *game, float forwardSpeed)

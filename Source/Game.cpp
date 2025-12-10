@@ -6,6 +6,7 @@
 #include "Actors/Characters/Dummy.h"
 #include "Actors/Characters/Enemies/WhiteBoss.h"
 #include "Actors/Characters/Enemies/WhiteCat.h"
+#include "Actors/Characters/Enemies/OrangeCat.h"
 #include "Actors/Characters/EnemyBase.h"
 #include "Actors/UpgradeTreat.h"
 #include "CSV.h"
@@ -15,6 +16,7 @@
 #include "Components/Drawing/DrawComponent.h"
 #include "Components/Physics/RigidBodyComponent.h"
 #include "Random.h"
+#include "SkillFactory.h"
 #include "UI/Screens/MainMenu.h"
 #include "UI/Screens/HUD.h"
 #include "UI/Screens/TutorialHUD.h"
@@ -33,6 +35,9 @@
 #include "Components/Skills/WhiteBubble.h"
 #include "Components/Skills/BossHealing.h"
 #include "Actors/Characters/Dummy.h"
+#include "Components/Skills/ClawAttack.h"
+#include "Components/Skills/Dash.h"
+#include "Components/Skills/ShadowForm.h"
 
 Game::Game()
 	: mWindow(nullptr),
@@ -62,7 +67,7 @@ Game::Game()
 
 bool Game::Initialize()
 {
-	
+
 	Random::Init();
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0)
@@ -132,6 +137,8 @@ bool Game::Initialize()
 
 	mTicksCount = SDL_GetTicks();
 
+	InitializeSkills();
+
 	return true;
 }
 
@@ -147,8 +154,24 @@ void Game::UnloadScene()
 	// Use state so we can call this from within an actor update
 	for (auto *actor : mActors)
 	{
-		if (actor->IsPersistent()) continue;
+		if (actor->IsPersistent())
+			continue;
 		actor->SetState(ActorState::Destroy);
+	}
+
+	// delete actors before clearing lists
+	std::vector<Actor *> deadActors;
+	for (auto actor : mActors)
+	{
+		if (actor->GetState() == ActorState::Destroy)
+		{
+			deadActors.emplace_back(actor);
+		}
+	}
+
+	for (auto actor : deadActors)
+	{
+		delete actor;
 	}
 
 	mStompActors.clear();
@@ -196,8 +219,35 @@ void Game::ResumeGame()
 
 void Game::ResetGame()
 {
-	// Bugged so return for now
-	return;
+	// Stop all sounds including game over/victory music
+	mAudio->StopAllSounds();
+
+	// kill ui screens except huds
+	auto iter = mUIStack.begin();
+	while (iter != mUIStack.end())
+	{
+		if ((*iter)->GetState() == UIScreen::UIState::Closing)
+		{
+			delete *iter;
+			iter = mUIStack.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
+
+	// reset game over conditions
+	SetGameOver(false);
+	SetGameWon(false);
+
+	SetScene(GameScene::Level1);
+
+	mCurrentBoss = nullptr;
+
+	mShadowCat->SetHP(mShadowCat->GetMaxHP());
+
+	ResumeGame();
 }
 
 void Game::SetScene(GameScene nextScene)
@@ -324,15 +374,15 @@ GroundType Game::GetGroundType() const
 	case GameScene::Level1:
 	case GameScene::Level1_Boss:
 		return GroundType::Grass;
-	
+
 	case GameScene::Level2:
 	case GameScene::Level2_Boss:
 		return GroundType::Brick;
-	
+
 	case GameScene::Level3:
 	case GameScene::Level3_Boss:
 		return GroundType::Stone;
-	
+
 	default:
 		return GroundType::Grass;
 	}
@@ -359,15 +409,15 @@ void Game::InitializeActors()
 	// Then delete the temporary Character (it will automatically clean up the skill components)
 	// Note: Skills are NOT added to the Character's mSkills vector, only registered in SkillFactory
 	{
-		Dummy* tempCharacter = new Dummy(this, Vector2::Zero, 0.0f);
-		
+		Dummy *tempCharacter = new Dummy(this, Vector2::Zero, 0.0f);
+
 		// Create temporary instances to trigger registration
 		// These will register themselves in SkillFactory during construction
 		new WhiteSlash(tempCharacter);
 		new WhiteBomb(tempCharacter);
 		new WhiteBubble(tempCharacter);
 		new BossHealing(tempCharacter);
-		
+
 		// Skills are now registered in SkillFactory
 		// Delete the temporary character (it will clean up the skill components automatically)
 		delete tempCharacter;
@@ -507,11 +557,14 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			// Player spawn
 			if (tileID == 0)
 			{
-				if (!mShadowCat) mShadowCat = new ShadowCat(this, position);
-				else mShadowCat->SetPosition(position);
+				if (!mShadowCat)
+					mShadowCat = new ShadowCat(this, position);
+				else
+					mShadowCat->SetPosition(position);
 			}
 			else if (tileID == 1)
 			{
+				auto orangeCat = new OrangeCat(this, position);
 			}
 			else if (tileID == 2)
 			{
@@ -686,10 +739,15 @@ void Game::ProcessInput()
 				if (mTutorialHUD)
 					mTutorialHUD->ToggleControlVisibility(); // Pass event to actors
 
-					// TEST
-			if (event.key.keysym.sym == SDLK_p && event.key.repeat == 0)
-				if (mShadowCat)
-					mShadowCat->AddUpgradePoint();
+			// Pause toggle
+			if (event.key.keysym.sym == SDLK_ESCAPE && event.key.repeat == 0)
+				if (mCurrentScene > GameScene::MainMenu && mShadowCat && mShadowCat->GetUpgradePoints() == 0)
+				{
+					if (mIsPaused)
+						ResumeGame();
+					else
+						PauseGame();
+				}
 
 			for (auto actor : mActors)
 				actor->OnHandleEvent(event);
@@ -712,13 +770,27 @@ void Game::UpdateGame(float deltaTime)
 	{
 		PauseGame();
 
-		if (mIsGameOver)
+		// Only create the screen if it doesn't already exist
+		bool screenExists = false;
+		for (auto screen : mUIStack)
 		{
-			new GameOver(this, "../Assets/Fonts/Pixellari.ttf");
+			if (dynamic_cast<GameOver *>(screen) != nullptr || dynamic_cast<WinScreen *>(screen) != nullptr)
+			{
+				screenExists = true;
+				break;
+			}
 		}
-		else
+
+		if (!screenExists)
 		{
-			new WinScreen(this, "../Assets/Fonts/Pixellari.ttf");
+			if (mIsGameOver)
+			{
+				new GameOver(this, "../Assets/Fonts/Pixellari.ttf");
+			}
+			else
+			{
+				new WinScreen(this, "../Assets/Fonts/Pixellari.ttf");
+			}
 		}
 	}
 
@@ -1252,7 +1324,8 @@ void Game::RegisterEnemy(EnemyBase *enemy)
 
 void Game::RegisterBoss(BossBase *boss)
 {
-	if (!boss) return;
+	if (!boss)
+		return;
 
 	mCurrentBoss = boss;
 }
@@ -1266,8 +1339,9 @@ void Game::UnregisterEnemy(EnemyBase *enemy)
 
 void Game::UnregisterBoss(BossBase *boss)
 {
-	if (mCurrentBoss != boss) return;
-	
+	if (mCurrentBoss != boss)
+		return;
+
 	mCurrentBoss = nullptr;
 }
 
@@ -1285,6 +1359,23 @@ int Game::CountAliveEnemies() const
 int Game::CountAliveBosses() const
 {
 	int count = 0;
-	if (mCurrentBoss) count += !mCurrentBoss->IsDead();
+	if (mCurrentBoss)
+		count += !mCurrentBoss->IsDead();
 	return count;
+}
+
+void Game::InitializeSkills()
+{
+	SkillFactory::Instance().RegisterSkill("basicAttackSkill", [](Actor *owner)
+										   { return new BasicAttack(owner); });
+	SkillFactory::Instance().RegisterSkill("clawAttackSkill", [](Actor *owner)
+										   { return new ClawAttack(owner); });
+	SkillFactory::Instance().RegisterSkill("dashSkill", [](Actor *owner)
+										   { return new Dash(owner); });
+	SkillFactory::Instance().RegisterSkill("shadowFormSkill", [](Actor *owner)
+										   { return new ShadowForm(owner); });
+	SkillFactory::Instance().RegisterSkill("stompSkill", [](Actor *owner)
+										   { return new Stomp(owner); });
+	SkillFactory::Instance().RegisterSkill("furBallSkill", [](Actor *owner)
+										   { return new FurBall(owner); });
 }

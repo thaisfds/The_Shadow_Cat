@@ -4,6 +4,7 @@
 #include "../../Actors/Actor.h"
 #include "../../Actors/Characters/Character.h"
 #include "../../Actors/Characters/Boss.h"
+#include "../../Actors/Characters/BossBase.h"
 #include "../Drawing/AnimatorComponent.h"
 #include "../Drawing/DrawComponent.h"
 #include "../Physics/Physics.h"
@@ -31,7 +32,6 @@ nlohmann::json BasicAttack::LoadSkillDataFromJSON(const std::string& fileName)
     mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
     mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
     auto id = GameJsonParser::GetStringValue(data, "id");
-    SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new BasicAttack(owner); });
 
     return data;
 }
@@ -44,16 +44,13 @@ void BasicAttack::StartSkill(Vector2 targetPosition)
 
     mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("BasicAttack");
     mCharacter->SetMovementLock(true);
-    mCharacter->SetAnimationLock(true);  // Lock animations so attack anim isn't overridden
     
     // Play appropriate sound based on character type
     std::string sound;
-    if (dynamic_cast<Boss*>(mCharacter))
+    if (dynamic_cast<Boss*>(mCharacter) || dynamic_cast<BossBase*>(mCharacter))
     {
-        // Bosses use boss attack sounds
-        int choice = rand() % 3;
-        sound = choice == 0 ? "s08_boss_simple_attack1.wav" : 
-                choice == 1 ? "s09_boss_simple_attack2.wav" : "s10_boss_simple_attack3.wav";
+        // Bosses use only s08_boss_simple_attack1.wav
+        sound = "s08_boss_simple_attack1.wav";
     }
     else
     {

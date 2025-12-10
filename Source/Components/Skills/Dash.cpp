@@ -20,7 +20,6 @@ nlohmann::json Dash::LoadSkillDataFromJSON(const std::string& fileName)
 
 	mDashSpeed = GameJsonParser::GetFloatEffectValue(data, "speed");
 	auto id = GameJsonParser::GetStringValue(data, "id");
-	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new Dash(owner); });
 
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "range", &mRange));
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "speed", &mDashSpeed));

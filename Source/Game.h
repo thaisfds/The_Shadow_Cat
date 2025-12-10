@@ -55,6 +55,8 @@ public:
 	void AddPersistentActor(class Actor *actor);
 	void RemovePersistentActor(class Actor *actor);
 
+	void InitializeSkills();
+
 	// UI functions
 	void PushUI(class UIScreen *screen) { mUIStack.emplace_back(screen); }
 	const std::vector<class UIScreen *> &GetUIStack() { return mUIStack; }
@@ -75,6 +77,7 @@ public:
 
 	void SetGameOver(bool isOver) { mIsGameOver = isOver; }
 	void SetGameWon(bool isWon) { mIsGameWon = isWon; }
+	GameScene GetCurrentScene() const { return mCurrentScene; }
 
 	// Renderer
 	class Renderer *GetRenderer() { return mRenderer; }

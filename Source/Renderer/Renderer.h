@@ -26,6 +26,7 @@ public:
 
     void AddUIElement(class UIElement *comp);
     void RemoveUIElement(class UIElement *comp);
+    void CleanUIElements() { mUIComps.clear(); }
 
     void DrawRect(const Vector2 &position, const Vector2 &size,  float rotation,
                   const Vector3 &color, const Vector2 &cameraPos, RendererMode mode);

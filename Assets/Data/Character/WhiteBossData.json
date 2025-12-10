@@ -9,7 +9,8 @@
 		"WhiteSlashSkill",
 		"WhiteBombSkill",
 		"WhiteBubbleSkill",
-		"BossHealingSkill"
+		"BossHealingSkill",
+		"basicAttackSkill"
 	],
 	"aiBehaviors":
 	{

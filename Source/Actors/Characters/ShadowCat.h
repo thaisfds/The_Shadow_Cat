@@ -17,6 +17,8 @@ public:
     void OnHandleEvent(const SDL_Event& event) override;
     void OnUpdate(float deltaTime) override;
 
+    std::vector<SkillBase*> GetSkills() const override;
+
     void TakeDamage(int damage) override;
     void Kill() override;
 

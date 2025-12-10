@@ -25,7 +25,6 @@ nlohmann::json Stomp::LoadSkillDataFromJSON(const std::string& fileName)
 	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
 	mRadius = mAreaOfEffect ? ((CircleCollider*)mAreaOfEffect)->GetRadius() : 0.0f;
 	auto id = GameJsonParser::GetStringValue(data, "id");
-	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new Stomp(owner); });
 
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "damage", &mDamage));
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "cooldown", &mCooldown));
