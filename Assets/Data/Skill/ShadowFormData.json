@@ -22,6 +22,12 @@
 			"max": 5
 		},
 		{
+			"type": "duration",
+			"name": "Duration",
+			"value": 1.0,
+			"max": 0
+		},
+		{
 			"type": "speedMultiplier",
 			"name": "Speed Boost",
 			"value": 0.2,

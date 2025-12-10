@@ -30,6 +30,8 @@ public:
     
     float GetCooldown() const { return mCurrentCooldown; }
     bool IsOnCooldown() const { return mCurrentCooldown > 0.0f; }
+
+    bool GetIsUsing() const { return mIsUsing; }
     
     const std::string& GetName() const { return mName; }
     const std::string& GetDescription() const { return mDescription; }

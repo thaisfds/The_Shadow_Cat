@@ -3,7 +3,7 @@
 	"name": "White Cat",
 	"hp": 30,
 	"speed": 150,
-	"dropChance": 1.0,
+	"dropChance": 0.3,
 	"skills":
 	[
 		"basicAttackSkill"

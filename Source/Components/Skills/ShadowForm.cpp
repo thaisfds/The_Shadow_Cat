@@ -21,6 +21,7 @@ nlohmann::json ShadowForm::LoadSkillDataFromJSON(const std::string& fileName)
 	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new ShadowForm(owner); });
 
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "cooldown", &mCooldown));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "duration", &mDuration));
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "speedMultiplier", &mSpeed));
 	return data;
 }
