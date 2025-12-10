@@ -57,8 +57,8 @@ void BasicAttack::StartSkill(Vector2 targetPosition)
     }
     else
     {
-        // Regular enemies and player use claw sounds
-        sound = rand() % 2 ? "s01_claw_attack1.wav" : "s02_claw_attack2.wav";
+        // Regular enemies and player use basic attack sounds
+        sound = rand() % 2 ? "s01_basic_attack1.wav" : "s02_basic_attack2.wav";
     }
     mCharacter->GetGame()->GetAudio()->PlaySound(sound, false, 0.5f);
 }

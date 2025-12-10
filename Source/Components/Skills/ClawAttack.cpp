@@ -89,7 +89,7 @@ void ClawAttack::StartSkill(Vector2 targetPosition)
 	mCharacter->SetMovementLock(true);
 	
 	// Play claw attack sound
-	std::string sound = rand() % 2 ? "s01_claw_attack1.wav" : "s02_claw_attack2.wav";
+	std::string sound = rand() % 2 ? "s11_claw_attack1.wav" : "s12_claw_attack2.wav";
 	mCharacter->GetGame()->GetAudio()->PlaySound(sound, false, 0.7f);
 }
 
