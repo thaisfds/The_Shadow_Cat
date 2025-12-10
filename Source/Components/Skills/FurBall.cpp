@@ -5,6 +5,7 @@
 #include "../../Actors/Characters/Character.h"
 #include "../Physics/ColliderComponent.h"
 #include "../Physics/Physics.h"
+#include "../../SkillFactory.h"
 
 FurBall::FurBall(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
@@ -22,14 +23,16 @@ nlohmann::json FurBall::LoadSkillDataFromJSON(const std::string& fileName)
 {
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
-	mProjectileSpeed = SkillJsonParser::GetFloatEffectValue(data, "projectileSpeed");
-	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
-	mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
+	mProjectileSpeed = GameJsonParser::GetFloatEffectValue(data, "projectileSpeed");
+	mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
+	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
+	auto id = GameJsonParser::GetStringValue(data, "id");
+	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new FurBall(owner); });
 
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "projectileSpeed", &mProjectileSpeed));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "damage", &mDamage));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "range", &mRange));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "projectileSpeed", &mProjectileSpeed));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "damage", &mDamage));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "cooldown", &mCooldown));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "range", &mRange));
 
 	return data;
 }
@@ -37,6 +40,9 @@ nlohmann::json FurBall::LoadSkillDataFromJSON(const std::string& fileName)
 void FurBall::Execute()
 {
 	float lifetime = mRange / mProjectileSpeed;
+
+	// Play furball sound
+	mCharacter->GetGame()->GetAudio()->PlaySound("s05_furball_launch1.wav", false, 0.7f);
 
 	mCharacter->GetGame()->GetFurBallActor()->Awake(
 		mCharacter->GetPosition() + mTargetVector * 20.0f,

@@ -1,0 +1,28 @@
+#pragma once
+
+#include "Json.h"
+#include "Components/Physics/Collider.h"
+#include "Components/Skills/UpgradeInfo.h"
+
+// Forward declaration to avoid circular dependency
+class SkillBase;
+
+class GameJsonParser
+{
+public:
+	GameJsonParser() = delete;
+
+	static int GetIntValue(const nlohmann::json& skillData, const std::string& key);
+	static float GetFloatValue(const nlohmann::json& skillData, const std::string& key);
+	static std::string GetStringValue(const nlohmann::json& skillData, const std::string& key);
+	static std::vector<std::string> GetStringArrayValue(const nlohmann::json& skillData, const std::string& key);
+
+	// SkillData specific methods
+	static float GetFloatEffectValue(const nlohmann::json& skillData, const std::string& effectName);
+	static Collider* GetAreaOfEffect(const nlohmann::json& skillData);
+	static UpgradeInfo GetUpgradeInfo(const SkillBase *skill, const nlohmann::json& skillData, const std::string& upgradeType, float *upgradeTarget);
+
+private:
+	static float ResolveReference(const nlohmann::json& skillData, const std::string& reference);
+	static float ExtractFloatValue(const nlohmann::json& skillData, const nlohmann::json& value);
+};

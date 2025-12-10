@@ -87,8 +87,6 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/BasicAttack.h
         Source/Components/Skills/SkillInputHandler.cpp
         Source/Components/Skills/SkillInputHandler.h
-        Source/Actors/Characters/Enemy.cpp
-        Source/Actors/Characters/Enemy.h
         Source/Actors/Characters/Boss.cpp
         Source/Actors/Characters/Boss.h
         Source/Actors/Characters/Character.cpp
@@ -117,8 +115,9 @@ add_executable(${PROJECT_NAME}
         Source/Debug/EnemyDebugDrawer.h
         Source/DelayedActionSystem.cpp
         Source/DelayedActionSystem.h
-        Source/SkillJsonParser.cpp
-        Source/SkillJsonParser.h
+        Source/GameJsonParser.cpp
+        Source/GameJsonParser.h
+        Source/SkillFactory.h
         Source/Components/Skills/UpgradeInfo.h
         Source/Components/Skills/Bomb.cpp
         Source/Components/Skills/Bomb.h
@@ -126,6 +125,20 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/ShadowForm.h
         Source/Debug/BossDebugDrawer.cpp
         Source/Debug/BossDebugDrawer.h
+        Source/Actors/Characters/EnemyBase.cpp
+        Source/Actors/Characters/EnemyBase.h
+        Source/AI/AIStateMachine.cpp
+        Source/AI/AIStateMachine.h
+        Source/AI/AIBehavior.cpp
+        Source/AI/AIBehavior.h
+        Source/Actors/Characters/Enemies/WhiteCat.cpp
+        Source/Actors/Characters/Enemies/WhiteCat.h
+        Source/AI/Behaviors/PatrolBehavior.cpp
+        Source/AI/Behaviors/PatrolBehavior.h
+        Source/AI/Behaviors/ChaseBehavior.cpp
+        Source/AI/Behaviors/ChaseBehavior.h
+        Source/AI/Behaviors/SkillBehavior.cpp
+        Source/AI/Behaviors/SkillBehavior.h
 )
 
 configure_local_linking(${PROJECT_NAME})

@@ -4,6 +4,7 @@
 #include "../../Game.h"
 #include "../Drawing/AnimatorComponent.h"
 #include "../Physics/ColliderComponent.h"
+#include "../../SkillFactory.h"
 
 Dash::Dash(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
@@ -22,11 +23,13 @@ nlohmann::json Dash::LoadSkillDataFromJSON(const std::string& fileName)
 {
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
-	mDashSpeed = SkillJsonParser::GetFloatEffectValue(data, "speed");
+	mDashSpeed = GameJsonParser::GetFloatEffectValue(data, "speed");
+	auto id = GameJsonParser::GetStringValue(data, "id");
+	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new Dash(owner); });
 
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "range", &mRange));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "speed", &mDashSpeed));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "range", &mRange));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "speed", &mDashSpeed));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "cooldown", &mCooldown));
 
 	return data;
 }
@@ -46,6 +49,9 @@ void Dash::StartSkill(Vector2 targetPosition)
 	SkillBase::StartSkill(targetPosition);
 	mTargetVector -= mCharacter->GetPosition();
 	mTargetVector.Normalize();
+
+	// Play dash sound
+	mCharacter->GetGame()->GetAudio()->PlaySound("s07_dash2.wav", false, 0.7f);
 
 	mCharacter->SetAnimationLock(true);
 	AnimatorComponent* animator = mCharacter->GetComponent<AnimatorComponent>();

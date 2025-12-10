@@ -8,6 +8,7 @@
 #include "../../GameConstants.h"
 #include "../Physics/ColliderComponent.h"
 #include "SkillBase.h"
+#include "../../SkillFactory.h"
 
 
 Stomp::Stomp(Actor* owner, int updateOrder)
@@ -20,14 +21,16 @@ nlohmann::json Stomp::LoadSkillDataFromJSON(const std::string& fileName)
 {
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
-	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
-	mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
+	mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
+	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
 	mRadius = mAreaOfEffect ? ((CircleCollider*)mAreaOfEffect)->GetRadius() : 0.0f;
+	auto id = GameJsonParser::GetStringValue(data, "id");
+	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new Stomp(owner); });
 
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "damage", &mDamage));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "range", &mRange));
-	mUpgrades.push_back(SkillJsonParser::GetUpgradeInfo(data, "radius", &mRadius));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "damage", &mDamage));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "cooldown", &mCooldown));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "range", &mRange));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "radius", &mRadius));
 
 	return data;
 }
@@ -37,6 +40,10 @@ void Stomp::StartSkill(Vector2 targetPosition)
 	mCurrentCooldown = mCooldown;
 
 	((CircleCollider*)mAreaOfEffect)->SetRadius(mRadius);
+
+	// Play stomp sound
+	std::string sound = rand() % 2 ? "s03_stomp_attack1.wav" : "s04_stomp_attack2.wav";
+	mCharacter->GetGame()->GetAudio()->PlaySound(sound, false, 0.7f);
 
 	mCharacter->GetGame()->GetStompActor()->Awake(
 		targetPosition,

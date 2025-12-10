@@ -4,6 +4,7 @@
 #include "../Drawing/AnimatorComponent.h"
 #include "../Physics/Physics.h"
 #include "../Physics/ColliderComponent.h"
+#include "../../SkillFactory.h"
 
 ClawAttack::ClawAttack(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
@@ -31,10 +32,12 @@ nlohmann::json ClawAttack::LoadSkillDataFromJSON(const std::string& fileName)
 {
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
-	mDamage = SkillJsonParser::GetFloatEffectValue(data, "damage");
-	mForwardSpeed = SkillJsonParser::GetFloatEffectValue(data, "forwardSpeed");
-	mBackwardDistancePercentage = SkillJsonParser::GetFloatEffectValue(data, "backwardDistancePercentage");
-	mAreaOfEffect = SkillJsonParser::GetAreaOfEffect(data);
+	mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
+	mForwardSpeed = GameJsonParser::GetFloatEffectValue(data, "forwardSpeed");
+	mBackwardDistancePercentage = GameJsonParser::GetFloatEffectValue(data, "backwardDistancePercentage");
+	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
+	auto id = GameJsonParser::GetStringValue(data, "id");
+	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new ClawAttack(owner); });
 
 	return data;
 }
@@ -84,6 +87,10 @@ void ClawAttack::StartSkill(Vector2 targetPosition)
 
 	mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("ClawAttack");
 	mCharacter->SetMovementLock(true);
+	
+	// Play claw attack sound
+	std::string sound = rand() % 2 ? "s11_claw_attack1.wav" : "s12_claw_attack2.wav";
+	mCharacter->GetGame()->GetAudio()->PlaySound(sound, false, 0.7f);
 }
 
 void ClawAttack::EndSkill()

@@ -3,6 +3,8 @@
 #include <map>
 #include <fstream>
 #include "Actors/Characters/Dummy.h"
+#include "Actors/Characters/Enemies/WhiteCat.h"
+#include "Actors/Characters/EnemyBase.h"
 #include "CSV.h"
 #include "Game.h"
 #include "Components/Skills/Stomp.h"
@@ -21,7 +23,6 @@
 #include "Actors/Spawner.h"
 #include "Actors/Characters/ShadowCat.h"
 #include "Components/AnimatedParticleSystemComponent.h"
-#include "Actors/Characters/Enemy.h"
 #include "Actors/Characters/Boss.h"
 #include "Actors/LevelPortal.h"
 
@@ -128,6 +129,13 @@ bool Game::Initialize()
 
 void Game::UnloadScene()
 {
+	// Stop background music
+	if (mBackgroundMusic.IsValid())
+	{
+		mAudio->StopSound(mBackgroundMusic);
+		mBackgroundMusic.Reset();
+	}
+
 	// Use state so we can call this from within an actor update
 	for (auto *actor : mActors)
 	{
@@ -195,14 +203,17 @@ void Game::SetScene(GameScene nextScene)
 	case GameScene::MainMenu:
 		mCurrentScene = GameScene::MainMenu;
 
-		// Main menu back music
-		// mAudio->PlaySound("Music.ogg", true);
+		// Main menu background music
+		mBackgroundMusic = mAudio->PlaySound("m01_main_menu.mp3", true, 0.3f);
 
 		new MainMenu(this, "../Assets/Fonts/Pixellari.ttf");
 		break;
 
 	case GameScene::Lobby:
 		mCurrentScene = GameScene::Lobby;
+
+		// Lobby background music
+		mBackgroundMusic = mAudio->PlaySound("m04_tutorial.mp3", true, 0.5f);
 
 		// Toggleable tutorial HUD
 		if (!mTutorialHUD)
@@ -222,6 +233,9 @@ void Game::SetScene(GameScene nextScene)
 	case GameScene::Level1:
 		mCurrentScene = GameScene::Level1;
 
+		// Level 1 background music
+		mBackgroundMusic = mAudio->PlaySound("m05_level1.mp3", true, 0.5f);
+
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
 			mTutorialHUD->HideControls();
@@ -231,6 +245,9 @@ void Game::SetScene(GameScene nextScene)
 
 	case GameScene::Level1_Boss:
 		mCurrentScene = GameScene::Level1_Boss;
+
+		// Boss 1 background music
+		mBackgroundMusic = mAudio->PlaySound("m08_boss1_grass.mp3", true, 0.3f);
 
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
@@ -242,6 +259,9 @@ void Game::SetScene(GameScene nextScene)
 	case GameScene::Level2:
 		mCurrentScene = GameScene::Level2;
 
+		// Level 2 background music
+		mBackgroundMusic = mAudio->PlaySound("m06_level2.mp3", true, 0.6f);
+
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
 			mTutorialHUD->HideControls();
@@ -251,6 +271,9 @@ void Game::SetScene(GameScene nextScene)
 
 	case GameScene::Level2_Boss:
 		mCurrentScene = GameScene::Level2_Boss;
+
+		// Boss 2 background music
+		mBackgroundMusic = mAudio->PlaySound("m09_boss2_bricks.mp3", true);
 
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
@@ -262,6 +285,9 @@ void Game::SetScene(GameScene nextScene)
 	case GameScene::Level3:
 		mCurrentScene = GameScene::Level3;
 
+		// Level 3 background music
+		mBackgroundMusic = mAudio->PlaySound("m07_level3.mp3", true);
+
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
 			mTutorialHUD->HideControls();
@@ -272,12 +298,37 @@ void Game::SetScene(GameScene nextScene)
 	case GameScene::Level3_Boss:
 		mCurrentScene = GameScene::Level3_Boss;
 
+		// Boss 3 background music
+		mBackgroundMusic = mAudio->PlaySound("m10_boss3_stone.mp3", true);
+
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
 			mTutorialHUD->HideControls();
 
 		InitializeActors();
 		break;
+	}
+}
+
+GroundType Game::GetGroundType() const
+{
+	switch (mCurrentScene)
+	{
+	case GameScene::Lobby:
+	case GameScene::Level1:
+	case GameScene::Level1_Boss:
+		return GroundType::Grass;
+	
+	case GameScene::Level2:
+	case GameScene::Level2_Boss:
+		return GroundType::Brick;
+	
+	case GameScene::Level3:
+	case GameScene::Level3_Boss:
+		return GroundType::Stone;
+	
+	default:
+		return GroundType::Grass;
 	}
 }
 
@@ -412,17 +463,6 @@ int **Game::LoadLevel(const std::string &fileName, int &outWidth, int &outHeight
 
 void Game::BuildLevel(int **levelData, int width, int height)
 {
-	// Determine enemy type based on current level
-	Enemy::EnemyType currentEnemyType = Enemy::EnemyType::WhiteCat;
-	if (mCurrentScene == GameScene::Level2)
-	{
-		currentEnemyType = Enemy::EnemyType::SylvesterCat;
-	}
-	else if (mCurrentScene == GameScene::Level3)
-	{
-		currentEnemyType = Enemy::EnemyType::OrangeCat;
-	}
-
 	// Determine if this is a boss level
 	bool isBossLevel = (mCurrentScene == GameScene::Level1_Boss ||
 						mCurrentScene == GameScene::Level2_Boss ||
@@ -454,38 +494,17 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			// Player spawn
 			if (tileID == 0)
 			{
-				mShadowCat = new ShadowCat(this);
-				mShadowCat->SetPosition(position);
+				mShadowCat = new ShadowCat(this, position);
 			}
-			// Tile ID 1: Spawner - small patrol (100px)
-			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 1)
 			{
-				// Create waypoints 100 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(100.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
-				spawner->SetPosition(position);
 			}
-			// Tile ID 2: Spawner - medium patrol (150px)
-			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 2)
 			{
-				// Create waypoints 150 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-150.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(150.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
-				spawner->SetPosition(position);
+				auto whiteCat = new WhiteCat(this, position);
 			}
-			// Tile ID 3: Spawner - large patrol (200px)
-			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 3)
 			{
-				// Create waypoints 200 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
-				spawner->SetPosition(position);
 			}
 			// Blocks (excluding tile 9 - carpet/portal, handled by LevelPortal actor)
 			else if (tileID >= 4 && tileID <= 10)
@@ -503,8 +522,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			// Dummy
 			else if (tileID == 11)
 			{
-				auto dummy = new Dummy(this);
-				dummy->SetPosition(position);
+				auto dummy = new Dummy(this, position);
 			}
 			// Walls (paredes)
 			else if (tileID >= 16 && tileID <= 27)
@@ -520,14 +538,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				{
 					auto boss = new Boss(this, position, currentBossType, false);
 				}
-				else
-				{
-					// Create waypoints 100 pixels to left and right of spawn position
-					Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
-					Vector2 waypointB = position + Vector2(100.0f, 0.0f);
-					auto enemy = new Enemy(this, waypointA, waypointB, currentEnemyType);
-					enemy->SetPosition(position);
-				}
 			}
 			// Tile ID 13: Enemy with larger patrol (200px) OR Boss in boss levels
 			else if (tileID == 13)
@@ -535,14 +545,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				if (isBossLevel)
 				{
 					auto boss = new Boss(this, position, currentBossType, false);
-				}
-				else
-				{
-					// Create waypoints 200 pixels to left and right of spawn position
-					Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
-					Vector2 waypointB = position + Vector2(200.0f, 0.0f);
-					auto enemy = new Enemy(this, waypointA, waypointB, currentEnemyType);
-					enemy->SetPosition(position);
 				}
 			}
 			// ========== DELAYED SPAWNERS (spawn when player approaches) ==========
@@ -554,14 +556,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				{
 					auto boss = new Boss(this, position, currentBossType, false);
 				}
-				else
-				{
-					// Create waypoints 100 pixels to left and right of spawn position
-					Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
-					Vector2 waypointB = position + Vector2(100.0f, 0.0f);
-					auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
-					spawner->SetPosition(position);
-				}
 			}
 			// Tile ID 15: Spawner - large patrol (200px) OR Boss in boss levels
 			// Spawns enemy when player camera comes within ~700px of this position
@@ -571,14 +565,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				{
 					// Spawn boss in boss levels
 					auto boss = new Boss(this, position, currentBossType, false);
-				}
-				else
-				{
-					// Create waypoints 200 pixels to left and right of spawn position
-					Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
-					Vector2 waypointB = position + Vector2(200.0f, 0.0f);
-					auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
-					spawner->SetPosition(position);
 				}
 			}
 			// ========== BOSS SPAWNS ==========
@@ -843,7 +829,11 @@ void Game::UpdateGame(float deltaTime)
 			}
 
 			if (!mIsGameWon)
+			{
+				// Play room change sound
+				mAudio->PlaySound("e16_change_room.mp3", false, 0.3f);
 				SetScene(nextScene);
+			}
 		}
 	}
 
@@ -1087,13 +1077,6 @@ void Game::GenerateOutput()
 			// Call debug draw for actor
 			auto actor = drawable->GetOwner();
 
-			// Check if actor is an Enemy and call its debug draw
-			auto enemy = dynamic_cast<Enemy *>(actor);
-			if (enemy)
-			{
-				enemy->OnDebugDraw(mRenderer);
-			}
-
 			// Check if actor is a Boss and call its debug draw
 			auto boss = dynamic_cast<Boss *>(actor);
 			if (boss)
@@ -1224,7 +1207,7 @@ FurBallActor *Game::GetFurBallActor()
 	return furball;
 }
 
-void Game::RegisterEnemy(Enemy *enemy)
+void Game::RegisterEnemy(EnemyBase *enemy)
 {
 	if (enemy)
 		mEnemies.push_back(enemy);
@@ -1248,7 +1231,7 @@ void Game::RegisterBoss(Boss *boss)
 	}
 }
 
-void Game::UnregisterEnemy(Enemy *enemy)
+void Game::UnregisterEnemy(EnemyBase *enemy)
 {
 	auto iter = std::find(mEnemies.begin(), mEnemies.end(), enemy);
 	if (iter != mEnemies.end())

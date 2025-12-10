@@ -8,7 +8,7 @@
 #include "../../Math.h"
 #include "../../DelayedActionSystem.h"
 #include "../../Json.h"
-#include "../../SkillJsonParser.h"
+#include "../../GameJsonParser.h"
 #include "UpgradeInfo.h"
 
 class Character;
@@ -23,15 +23,17 @@ public:
     void ComponentDraw(class Renderer* renderer) override;
     
     virtual bool CanUse(Vector2 targetPosition, bool showRangeOnFalse = false) const;
+    virtual bool EnemyShouldUse() { return false; }
     
     virtual void StartSkill(Vector2 targetPosition);
-    virtual void EndSkill() { mIsUsing = false; }
+    virtual void EndSkill();
     
     float GetCooldown() const { return mCurrentCooldown; }
     bool IsOnCooldown() const { return mCurrentCooldown > 0.0f; }
     
     const std::string& GetName() const { return mName; }
     const std::string& GetDescription() const { return mDescription; }
+    const std::string& GetIconPath() const { return mIconPath; }
     std::vector<UpgradeInfo> GetAvailableUpgrades() const;
 
 protected:
@@ -39,6 +41,7 @@ protected:
 
     std::string mName;
     std::string mDescription;
+    std::string mIconPath;
     float mCooldown;
     float mCurrentCooldown;
     float mRange;

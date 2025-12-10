@@ -15,28 +15,18 @@
 #include <random>
 #include <algorithm>
 
-ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
-    : Character(game, forwardSpeed)
+ShadowCat::ShadowCat(Game *game, Vector2 position, const float forwardSpeed)
+    : Character(game, position, forwardSpeed)
+    , mFootstepTimer(0.0f)
 {
     mAnimatorComponent = new AnimatorComponent(this, "ShadowCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
-    mRigidBodyComponent = new RigidBodyComponent(this);
     
-    Collider *collider = new AABBCollider(48, 32);
-    mColliderComponent = new ColliderComponent(this, Vector2(0, 16), collider);
     ResetCollisionFilter();
 
     mSkillFilter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::PlayerSkills});
     mSkillFilter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Enemy});
     
     mSkillInputHandler = new SkillInputHandler(this);
-    mRigidBodyComponent->SetApplyGravity(false);
-
-    // Setup animations
-    mAnimatorComponent->AddAnimation("Idle", {0});
-    mAnimatorComponent->AddAnimation("Run", {0, 1, 2, 3});
-    mAnimatorComponent->AddAnimation("BasicAttack", {4, 5, 6, 7, 8, 0});
-    
-    mAnimatorComponent->LoopAnimation("Idle");
 
     hp = 200;
     maxHp = hp;
@@ -137,6 +127,42 @@ void ShadowCat::OnHandleEvent(const SDL_Event& event)
 void ShadowCat::OnUpdate(float deltaTime)
 {
     Character::OnUpdate(deltaTime);
+
+    // Handle footstep sounds
+    if (mIsMoving && !mIsDead)
+    {
+        mFootstepTimer -= deltaTime;
+        
+        if (mFootstepTimer <= 0.0f)
+        {
+            mFootstepTimer = 0.3f;  // Reset timer
+            
+            // Determine which sounds to use based on ground type
+            std::string sound1, sound2;
+            switch (mGame->GetGroundType())
+            {
+            case GroundType::Grass:
+                sound1 = "e01_step_on_grass_small1.wav";
+                sound2 = "e02_step_on_grass_small2.wav";
+                break;
+            case GroundType::Brick:
+                sound1 = "e06_step_on_bricks1.wav";
+                sound2 = "e07_step_on_bricks2.wav";
+                break;
+            case GroundType::Stone:
+                sound1 = "e08_step_on_stone1.wav";
+                sound2 = "e09_step_on_stone2.wav";
+                break;
+            }
+            
+            // Play random one of the two sounds
+            mGame->GetAudio()->PlaySound(rand() % 2 ? sound1 : sound2, false, 0.6f);
+        }
+    }
+    else
+    {
+        mFootstepTimer = 0.0f;  // Reset when not moving
+    }
 }
 
 void ShadowCat::TakeDamage(int damage)

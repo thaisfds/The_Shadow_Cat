@@ -48,4 +48,10 @@ Vector3 Random::GetVector(const Vector3& min, const Vector3& max)
 	return min + (max - min) * r;
 }
 
+Vector2 Random::GetUnitVector()
+{
+    float angle = GetFloatRange(0.0f, Math::TwoPi);
+    return Vector2(Math::Cos(angle), Math::Sin(angle));
+}
+
 std::mt19937 Random::sGenerator;
