@@ -710,11 +710,6 @@ void Game::ProcessInput()
 				if (mTutorialHUD)
 					mTutorialHUD->ToggleControlVisibility(); // Pass event to actors
 
-					// TEST
-			if (event.key.keysym.sym == SDLK_p && event.key.repeat == 0)
-				if (mShadowCat)
-					mShadowCat->AddUpgradePoint();
-
 			for (auto actor : mActors)
 				actor->OnHandleEvent(event);
 			break;
