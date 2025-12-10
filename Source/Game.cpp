@@ -52,6 +52,7 @@ Game::Game()
 
 bool Game::Initialize()
 {
+	
 	Random::Init();
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0)
@@ -109,6 +110,9 @@ bool Game::Initialize()
 		}
 	}
 
+	// Hide cursor, we use our own
+	SDL_ShowCursor(SDL_DISABLE);
+
 	// Init audio system
 	mAudio = new AudioSystem();
 	mAudio->CacheAllSounds();
@@ -145,6 +149,10 @@ void Game::UnloadScene()
 		delete ui;
 	}
 	mUIStack.clear();
+	if (mTutorialHUD)
+		mUIStack.push_back(mTutorialHUD);
+	if (mHUD)
+		mUIStack.push_back(mHUD);
 
 	// Reset states
 	mShadowCat = nullptr;
@@ -193,12 +201,12 @@ void Game::SetScene(GameScene nextScene)
 	case GameScene::Lobby:
 		mCurrentScene = GameScene::Lobby;
 
-		// Always shown
-		mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf");
-
 		// Toggleable tutorial HUD
 		if (!mTutorialHUD)
 			mTutorialHUD = new TutorialHUD(this, "../Assets/Fonts/Pixellari.ttf");
+
+		// Always shown
+		mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf");
 
 		// Show tutorial in Lobby
 		if (mTutorialHUD)
@@ -925,7 +933,7 @@ void Game::GenerateOutput()
 	switch (mCurrentScene)
 	{
 	case GameScene::MainMenu:
-		backgroundPath = "../Assets/HUD/MainMenuBackground.png";
+		backgroundPath = "../Assets/HUD/Background/MainMenuBackground.png";
 		break;
 	case GameScene::Lobby:
 		backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
@@ -1093,6 +1101,20 @@ Vector2 Game::GetMouseWorldPosition()
 	worldPos.y = static_cast<float>(mouseY) + mCameraPos.y;
 
 	return worldPos;
+}
+
+Vector2 Game::GetMouseAbsolutePosition()
+{
+	int mouseX, mouseY;
+	SDL_GetMouseState(&mouseX, &mouseY);
+
+	float scaleX = static_cast<float>(GameConstants::WINDOW_WIDTH) / static_cast<float>(mRenderer->GetScreenWidth());
+	float scaleY = static_cast<float>(GameConstants::WINDOW_HEIGHT) / static_cast<float>(mRenderer->GetScreenHeight());
+	mouseX = static_cast<int>(mouseX * scaleX);
+	mouseY = static_cast<int>(mouseY * scaleY);
+
+	Vector2 mousePos = Vector2(static_cast<float>(mouseX), static_cast<float>(mouseY));
+	return mousePos;
 }
 
 StompActor *Game::GetStompActor()

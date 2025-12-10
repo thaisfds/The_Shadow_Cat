@@ -16,6 +16,9 @@ public:
     const Vector2& GetOffset() const { return mOffset; }
     void SetOffset(const Vector2 &offset) { mOffset = offset; }
 
+    const Vector2& GetAbsolutePos() const { return mAbsolutePos; }
+    void SetAbsolutePos(const Vector2 &absPos) { mAbsolutePos = absPos; }
+
     float GetScale() const { return mScale; }
     void SetScale(const float scale) { mScale = scale; }
 
@@ -33,6 +36,7 @@ protected:
     class Game* mGame;
 
     Vector2 mOffset;
+    Vector2 mAbsolutePos = Vector2(-1.0f, -1.0f); // ignore if negative
     float mScale;
     float mAngle;
 

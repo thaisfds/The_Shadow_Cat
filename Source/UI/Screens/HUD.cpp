@@ -1,5 +1,6 @@
 #include "HUD.h"
 #include "../../Game.h"
+#include "../../GameConstants.h"
 #include "../../Actors/Characters/ShadowCat.h"
 #include <string>
 
@@ -8,22 +9,57 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
     mMaxHealth(maxHealth),
     mHealth(maxHealth)
 {   
+    // Main health icons, top left
     mMaxHealth = std::max(2, mMaxHealth); // Ensure at least 2
     mHealth = mMaxHealth;
 
     InitHealthIcons();
+
+    // Cursor
+    mCursorImage = AddImage("../Assets/HUD/ShadowCat/Cursor.png", Vector2(0.0f, 0.0f), 1.0f, 0.0f, 20000);
+
+    // Enemy counter top right
+    AddText("Enemies Left:", Vector2(500.0f, -300.0f), 0.7f);
+    mEnemiesLeftCount = AddText("0", Vector2(600.0f, -300.0f), 0.7f);
+
+    mAreaClearTxt = AddText("            Area clear!\nProceed to the red carpet!", Vector2(630.0f, -220.0f), 0.5f);
+
+    for (auto &txt : mTexts) {
+        txt->SetTextColor(Vector3::One); // White
+        txt->SetBackgroundColor(Vector4::Zero); // Transparent
+    }
 }
 
 void HUD::Update(float deltaTime)
 {
+    // Update cursor pos  ------------------- //
+    Vector2 mousePos = mGame->GetMouseAbsolutePosition();
+
+    // Rotate cursor based on deviation from center
+    Vector2 center(GameConstants::WINDOW_WIDTH / 2.0f, GameConstants::WINDOW_HEIGHT / 2.0f);
+    Vector2 dir = mousePos - center;
+
+    float angle = Math::Atan2(dir.y, dir.x) + Math::PiOver2;
+    mCursorImage->SetAngle(angle);
+    mCursorImage->SetAbsolutePos(mousePos);
+
+    // Update enemies left  ------------------- //
+    int enemiesLeft = mGame->CountAliveEnemies();
+    mEnemiesLeftCount->SetText(std::to_string(enemiesLeft));
+    if (enemiesLeft == 0)
+        mAreaClearTxt->SetIsVisible(true);
+    else
+        mAreaClearTxt->SetIsVisible(false);
+
+    // Update health ------------------- //
     if (!mGame->GetPlayer()) return;
 
     // If new max hp update otherwise just update health
     if (mGame->GetPlayer()->GetMaxHP() != mMaxHealth) {
-        UpdateMaxHealth(mGame->GetPlayer()->GetMaxHP(), true);
+        UpdateMaxHealth(mGame->GetPlayer()->GetMaxHP() / 10, true);
     }
 
-    SetHealth(mGame->GetPlayer()->GetHP());
+    SetHealth(mGame->GetPlayer()->GetHP() / 10);
 }
 
 void HUD::InitHealthIcons() {
@@ -42,15 +78,20 @@ void HUD::InitHealthIcons() {
     mEmptyHeartIcons.clear();
 
     // Create new icons based on mMaxHealth
-    const float SCALE = 1.5f;
+    const float SCALE = 1.0f;
     const float SPACING = 35.0f * SCALE;
+    const float VERTICAL_SPACING = 30.0f;
+
+    // Draw two equal rows if more than 10 health
+    int rows = (mMaxHealth > 10) ? 2 : 1;
 
     for (int i = 0; i < mMaxHealth / 2; ++i) {
-        Vector2 offset(-560.0f + i * SPACING, -300.0f);
+        int row = i > mMaxHealth / 4 - 1 ? 1 : 0;
+        Vector2 offset(-580.0f + (i - row * (mMaxHealth / 4)) * SPACING, +300.0f - row * VERTICAL_SPACING);
 
-        UIImage* emptyHeart = AddImage("../Assets/HUD/LifeBar_2.png", offset, SCALE, 0.0f, 1);
-        UIImage* halfHeart = AddImage("../Assets/HUD/LifeBar_1.png", offset, SCALE, 0.0f, 2);
-        UIImage* fullHeart = AddImage("../Assets/HUD/LifeBar_0.png", offset, SCALE, 0.0f, 3);
+        UIImage* emptyHeart = AddImage("../Assets/HUD/ShadowCat/LifeBar_2.png", offset, SCALE, 0.0f, 1);
+        UIImage* halfHeart = AddImage("../Assets/HUD/ShadowCat/LifeBar_1.png", offset, SCALE, 0.0f, 2);
+        UIImage* fullHeart = AddImage("../Assets/HUD/ShadowCat/LifeBar_0.png", offset, SCALE, 0.0f, 3);
 
         mEmptyHeartIcons.push_back(emptyHeart);
         mHalfHeartIcons.push_back(halfHeart);
