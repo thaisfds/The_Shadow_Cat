@@ -3,6 +3,7 @@
 #include "Character.h"
 #include <vector>
 #include "../../Components/Skills/SkillBase.h"
+#include "../../Json.h"
 
 class EnemyBase : public Character
 {
@@ -18,7 +19,7 @@ public:
 protected:
 	class AIStateMachine *mStateMachine;
 	
-	virtual void SetupAIBehaviors() = 0;
+	virtual void SetupAIBehaviors(const nlohmann::json& data) = 0;
 
 	nlohmann::json LoadEnemyDataFromJSON(const std::string& fileName);
 };

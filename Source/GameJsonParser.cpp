@@ -22,10 +22,43 @@ float GameJsonParser::GetFloatEffectValue(const nlohmann::json &skillData, const
 	return 0.0f;
 }
 
+template<typename T>
+T GameJsonParser::GetValue(const nlohmann::json& data, const std::string& key)
+{
+	// Check if key contains dot notation (nested path)
+	if (key.find('.') != std::string::npos)
+		return ResolveReference<T>(data, key);
+	
+	// Direct key lookup
+	if (data.contains(key))
+		return ExtractValue<T>(data, data[key]);
+
+	SDL_Log("Data does not contain key: %s", key.c_str());
+	return T{};
+}
+
+template<typename T>
+T GameJsonParser::GetValue(const nlohmann::json& data, const std::string& key, const T& defaultValue)
+{
+	// Check if key contains dot notation (nested path)
+	if (key.find('.') != std::string::npos)
+	{
+		// For nested paths, need to check if path exists
+		try { return ResolveReference<T>(data, key); }
+		catch(...) { return defaultValue; }
+	}
+	
+	// Direct key lookup
+	if (data.contains(key))
+		return ExtractValue<T>(data, data[key]);
+	
+	return defaultValue;
+}
+
 float GameJsonParser::GetFloatValue(const nlohmann::json& skillData, const std::string& key)
 {
 	if (skillData.contains(key))
-		return ExtractFloatValue(skillData, skillData[key]);
+		return ExtractValue<float>(skillData, skillData[key]);
 
 	SDL_Log("Skill data does not contain key: %s or it is not a number", key.c_str());
 	return 0.0f;
@@ -40,7 +73,8 @@ int GameJsonParser::GetIntValue(const nlohmann::json& skillData, const std::stri
 	return 0;
 }
 
-float GameJsonParser::ResolveReference(const nlohmann::json& skillData, const std::string& reference)
+template<typename T>
+T GameJsonParser::ResolveReference(const nlohmann::json& data, const std::string& reference)
 {
 	// Handle nested paths with dot notation (e.g., "effects.range")
 	size_t dotPos = reference.find('.');
@@ -48,34 +82,56 @@ float GameJsonParser::ResolveReference(const nlohmann::json& skillData, const st
 	{
 		std::string parent = reference.substr(0, dotPos);
 		std::string child = reference.substr(dotPos + 1);
-		if (skillData.contains(parent) && skillData[parent].is_object())
-			return ResolveReference(skillData[parent], child);
+		if (data.contains(parent) && data[parent].is_object())
+			return ResolveReference<T>(data[parent], child);
 	}
 	
 	// Direct field lookup
-	if (skillData.contains(reference) && skillData[reference].is_number())
-		return skillData[reference].get<float>();
+	if (data.contains(reference))
+		return data[reference].get<T>();
 	
 	SDL_Log("Could not resolve reference: @%s", reference.c_str());
-	return 0.0f;
+	return T{};
 }
 
-float GameJsonParser::ExtractFloatValue(const nlohmann::json& skillData, const nlohmann::json& value)
+template<typename T>
+T GameJsonParser::ExtractValue(const nlohmann::json& data, const nlohmann::json& value)
 {
-	if (value.is_number())
-		return value.get<float>();
-	else if (value.is_string())
+	// Check for string references first (before trying to convert)
+	if (value.is_string())
 	{
 		std::string str = value.get<std::string>();
 		if (!str.empty() && str[0] == '@')
 		{
 			std::string refKey = str.substr(1); // Remove '@'
-			return ResolveReference(skillData, refKey);
+			return ResolveReference<T>(data, refKey);
 		}
 	}
-	SDL_Log("Expected float is neither a number nor a valid reference");
-	return 0.0f;
+	
+	// Direct value extraction
+	if (value.is_number() || value.is_string() || value.is_boolean())
+		return value.get<T>();
+	
+	SDL_Log("Expected value is neither a valid type nor a valid reference");
+	return T{};
 }
+
+// Explicit template instantiations
+template float GameJsonParser::ResolveReference<float>(const nlohmann::json&, const std::string&);
+template std::string GameJsonParser::ResolveReference<std::string>(const nlohmann::json&, const std::string&);
+template int GameJsonParser::ResolveReference<int>(const nlohmann::json&, const std::string&);
+
+template float GameJsonParser::ExtractValue<float>(const nlohmann::json&, const nlohmann::json&);
+template std::string GameJsonParser::ExtractValue<std::string>(const nlohmann::json&, const nlohmann::json&);
+template int GameJsonParser::ExtractValue<int>(const nlohmann::json&, const nlohmann::json&);
+
+template float GameJsonParser::GetValue<float>(const nlohmann::json&, const std::string&);
+template std::string GameJsonParser::GetValue<std::string>(const nlohmann::json&, const std::string&);
+template int GameJsonParser::GetValue<int>(const nlohmann::json&, const std::string&);
+
+template float GameJsonParser::GetValue<float>(const nlohmann::json&, const std::string&, const float&);
+template std::string GameJsonParser::GetValue<std::string>(const nlohmann::json&, const std::string&, const std::string&);
+template int GameJsonParser::GetValue<int>(const nlohmann::json&, const std::string&, const int&);
 
 std::string GameJsonParser::GetStringValue(const nlohmann::json& skillData, const std::string& key)
 {
@@ -110,13 +166,13 @@ Collider* GameJsonParser::GetAreaOfEffect(const nlohmann::json& skillData)
 			std::string type = aoeData["type"].get<std::string>();
 			if (type == "circle" && aoeData.contains("radius"))
 			{
-				float radius = ExtractFloatValue(skillData, aoeData["radius"]);
+				float radius = ExtractValue<float>(skillData, aoeData["radius"]);
 				return new CircleCollider(radius);
 			}
 			else if (type == "cone" && aoeData.contains("length") && aoeData.contains("angle"))
 			{
-				float length = ExtractFloatValue(skillData, aoeData["length"]);
-				float angle = ExtractFloatValue(skillData, aoeData["angle"]);
+				float length = ExtractValue<float>(skillData, aoeData["length"]);
+				float angle = ExtractValue<float>(skillData, aoeData["angle"]);
 
 				// Make a polygon collider representing the cone
 				PolygonCollider* coneCollider = new PolygonCollider(
@@ -128,8 +184,8 @@ Collider* GameJsonParser::GetAreaOfEffect(const nlohmann::json& skillData)
 				&& aoeData.contains("width") && aoeData["width"].is_number()
 				&& aoeData.contains("height") && aoeData["height"].is_number())
 			{
-				float width = ExtractFloatValue(skillData, aoeData["width"]);
-				float height = ExtractFloatValue(skillData, aoeData["height"]);
+				float width = ExtractValue<float>(skillData, aoeData["width"]);
+				float height = ExtractValue<float>(skillData, aoeData["height"]);
 				return new AABBCollider(width, height);
 			}
 		}
@@ -149,7 +205,7 @@ UpgradeInfo GameJsonParser::GetUpgradeInfo(const nlohmann::json& skillData, cons
 			if (upgrade.contains("type") && upgrade["type"].get<std::string>() == upgradeType)
 			{
 				info.type = upgradeType;
-				info.value = ExtractFloatValue(skillData, upgrade["value"]);
+				info.value = ExtractValue<float>(skillData, upgrade["value"]);
 				if (upgrade.contains("maxLevel") && upgrade["maxLevel"].is_number())
 					info.maxLevel = upgrade["maxLevel"].get<int>();
 				return info;

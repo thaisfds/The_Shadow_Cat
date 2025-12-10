@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Game.h"
 namespace GameConstants
 {
     // Window settings
@@ -24,4 +25,6 @@ namespace GameConstants
     constexpr float DRAW_SKILL_RANGE_DURATION = 0.5f;
 
     constexpr int UPGRADE_COUNT = 5;
+
+    constexpr GameScene DEFAULT_STARTING_SCENE = GameScene::Level1_Boss;
 }

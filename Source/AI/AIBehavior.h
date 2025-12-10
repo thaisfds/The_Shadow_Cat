@@ -3,6 +3,7 @@
 #include <functional>
 #include <string>
 #include "../Actors/Characters/Character.h"
+#include "../Json.h"
 
 struct StateTransition
 {
@@ -26,12 +27,19 @@ public:
     {
         mTransitions.push_back({targetState, condition});
     }
+
+    void AddTransitionCondition(std::function<bool()> condition)
+    {
+        mTransitionConditions.push_back(condition);
+    }
     
     const std::vector<StateTransition>& GetTransitions() const { return mTransitions; }
     
 	std::string CheckTransitions() const;
 
     bool CheckTransitionConditions() const;
+
+    virtual void LoadBehaviorData(const nlohmann::json& data) = 0;
 
 protected:
     const char* mName;
