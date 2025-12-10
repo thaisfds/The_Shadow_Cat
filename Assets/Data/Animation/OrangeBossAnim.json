@@ -4,7 +4,7 @@
   "animations": 
   {
     "Idle": [0],
-    "Walk": [1, 2],
+    "Run": [1, 2],
     "BasicAttack": [3, 4],
     "SpecialAttack": [5, 6],
     "Attack": [3, 4],

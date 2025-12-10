@@ -19,7 +19,6 @@ public:
 
     std::vector<SkillBase*> GetSkills() const override;
 
-    void TakeDamage(int damage) override;
     void Kill() override;
 
     void ResetCollisionFilter() const override;

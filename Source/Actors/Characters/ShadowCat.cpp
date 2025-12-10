@@ -172,12 +172,6 @@ void ShadowCat::OnUpdate(float deltaTime)
     }
 }
 
-void ShadowCat::TakeDamage(int damage)
-{
-    hp -= damage;
-
-    if (hp <= 0) Kill();
-}
 void ShadowCat::Kill()
 {
     mGame->SetGameOver(true);

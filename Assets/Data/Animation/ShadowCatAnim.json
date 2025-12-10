@@ -13,7 +13,8 @@
     "FurBall": { "start": 33, "end": 38 },
     "ShadowFormBegin": { "start": 39, "end": 45 },
     "ShadowFormMid": [46, 47, 46, 45, 46, 47, 46, 48],
-    "ShadowFormEnd": { "start": 45, "end": 39 }
+    "ShadowFormEnd": { "start": 45, "end": 39 },
+    "Hit": { "start": 49, "end": 53 }
   },
   "base": "Idle"
 }
