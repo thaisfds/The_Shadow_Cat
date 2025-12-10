@@ -1,0 +1,10 @@
+{
+  "image": "../Assets/Sprites/AttackBoss/WhiteSlash.png",
+  "spriteSheetData": "../Assets/Sprites/AttackBoss/WhiteSlash.json",
+  "animations": 
+  {
+    "WhiteSlash": { "start": 0, "end": 6 }
+  },
+  "base": "WhiteSlash"
+}
+

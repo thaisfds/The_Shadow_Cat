@@ -19,6 +19,7 @@ void SkillBehavior::Update(float deltaTime)
 	auto playerPos = player->GetPosition();
 	for (auto& skill : mOwner->GetSkills())
 	{
+		if (!skill) continue; // Skip null skills
 		if (skill->CanUse(playerPos) && skill->EnemyShouldUse())
 		{
 			skill->StartSkill(playerPos);
@@ -39,7 +40,10 @@ bool SkillBehavior::SkillToPatrol()
 bool SkillBehavior::AnySkillAvailable() const
 {
 	for (auto& skill : mOwner->GetSkills())
+	{
+		if (!skill) continue; // Skip null skills
 		if (skill->EnemyShouldUse()) return true;
+	}
 
 	return false;
 }

@@ -18,6 +18,7 @@ public:
     void OnUpdate(float deltaTime) override;
 
     virtual void TakeDamage(int damage);
+    void Heal(int amount);
     void Kill() override;
 
     void MoveToward(const Vector2& target);

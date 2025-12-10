@@ -28,6 +28,10 @@
 #include "Components/AnimatedParticleSystemComponent.h"
 #include "Actors/Characters/Boss.h"
 #include "Actors/LevelPortal.h"
+#include "Components/Skills/WhiteSlash.h"
+#include "Components/Skills/WhiteBomb.h"
+#include "Components/Skills/BossHealing.h"
+#include "Actors/Characters/Dummy.h"
 
 Game::Game()
 	: mWindow(nullptr),
@@ -343,6 +347,29 @@ void Game::InitializeActors()
 
 	mAttackTrailActor = new Actor(this);
 	new AnimatedParticleSystemComponent(mAttackTrailActor, "AttackTrailAnim", false);
+
+	mWhiteSlashActor = new Actor(this);
+	new AnimatedParticleSystemComponent(mWhiteSlashActor, "WhiteSlashAnim", false);
+
+	// Pre-register boss skills before any enemies are created
+	// This ensures they are registered in SkillFactory before EnemyBase tries to create them
+	// Create temporary Character (Dummy) and skills just for registration
+	// The skills will register themselves in SkillFactory during construction
+	// Then delete the temporary Character (it will automatically clean up the skill components)
+	// Note: Skills are NOT added to the Character's mSkills vector, only registered in SkillFactory
+	{
+		Dummy* tempCharacter = new Dummy(this, Vector2::Zero, 0.0f);
+		
+		// Create temporary instances to trigger registration
+		// These will register themselves in SkillFactory during construction
+		new WhiteSlash(tempCharacter);
+		new WhiteBomb(tempCharacter);
+		new BossHealing(tempCharacter);
+		
+		// Skills are now registered in SkillFactory
+		// Delete the temporary character (it will clean up the skill components automatically)
+		delete tempCharacter;
+	}
 
 	std::string levelPath;
 
@@ -1167,6 +1194,22 @@ FurBallActor *Game::GetFurBallActor()
 	}
 
 	return furball;
+}
+
+WhiteBombActor *Game::GetWhiteBombActor()
+{
+	WhiteBombActor *bomb = nullptr;
+	for (auto actor : mWhiteBombActors)
+		if (actor->IsDead())
+			bomb = actor;
+
+	if (!bomb)
+	{
+		bomb = new WhiteBombActor(this);
+		mWhiteBombActors.push_back(bomb);
+	}
+
+	return bomb;
 }
 
 UpgradeTreat *Game::GetUpgradeTreatActor()

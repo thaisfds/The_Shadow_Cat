@@ -12,6 +12,7 @@
 #include "Renderer/Renderer.h"
 #include "AudioSystem.h"
 #include "Components/Skills/FurBall.h"
+#include "Components/Skills/WhiteBomb.h"
 #include "Components/Skills/Stomp.h"
 #include "Actors/UpgradeTreat.h"
 
@@ -120,8 +121,10 @@ public:
 
 	Actor *GetCollisionQueryActor() { return mCollisionQueryActor; }
 	Actor *GetAttackTrailActor() { return mAttackTrailActor; }
+	Actor *GetWhiteSlashActor() { return mWhiteSlashActor; }
 	StompActor *GetStompActor();
 	FurBallActor *GetFurBallActor();
+	class WhiteBombActor *GetWhiteBombActor();
 	UpgradeTreat *GetUpgradeTreatActor();
 
 private:
@@ -191,10 +194,12 @@ private:
 
 	class std::vector<StompActor *> mStompActors;
 	class std::vector<FurBallActor *> mFurBallActors;
+	class std::vector<class WhiteBombActor *> mWhiteBombActors;
 	class std::vector<UpgradeTreat *> mUpgradeTreatActors;
 
 	// Global particle system
 	class Actor *mAttackTrailActor;
+	class Actor *mWhiteSlashActor;
 
 	// Enemy and Boss tracking
 	std::vector<class EnemyBase *> mEnemies;

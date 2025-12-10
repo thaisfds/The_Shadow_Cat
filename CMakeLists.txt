@@ -111,6 +111,12 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/ClawAttack.h
         Source/Components/Skills/FurBall.cpp
         Source/Components/Skills/FurBall.h
+        Source/Components/Skills/WhiteSlash.cpp
+        Source/Components/Skills/WhiteSlash.h
+        Source/Components/Skills/WhiteBomb.cpp
+        Source/Components/Skills/WhiteBomb.h
+        Source/Components/Skills/BossHealing.cpp
+        Source/Components/Skills/BossHealing.h
         Source/Debug/EnemyDebugDrawer.cpp
         Source/Debug/EnemyDebugDrawer.h
         Source/DelayedActionSystem.cpp

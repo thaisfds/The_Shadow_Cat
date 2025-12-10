@@ -1,0 +1,10 @@
+{
+  "image": "../Assets/Sprites/AttackBoss/BossHealing.png",
+  "spriteSheetData": "../Assets/Sprites/AttackBoss/BossHealing.json",
+  "animations": 
+  {
+    "BossHealing": { "start": 0, "end": 2 }
+  },
+  "base": "BossHealing"
+}
+
