@@ -3,6 +3,7 @@
 #include "../AnimatedParticleSystemComponent.h"
 #include "../../Actors/Actor.h"
 #include "../../Actors/Characters/Character.h"
+#include "../../Actors/Characters/Boss.h"
 #include "../Drawing/AnimatorComponent.h"
 #include "../Drawing/DrawComponent.h"
 #include "../Physics/Physics.h"
@@ -44,6 +45,22 @@ void BasicAttack::StartSkill(Vector2 targetPosition)
     mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("BasicAttack");
     mCharacter->SetMovementLock(true);
     mCharacter->SetAnimationLock(true);  // Lock animations so attack anim isn't overridden
+    
+    // Play appropriate sound based on character type
+    std::string sound;
+    if (dynamic_cast<Boss*>(mCharacter))
+    {
+        // Bosses use boss attack sounds
+        int choice = rand() % 3;
+        sound = choice == 0 ? "s08_boss_simple_attack1.wav" : 
+                choice == 1 ? "s09_boss_simple_attack2.wav" : "s10_boss_simple_attack3.wav";
+    }
+    else
+    {
+        // Regular enemies and player use claw sounds
+        sound = rand() % 2 ? "s01_claw_attack1.wav" : "s02_claw_attack2.wav";
+    }
+    mCharacter->GetGame()->GetAudio()->PlaySound(sound, false, 0.5f);
 }
 
 void BasicAttack::Execute()
