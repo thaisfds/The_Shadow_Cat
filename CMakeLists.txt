@@ -69,6 +69,8 @@ add_executable(${PROJECT_NAME}
         Source/UI/Screens/HUD.h
         Source/UI/Screens/TutorialHUD.cpp
         Source/UI/Screens/TutorialHUD.h
+        Source/UI/Screens/UpgradeHUD.cpp
+        Source/UI/Screens/UpgradeHUD.h
         Source/UI/UIRect.cpp
         Source/UI/UIRect.h
         Source/UI/Screens/MainMenu.cpp
