@@ -38,5 +38,6 @@ private:
     // Skill feedback
     std::vector<UIImage*> mSkillBorders;
     std::vector<UIImage*> mSkillIcons;
+    std::vector<UIImage*> mSkillHints;
     std::vector<UIText*> mSkillCDText;
 };

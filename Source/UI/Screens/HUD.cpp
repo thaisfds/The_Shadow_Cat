@@ -35,31 +35,41 @@ void HUD::InitSkillIcons() {
     for (auto img : mSkillBorders) delete img;
     for (auto img : mSkillIcons) delete img;
     for (auto txt : mSkillCDText) delete txt;
+    for (auto img : mSkillHints) delete img;
     mSkillBorders.clear();
     mSkillIcons.clear();
     mSkillCDText.clear();
+    mSkillHints.clear();
 
     // Create skill icons
-    const float SCALE = 1.0f;
-    const float SPACING = 40.0f * SCALE;
-    Vector2 startOffset(-500.0f, -300.0f);
+    const float SCALE = 1.1f;
+    const float SPACING = 60.0f * SCALE;
+    Vector2 startOffset(300.0f, 300.0f);
 
     ShadowCat* player = mGame->GetPlayer();
     if (!player) return;
 
-    const auto& skills = player->GetSkills();
+    auto skills = player->GetSkills();
+
+    // Change order to match input layout
+    auto skillsCopy = skills;
+
+    skills[0] = skillsCopy[4]; // LMB
+    skills[1] = skillsCopy[2]; // RMB
+    skills[2] = skillsCopy[0]; // Q
+    skills[3] = skillsCopy[1]; // E
+    skills[4] = skillsCopy[3]; // SHIFT
 
     for (size_t i = 0; i < skills.size(); ++i) {
         Vector2 offset = startOffset + Vector2(i * SPACING, 0.0f);
 
-        UIImage* border = AddImage("../Assets/HUD/ShadowCat/ItemSlot.png", offset, SCALE, 0.0f, 1);
-        //UIImage* icon = AddImage(skills[i]->GetIconPath(), offset, SCALE, 0.0f, 2);
+        UIImage* border = AddImage("../Assets/Icons/ItemSlot.png", offset, SCALE * 1.4f, 0.0f, 1);
+        UIImage* icon = AddImage(skills[i]->GetIconPath(), offset, SCALE, 0.0f, 2);
 
-        SDL_Log("skill path : %s", skills[i]->GetIconPath().c_str());
-        UIText* cdText = AddText("", offset + Vector2(0.0f, 20.0f), 0.5f);
+        UIText* cdText = AddText("", offset + Vector2(0.0f, 0.0f), 0.6f);
 
         mSkillBorders.push_back(border);
-        //mSkillIcons.push_back(icon);
+        mSkillIcons.push_back(icon);
         mSkillCDText.push_back(cdText);
 
         // Update cooldown text
@@ -69,6 +79,38 @@ void HUD::InitSkillIcons() {
         } else {
             cdText->SetText("");
         }
+
+        // Add keyboard hints
+        switch (i) {
+            case 0: // LMB
+                mSkillHints.push_back(AddImage("../Assets/HUD/Menu/KeyboardLMB.png", offset + Vector2(20.0f, 20.0f), 0.7f, 0.0f));
+                break;
+
+            case 1: // RMB
+                mSkillHints.push_back(AddImage("../Assets/HUD/Menu/KeyboardRMB.png", offset + Vector2(20.0f, 20.0f), 0.7f, 0.0f));
+                break;
+
+            case 2: // Q
+                mSkillHints.push_back(AddImage("../Assets/HUD/Menu/KeyboardQ.png", offset + Vector2(20.0f, 20.0f), 0.7f, 0.0f));
+                break;
+
+            case 3: // E
+                mSkillHints.push_back(AddImage("../Assets/HUD/Menu/KeyboardE.png", offset + Vector2(20.0f, 20.0f), 0.7f, 0.0f));
+                break;
+
+            case 4: // SHIFT
+                mSkillHints.push_back(AddImage("../Assets/HUD/Menu/KeyboardSHIFT.png", offset + Vector2(20.0f, 20.0f), 0.9f, 0.0f));
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
+    for (auto &txt : mSkillCDText) {
+        txt->SetTextColor(Vector3::One); // White
+        txt->SetBackgroundColor(Vector4::Zero); // Transparent
     }
 }
 
