@@ -1,7 +1,7 @@
 {
 	"id": "WhiteBoss",
 	"name": "White Boss",
-	"hp": 80,
+	"hp": 200,
 	"speed": 150,
 	"dropChance": 1.0,
 	"skills":

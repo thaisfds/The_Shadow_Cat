@@ -15,6 +15,9 @@ void SkillBehavior::OnEnter()
 
 void SkillBehavior::Update(float deltaTime)
 {
+	// Don't use skills if already using one
+	if (mOwner->IsUsingSkill()) return;
+	
 	auto player = mOwner->GetGame()->GetPlayer();
 	if (!player) return;
 
@@ -25,7 +28,7 @@ void SkillBehavior::Update(float deltaTime)
 	for (auto& skill : mOwner->GetSkills())
 	{
 		if (!skill) continue; // Skip null skills
-		if (skill->CanUse(playerPos) && skill->EnemyShouldUse())
+		if (skill->CanUse(playerPos) && skill->EnemyShouldUse() && !skill->IsOnCooldown())
 		{
 			availableSkills.push_back(skill);
 		}
@@ -50,10 +53,19 @@ bool SkillBehavior::SkillToPatrol()
 
 bool SkillBehavior::AnySkillAvailable() const
 {
+	auto player = mOwner->GetGame()->GetPlayer();
+	if (!player) return false;
+	
+	auto playerPos = player->GetPosition();
+	
 	for (auto& skill : mOwner->GetSkills())
 	{
 		if (!skill) continue; // Skip null skills
-		if (skill->EnemyShouldUse()) return true;
+		// Check if skill can be used (not on cooldown, in range, and should be used)
+		if (skill->EnemyShouldUse() && !skill->IsOnCooldown() && skill->CanUse(playerPos))
+		{
+			return true;
+		}
 	}
 
 	return false;

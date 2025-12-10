@@ -113,7 +113,7 @@ void WhiteBoss::SetupAIBehaviors(const nlohmann::json& data)
 	chase->AddTransition(patrol->GetName(), [chase]() { return chase->ChaseToPatrol(); });
 	chase->AddTransition(skill->GetName(), [skill]() { return skill->AnySkillAvailable(); });
 	skill->AddTransition(patrol->GetName(), [skill]() { return skill->SkillToPatrol(); });
-	skill->AddTransitionCondition([skill]() { return skill->AnySkillAvailable(); });
+	skill->AddTransitionCondition([skill]() { return skill->AnySkillAvailable(); }); // Allow re-entering skill state when skills available
 
 	mStateMachine->SetInitialState(patrol->GetName());
 }
