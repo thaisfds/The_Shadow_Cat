@@ -27,7 +27,6 @@ public:
 
 	void SetCollider(Collider* collider);
     
-	void SetSize(int width, int height);
 	void SetOffset(Vector2 offset);
     
 	void DebugDraw(class Renderer *renderer) override;

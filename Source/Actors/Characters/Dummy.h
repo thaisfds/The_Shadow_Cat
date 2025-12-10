@@ -5,7 +5,7 @@
 class Dummy : public Character
 {
 public:
-    Dummy(class Game* game, float forwardSpeed = 0.0f);
+    Dummy(class Game* game, Vector2 position, float forwardSpeed = 0.0f);
     virtual ~Dummy();
 
     void TakeDamage(int damage) override;

@@ -12,7 +12,6 @@
 RigidBodyComponent::RigidBodyComponent(class Actor* owner, float mass, float friction, bool applyGravity, int updateOrder)
         :Component(owner, updateOrder)
         ,mMass(mass)
-        ,mApplyGravity(applyGravity)
         ,mFrictionCoefficient(friction)
         ,mVelocity(Vector2::Zero)
         ,mAcceleration(Vector2::Zero)
@@ -27,12 +26,6 @@ void RigidBodyComponent::ApplyForce(const Vector2 &force)
 
 void RigidBodyComponent::Update(float deltaTime)
 {
-    // Apply gravity acceleration
-    if(mApplyGravity)
-    {
-        ApplyForce(Vector2::UnitY * GameConstants::GRAVITY);
-    }
-
     // Apply friction
     if(Math::Abs(mVelocity.x) > 0.05f && mFrictionCoefficient != 0.0f)
     {
