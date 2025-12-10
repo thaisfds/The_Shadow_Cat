@@ -6,6 +6,7 @@
 #include "Character.h"
 #include "../../UI/Screens/HUD.h"
 #include <vector>
+#include "../../Components/Skills/UpgradeInfo.h"
 
 class ShadowCat : public Character
 {
@@ -26,7 +27,7 @@ public:
     std::vector<UpgradeInfo> GetRandomUpgrades() const;
     int GetUpgradePoints() const { return mUpgradePoints; }
     void AddUpgradePoint() { mUpgradePoints++; }
-    void SpendUpgradePoint() { if (mUpgradePoints > 0) mUpgradePoints--; }
+    void SpendUpgradePoint(UpgradeInfo upgrade);
 
 private:
     class SkillInputHandler *mSkillInputHandler;

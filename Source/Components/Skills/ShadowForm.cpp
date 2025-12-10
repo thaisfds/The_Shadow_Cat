@@ -8,15 +8,7 @@ ShadowForm::ShadowForm(Actor* owner, int updateOrder)
 {
 	LoadSkillDataFromJSON("ShadowFormData");
 
-	float shadowFormBeginDuration = mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("ShadowFormBegin");
-	AddDelayedAction(shadowFormBeginDuration, [this]() { mCharacter->SetMovementLock(false); });
-	float shadowFormEndDelay = mDuration - mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("ShadowFormEnd");
-	AddDelayedAction(shadowFormEndDelay, [this]()
-	{ 
-		mCharacter->SetMovementLock(true);
-		mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("ShadowFormEnd", false); 
-	});
-	AddDelayedAction(mDuration, [this]() { EndSkill(); });
+	
 }
 
 nlohmann::json ShadowForm::LoadSkillDataFromJSON(const std::string& fileName)
@@ -28,7 +20,6 @@ nlohmann::json ShadowForm::LoadSkillDataFromJSON(const std::string& fileName)
 	auto id = GameJsonParser::GetStringValue(data, "id");
 	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new ShadowForm(owner); });
 
-	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "duration", &mDuration));
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "cooldown", &mCooldown));
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "speedMultiplier", &mSpeed));
 	return data;
@@ -51,6 +42,16 @@ void ShadowForm::StartSkill(Vector2 targetPosition)
 	filter.collidesWith = CollisionFilter::RemoveGroups(filter.collidesWith,
 		{CollisionGroup::Player, CollisionGroup::Enemy, CollisionGroup::PlayerSkills, CollisionGroup::EnemySkills});
 	mCharacter->GetComponent<ColliderComponent>()->SetFilter(filter);
+
+	float shadowFormBeginDuration = animator->GetAnimationDuration("ShadowFormBegin");
+	AddDelayedAction(shadowFormBeginDuration, [this]() { mCharacter->SetMovementLock(false); });
+	float shadowFormEndDelay = mDuration - animator->GetAnimationDuration("ShadowFormEnd");
+	AddDelayedAction(shadowFormEndDelay, [this]()
+	{ 
+		mCharacter->SetMovementLock(true);
+		mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("ShadowFormEnd", false); 
+	});
+	AddDelayedAction(mDuration, [this]() { EndSkill(); });
 }
 
 void ShadowForm::EndSkill()

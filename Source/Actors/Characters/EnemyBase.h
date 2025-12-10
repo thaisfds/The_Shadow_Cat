@@ -18,6 +18,7 @@ public:
 
 protected:
 	class AIStateMachine *mStateMachine;
+	float mUpgradeDropChance;
 	
 	virtual void SetupAIBehaviors(const nlohmann::json& data) = 0;
 

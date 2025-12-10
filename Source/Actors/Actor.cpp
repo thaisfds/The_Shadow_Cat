@@ -4,7 +4,7 @@
 #include <algorithm>
 
 Actor::Actor(Game *game)
-    : mState(ActorState::Active), mPosition(Vector2::Zero), mScale(Vector2(1.0f, 1.0f)), mRotation(0.0f), mGame(game)
+    : mState(ActorState::Active), mPosition(Vector2::Zero), mScale(Vector2(1.0f, 1.0f)), mRotation(0.0f), mGame(game), mPersistent(false)
 {
     mGame->AddActor(this);
 }
@@ -70,4 +70,13 @@ void Actor::AddComponent(Component *c)
     mComponents.emplace_back(c);
     std::sort(mComponents.begin(), mComponents.end(), [](Component *a, Component *b)
               { return a->GetUpdateOrder() < b->GetUpdateOrder(); });
+}
+
+void Actor::SetPersistent(bool persistent)
+{
+    if (persistent == mPersistent) return;
+
+    mPersistent = persistent;
+    if (mPersistent) mGame->AddPersistentActor(this);
+    else mGame->RemovePersistentActor(this);
 }

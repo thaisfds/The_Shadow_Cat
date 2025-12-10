@@ -47,6 +47,9 @@ public:
     // Components getter
     const std::vector<class Component *> &GetComponents() const { return mComponents; }
 
+    void SetPersistent(bool persistent);
+    bool IsPersistent() const { return mPersistent; }
+
     // Returns component of type T, or null if doesn't exist
     template <typename T>
     T *GetComponent() const
@@ -81,6 +84,8 @@ protected:
     Vector2 mPosition;
     Vector2 mScale;
     float mRotation;
+
+    bool mPersistent;
 
     // Components
     std::vector<class Component *> mComponents;

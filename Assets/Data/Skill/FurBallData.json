@@ -31,7 +31,7 @@
 		{
 			"type": "range",
 			"name": "Range",
-			"value": 20
+			"value": 50
 		},
 		{
 			"type": "cooldown",
@@ -42,7 +42,7 @@
 		{
 			"type": "projectileSpeed",
 			"name": "Speed",
-			"value": 50
+			"value": 60
 		}
 	]
 }

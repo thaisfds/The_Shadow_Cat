@@ -3,6 +3,7 @@
 	"name": "White Boss",
 	"hp": 500,
 	"speed": 150,
+	"dropChance": 1.0,
 	"skills":
 	[
 		"BasicAttackSkill"
