@@ -191,8 +191,17 @@ void Game::ResumeGame()
 
 void Game::ResetGame()
 {
-	// Bugged so return for now
-	return;
+	// // Stop background music
+	// if (mBackgroundMusic.IsValid())
+	// {
+	// 	mAudio->StopSound(mBackgroundMusic);
+	// 	mBackgroundMusic.Reset();
+	// }
+
+	// mRenderer->CleanUIElements();
+	// Game();
+
+	// SetScene(GameScene::MainMenu);
 }
 
 void Game::SetScene(GameScene nextScene)

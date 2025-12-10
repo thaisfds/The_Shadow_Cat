@@ -23,7 +23,8 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
     mEnemiesLeftCount = AddText("0", Vector2(600.0f, -300.0f), 0.7f);
 
     mAreaClearTxt = AddText("            Area clear!\nProceed to the red carpet!", Vector2(630.0f, -220.0f), 0.5f);
-
+    mAreaClearTxt->SetIsVisible(false);
+    
     for (auto &txt : mTexts) {
         txt->SetTextColor(Vector3::One); // White
         txt->SetBackgroundColor(Vector4::Zero); // Transparent
@@ -46,10 +47,6 @@ void HUD::Update(float deltaTime)
     // Update enemies left  ------------------- //
     int enemiesLeft = mGame->CountAliveEnemies();
     mEnemiesLeftCount->SetText(std::to_string(enemiesLeft));
-    if (enemiesLeft == 0)
-        mAreaClearTxt->SetIsVisible(true);
-    else
-        mAreaClearTxt->SetIsVisible(false);
 
     // Update health ------------------- //
     if (!mGame->GetPlayer()) return;
