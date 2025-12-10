@@ -997,7 +997,7 @@ void Game::GenerateOutput()
 	switch (mCurrentScene)
 	{
 	case GameScene::MainMenu:
-		backgroundPath = "../Assets/HUD/MainMenuBackground.png";
+		backgroundPath = "../Assets/HUD/Background/MainMenuBackground.png";
 		break;
 	case GameScene::Lobby:
 		backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
