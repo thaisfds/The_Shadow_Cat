@@ -1,0 +1,28 @@
+{
+	"id": "SylvesterBoss",
+	"name": "Sylvester Boss",
+	"hp": 200,
+	"speed": 150,
+	"dropChance": 1.0,
+	"skills":
+	[
+		"WhiteSlashSkill",
+		"WhiteBombSkill",
+		"WhiteBubbleSkill",
+		"BossHealingSkill",
+		"basicAttackSkill"
+	],
+	"aiBehaviors":
+	{
+		"patrol":
+		{
+			"radius": 400.0,
+			"pauseMinDuration": 0.5,
+			"pauseMaxDuration": 2.0
+		},
+		"chase":
+		{
+			"range": 10000.0
+		}
+	}
+}

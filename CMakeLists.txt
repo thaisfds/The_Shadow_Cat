@@ -151,6 +151,10 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Characters/BossBase.h
         Source/Actors/Characters/Enemies/WhiteBoss.cpp
         Source/Actors/Characters/Enemies/WhiteBoss.h
+        Source/Actors/Characters/Enemies/SylvesterBoss.cpp
+        Source/Actors/Characters/Enemies/SylvesterBoss.h
+        Source/Actors/Characters/Enemies/OrangeBoss.cpp
+        Source/Actors/Characters/Enemies/OrangeBoss.h
         Source/Actors/UpgradeTreat.cpp
         Source/Actors/UpgradeTreat.h
         Source/AI/Behaviors/FleeBehavior.cpp
