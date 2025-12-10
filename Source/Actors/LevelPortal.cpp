@@ -7,28 +7,22 @@
 LevelPortal::LevelPortal(Game* game)
     : Actor(game)
     , mIsActive(false)
+    , mAnimatorComponent(nullptr)
 {
-    // Use Floor animation for the red carpet
-    mAnimatorComponent = new AnimatorComponent(this, "Floor", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
-    mAnimatorComponent->LoopAnimation("Floor5");  // Red carpet tile
-    
-    // Start invisible
+    // Portal is purely logical - carpet tile from CSV shows when portal is active
+    // No visual component needed, the tile 9 in the level handles the visual
     Deactivate();
-    SDL_Log("[PORTAL] Created - initially hidden");
+    SDL_Log("[PORTAL] Created - purely logical (visual is from level tile)");
 }
 
 void LevelPortal::Activate()
 {
     mIsActive = true;
-    mAnimatorComponent->SetVisible(true);
-    mAnimatorComponent->SetEnabled(true);
-    SDL_Log("[PORTAL] ACTIVATED - carpet now visible");
+    SDL_Log("[PORTAL] ACTIVATED - carpet visible (from level tile)");
 }
 
 void LevelPortal::Deactivate()
 {
     mIsActive = false;
-    mAnimatorComponent->SetVisible(false);
-    mAnimatorComponent->SetEnabled(false);
-    SDL_Log("[PORTAL] DEACTIVATED - carpet now hidden");
+    SDL_Log("[PORTAL] DEACTIVATED");
 }

@@ -41,6 +41,9 @@ void FurBall::Execute()
 {
 	float lifetime = mRange / mProjectileSpeed;
 
+	// Play furball sound
+	mCharacter->GetGame()->GetAudio()->PlaySound("s05_furball_launch1.wav", false, 0.7f);
+
 	mCharacter->GetGame()->GetFurBallActor()->Awake(
 		mCharacter->GetPosition() + mTargetVector * 20.0f,
 		mTargetVector,

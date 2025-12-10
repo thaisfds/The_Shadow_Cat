@@ -41,6 +41,10 @@ void Stomp::StartSkill(Vector2 targetPosition)
 
 	((CircleCollider*)mAreaOfEffect)->SetRadius(mRadius);
 
+	// Play stomp sound
+	std::string sound = rand() % 2 ? "s03_stomp_attack1.wav" : "s04_stomp_attack2.wav";
+	mCharacter->GetGame()->GetAudio()->PlaySound(sound, false, 0.7f);
+
 	mCharacter->GetGame()->GetStompActor()->Awake(
 		targetPosition,
 		mDamage,

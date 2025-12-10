@@ -201,7 +201,7 @@ void Game::SetScene(GameScene nextScene)
 		mCurrentScene = GameScene::MainMenu;
 
 		// Main menu background music
-		mBackgroundMusic = mAudio->PlaySound("m01_main_menu.mp3", true, 0.8f);
+		mBackgroundMusic = mAudio->PlaySound("m01_main_menu.mp3", true, 0.3f);
 
 		new MainMenu(this, "../Assets/Fonts/Pixellari.ttf");
 		break;
@@ -210,7 +210,7 @@ void Game::SetScene(GameScene nextScene)
 		mCurrentScene = GameScene::Lobby;
 
 		// Lobby background music
-		mBackgroundMusic = mAudio->PlaySound("m04_tutorial.mp3", true);
+		mBackgroundMusic = mAudio->PlaySound("m04_tutorial.mp3", true, 0.5f);
 
 		// Toggleable tutorial HUD
 		if (!mTutorialHUD)
@@ -230,7 +230,7 @@ void Game::SetScene(GameScene nextScene)
 		mCurrentScene = GameScene::Level1;
 
 		// Level 1 background music
-		mBackgroundMusic = mAudio->PlaySound("m05_level1.mp3", true);
+		mBackgroundMusic = mAudio->PlaySound("m05_level1.mp3", true, 0.5f);
 
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
@@ -243,7 +243,7 @@ void Game::SetScene(GameScene nextScene)
 		mCurrentScene = GameScene::Level1_Boss;
 
 		// Boss 1 background music
-		mBackgroundMusic = mAudio->PlaySound("m08_boss1_grass.mp3", true);
+		mBackgroundMusic = mAudio->PlaySound("m08_boss1_grass.mp3", true, 0.3f);
 
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
@@ -256,7 +256,7 @@ void Game::SetScene(GameScene nextScene)
 		mCurrentScene = GameScene::Level2;
 
 		// Level 2 background music
-		mBackgroundMusic = mAudio->PlaySound("m06_level2.mp3", true);
+		mBackgroundMusic = mAudio->PlaySound("m06_level2.mp3", true, 0.6f);
 
 		// Hide tutorial when entering levels
 		if (mTutorialHUD)
@@ -303,6 +303,28 @@ void Game::SetScene(GameScene nextScene)
 
 		InitializeActors();
 		break;
+	}
+}
+
+GroundType Game::GetGroundType() const
+{
+	switch (mCurrentScene)
+	{
+	case GameScene::Lobby:
+	case GameScene::Level1:
+	case GameScene::Level1_Boss:
+		return GroundType::Grass;
+	
+	case GameScene::Level2:
+	case GameScene::Level2_Boss:
+		return GroundType::Brick;
+	
+	case GameScene::Level3:
+	case GameScene::Level3_Boss:
+		return GroundType::Stone;
+	
+	default:
+		return GroundType::Grass;
 	}
 }
 
@@ -745,7 +767,11 @@ void Game::UpdateGame(float deltaTime)
 			}
 
 			if (!mIsGameWon)
+			{
+				// Play room change sound
+				mAudio->PlaySound("e16_change_room.mp3", false, 0.3f);
 				SetScene(nextScene);
+			}
 		}
 	}
 

@@ -26,4 +26,7 @@ public:
 private:
     class SkillInputHandler *mSkillInputHandler;
     int mUpgradePoints;
+
+    // Footstep sound system
+    float mFootstepTimer;
 };
