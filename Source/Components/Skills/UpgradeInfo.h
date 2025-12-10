@@ -1,8 +1,10 @@
 #pragma once
 
-#include "SkillBase.h"
 #include <functional>
 #include <string>
+
+// Forward declaration to avoid circular dependency
+class SkillBase;
 
 struct UpgradeInfo
 {
@@ -11,6 +13,6 @@ struct UpgradeInfo
     int currentLevel = 0;
     int maxLevel = -1;
 
-    SkillBase *skill = nullptr;
+    const SkillBase *skill = nullptr;
     float *upgradeTarget = nullptr;
 };

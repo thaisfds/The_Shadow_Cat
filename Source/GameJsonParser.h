@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Components/Skills/SkillBase.h"
 #include "Json.h"
 #include "Components/Physics/Collider.h"
 #include "Components/Skills/UpgradeInfo.h"
+
+// Forward declaration to avoid circular dependency
+class SkillBase;
 
 class GameJsonParser
 {
