@@ -21,11 +21,14 @@ public:
 
     void ResetCollisionFilter() const override;
 
-    std::vector<UpgradeInfo> GetRandomUpgrades();
+    std::vector<UpgradeInfo> GetRandomUpgrades() const;
+    int GetUpgradePoints() const { return mUpgradePoints; }
+    void AddUpgradePoint() { mUpgradePoints++; }
+    void SpendUpgradePoint() { if (mUpgradePoints > 0) mUpgradePoints--; }
 
 private:
     class SkillInputHandler *mSkillInputHandler;
-    int mUpgradePoints;
+    int mUpgradePoints = 0;
 
     // Footstep sound system
     float mFootstepTimer;

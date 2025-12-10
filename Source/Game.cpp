@@ -15,6 +15,7 @@
 #include "UI/Screens/MainMenu.h"
 #include "UI/Screens/HUD.h"
 #include "UI/Screens/TutorialHUD.h"
+#include "UI/Screens/UpgradeHUD.h"
 #include "UI/Screens/GameOver.h"
 #include "UI/Screens/WinScreen.h"
 #include "Actors/Actor.h"
@@ -38,6 +39,7 @@ Game::Game()
 	  mAudio(nullptr),
 	  mHUD(nullptr),
 	  mTutorialHUD(nullptr),
+	  mUpgradeHUD(nullptr),
 	  mLevelPortal(nullptr),
 	  mCurrentBoss(nullptr),
 	  mIsPaused(false),
@@ -149,8 +151,8 @@ void Game::UnloadScene()
 	// Delete UI screens
 	for (auto ui : mUIStack)
 	{
-		// Don't delete HUD or Tutorial HUD here, they persist between scenes
-		if (ui == mHUD || ui == mTutorialHUD)
+		// Don't delete HUD, Tutorial HUD, or Upgrade HUD here, they persist between scenes
+		if (ui == mHUD || ui == mTutorialHUD || ui == mUpgradeHUD)
 			continue;
 
 		delete ui;
@@ -160,6 +162,8 @@ void Game::UnloadScene()
 		mUIStack.push_back(mTutorialHUD);
 	if (mHUD)
 		mUIStack.push_back(mHUD);
+	if (mUpgradeHUD)
+		mUIStack.push_back(mUpgradeHUD);
 
 	// Reset states
 	mShadowCat = nullptr;
@@ -217,6 +221,7 @@ void Game::SetScene(GameScene nextScene)
 
 		// Always shown
 		mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf");
+		mUpgradeHUD = new UpgradeHUD(this, "../Assets/Fonts/Pixellari.ttf");
 
 		// Show tutorial in Lobby
 		if (mTutorialHUD)
@@ -704,6 +709,12 @@ void Game::ProcessInput()
 			if (event.key.keysym.sym == SDLK_h && event.key.repeat == 0)
 				if (mTutorialHUD)
 					mTutorialHUD->ToggleControlVisibility(); // Pass event to actors
+
+					// TEST
+			if (event.key.keysym.sym == SDLK_p && event.key.repeat == 0)
+				if (mShadowCat)
+					mShadowCat->AddUpgradePoint();
+
 			for (auto actor : mActors)
 				actor->OnHandleEvent(event);
 			break;

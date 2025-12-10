@@ -176,7 +176,7 @@ void ShadowCat::Kill()
     mGame->SetGameOver(true);
 }
 
-std::vector<UpgradeInfo> ShadowCat::GetRandomUpgrades()
+std::vector<UpgradeInfo> ShadowCat::GetRandomUpgrades() const
 {
     std::vector<UpgradeInfo> allUpgrades;
 

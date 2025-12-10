@@ -63,6 +63,7 @@ public:
 	void PauseGame();
 	void ResumeGame();
 	void ResetGame();
+	bool IsPaused() const { return mIsPaused; }
 
 	void SetGameOver(bool isOver) { mIsGameOver = isOver; }
 	void SetGameWon(bool isWon) { mIsGameWon = isWon; }
@@ -89,7 +90,7 @@ public:
 	Vector2 GetMouseAbsolutePosition();
 
 	// Game specific
-	const class ShadowCat *GetPlayer() { return mShadowCat; }
+	class ShadowCat *GetPlayer() { return mShadowCat; }
 	class Boss *GetCurrentBoss() const { return mCurrentBoss; }
 	class HUD *GetHUD() { return mHUD; }
 
@@ -172,6 +173,7 @@ private:
 	// Game-specific
 	class ShadowCat *mShadowCat;
 	class HUD *mHUD;
+	class UpgradeHUD *mUpgradeHUD;
 	class TutorialHUD *mTutorialHUD;
 	class LevelPortal *mLevelPortal;
 	int **mLevelData;
