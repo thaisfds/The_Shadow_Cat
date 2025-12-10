@@ -13,6 +13,7 @@
 #include "AudioSystem.h"
 #include "Components/Skills/FurBall.h"
 #include "Components/Skills/WhiteBomb.h"
+#include "Components/Skills/WhiteBubble.h"
 #include "Components/Skills/Stomp.h"
 #include "Actors/UpgradeTreat.h"
 
@@ -125,6 +126,7 @@ public:
 	StompActor *GetStompActor();
 	FurBallActor *GetFurBallActor();
 	class WhiteBombActor *GetWhiteBombActor();
+	class WhiteBubbleActor *GetWhiteBubbleActor();
 	UpgradeTreat *GetUpgradeTreatActor();
 
 private:
@@ -195,6 +197,7 @@ private:
 	class std::vector<StompActor *> mStompActors;
 	class std::vector<FurBallActor *> mFurBallActors;
 	class std::vector<class WhiteBombActor *> mWhiteBombActors;
+	class std::vector<class WhiteBubbleActor *> mWhiteBubbleActors;
 	class std::vector<UpgradeTreat *> mUpgradeTreatActors;
 
 	// Global particle system

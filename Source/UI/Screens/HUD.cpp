@@ -28,9 +28,6 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
         txt->SetTextColor(Vector3::One); // White
         txt->SetBackgroundColor(Vector4::Zero); // Transparent
     }
-
-    // Initialize boss health bar (initially hidden)
-    InitBossHealthBar();
 }
 
 void HUD::Update(float deltaTime)
@@ -63,9 +60,6 @@ void HUD::Update(float deltaTime)
     }
 
     SetHealth(mGame->GetPlayer()->GetHP() / 10);
-
-    // Update boss health bar
-    UpdateBossHealth();
 }
 
 void HUD::InitHealthIcons() {
@@ -139,140 +133,4 @@ void HUD::UpdateMaxHealth(int maxHealth, bool fill)
     mHealth = fill ? mMaxHealth : std::min(mHealth, mMaxHealth);
 
     InitHealthIcons();
-}
-
-void HUD::InitBossHealthBar()
-{
-    // Boss health bar at top center of screen
-    // Total: 40 bars (12 left + 16 middle + 12 right), each bar = 2 HP
-    // Initial HP: 80
-    
-    float scale = 5.0f;
-    float yPos = -330.0f; // Top center Y position
-    
-    // All images are 64x64 pixels
-    float imageWidth = 64.0f * scale;
-    
-    // Calculate total width and starting position (left edge)
-    float totalWidth = imageWidth * 3.0f; // 3 images of 64 pixels each
-    float leftEdge = -totalWidth / 2.0f; // Left edge of entire bar
-    
-    // Position each image so it starts exactly where the previous one ends
-    // Since images are positioned by their center, we calculate:
-    // Image center = leftEdge + (imageIndex * imageWidth) + (imageWidth / 2)
-    
-    // Left image (index 0): center at -96 + 0*64 + 32 = -64 (spans from -96 to -32)
-    Vector2 leftPos(leftEdge + imageWidth / 2.0f, yPos);
-    
-    // Middle image (index 1): center at -96 + 1*64 + 32 = -32 (spans from -32 to 0)
-    Vector2 middlePos(leftEdge + imageWidth + imageWidth / 2.0f, yPos);
-    
-    // Right image (index 2): center at -96 + 2*64 + 32 = 0 (spans from 0 to 32)
-    Vector2 rightPos(leftEdge + imageWidth * 2.0f + imageWidth / 2.0f, yPos);
-    
-    // Create individual BossLife_3.png segments FIRST (40 total, each represents 2 HP)
-    // These appear behind the main bars (drawOrder 5, lower than main bars at 10)
-    // Start 20px to the right from the beginning of BossLife_0.png, then every 4px
-    // Apply scale to all spacing and positioning calculations
-    float segmentSpacing = 4.0f * scale; // Spacing between each segment (4px scaled)
-    
-    // BossLife_0.png's left edge is at leftEdge (e.g., -96 for a centered bar)
-    // The center of BossLife_0.png is at leftPos.x = leftEdge + imageWidth/2 = -96 + 32 = -64
-    // To start 20px to the RIGHT of the left edge, we use: leftEdge + (20 * scale)
-    // Since leftEdge is negative (-96), leftEdge + (20 * scale) moves to the right
-    float bossLife0LeftEdge = leftEdge; // Left edge of BossLife_0.png
-    float firstSegmentLeftEdge = bossLife0LeftEdge + (50.0f * scale); // 20px to the RIGHT of BossLife_0 left edge (scaled)
-    
-    // We'll need to get the actual texture width, but for now assume it's 4px
-    // The center of the first segment should be at: leftEdge + (20 * scale) + (segmentWidth/2)
-    // Since spacing is 4px, we assume segment width is also 4px (scaled)
-    float segmentWidth = 4.0f * scale; // Width of each BossLife_3 segment (scaled)
-    float firstSegmentCenterX = firstSegmentLeftEdge + segmentWidth / 2.0f;
-    
-    mBossHealthSegments.clear();
-    for (int i = 0; i < 38; ++i)
-    {
-        // Each segment center is positioned at: firstSegmentCenterX + (i * segmentSpacing)
-        float segmentCenterX = firstSegmentCenterX + (i * segmentSpacing);
-        Vector2 segmentPos(segmentCenterX, yPos);
-        UIImage* segment = AddImage("../Assets/HUD/BossFight/BossLife_3.png", segmentPos, scale, 0.0f, 5);
-        segment->SetIsVisible(false); // Initially hidden
-        mBossHealthSegments.push_back(segment);
-    }
-    
-    // Create main bar segments AFTER BossLife_3 segments (so they appear on top)
-    // Left segment (BossLife_0.png) - 12 bars
-    mBossHealthLeft = AddImage("../Assets/HUD/BossFight/BossLife_0.png", leftPos, scale, 0.0f, 10);
-    
-    // Middle segment (BossLife_1.png) - 16 bars
-    mBossHealthMiddle = AddImage("../Assets/HUD/BossFight/BossLife_1.png", middlePos, scale, 0.0f, 10);
-    
-    // Right segment (BossLife_2.png) - 12 bars
-    mBossHealthRight = AddImage("../Assets/HUD/BossFight/BossLife_2.png", rightPos, scale, 0.0f, 10);
-    
-    // Initially hide all boss health elements
-    if (mBossHealthLeft) mBossHealthLeft->SetIsVisible(false);
-    if (mBossHealthMiddle) mBossHealthMiddle->SetIsVisible(false);
-    if (mBossHealthRight) mBossHealthRight->SetIsVisible(false);
-}
-
-void HUD::UpdateBossHealth()
-{
-    auto boss = mGame->GetCurrentBoss();
-    
-    if (!boss || boss->IsDead())
-    {
-        // Hide boss health bar if no boss or boss is dead
-        if (mBossHealthLeft) mBossHealthLeft->SetIsVisible(false);
-        if (mBossHealthMiddle) mBossHealthMiddle->SetIsVisible(false);
-        if (mBossHealthRight) mBossHealthRight->SetIsVisible(false);
-        for (auto segment : mBossHealthSegments)
-        {
-            if (segment) segment->SetIsVisible(false);
-        }
-        return;
-    }
-    
-    // Show boss health bar
-    int currentHP = boss->GetHP();
-    int maxHP = boss->GetMaxHP();
-    
-    // Each segment represents 2 HP
-    // Total segments: 40 (12 left + 16 middle + 12 right)
-    int totalSegments = 40;
-    int visibleSegments = currentHP / 2; // Each segment = 2 HP
-    visibleSegments = std::clamp(visibleSegments, 0, totalSegments);
-    
-    // Update individual BossLife_3 segments visibility
-    for (int i = 0; i < mBossHealthSegments.size(); ++i)
-    {
-        if (mBossHealthSegments[i])
-        {
-            mBossHealthSegments[i]->SetIsVisible(i < visibleSegments);
-        }
-    }
-    
-    // Calculate which main bar segments should be visible
-    // Left: segments 1-12
-    // Middle: segments 13-28 (12+1 to 12+16)
-    // Right: segments 29-40 (28+1 to 40)
-    
-    bool showLeft = visibleSegments > 0;
-    bool showMiddle = visibleSegments > 12;
-    bool showRight = visibleSegments > 28;
-    
-    if (mBossHealthLeft)
-    {
-        mBossHealthLeft->SetIsVisible(showLeft);
-    }
-    
-    if (mBossHealthMiddle)
-    {
-        mBossHealthMiddle->SetIsVisible(showMiddle);
-    }
-    
-    if (mBossHealthRight)
-    {
-        mBossHealthRight->SetIsVisible(showRight);
-    }
 }

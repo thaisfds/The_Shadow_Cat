@@ -30,6 +30,7 @@
 #include "Actors/LevelPortal.h"
 #include "Components/Skills/WhiteSlash.h"
 #include "Components/Skills/WhiteBomb.h"
+#include "Components/Skills/WhiteBubble.h"
 #include "Components/Skills/BossHealing.h"
 #include "Actors/Characters/Dummy.h"
 
@@ -364,6 +365,7 @@ void Game::InitializeActors()
 		// These will register themselves in SkillFactory during construction
 		new WhiteSlash(tempCharacter);
 		new WhiteBomb(tempCharacter);
+		new WhiteBubble(tempCharacter);
 		new BossHealing(tempCharacter);
 		
 		// Skills are now registered in SkillFactory
@@ -1210,6 +1212,22 @@ WhiteBombActor *Game::GetWhiteBombActor()
 	}
 
 	return bomb;
+}
+
+WhiteBubbleActor *Game::GetWhiteBubbleActor()
+{
+	WhiteBubbleActor *bubble = nullptr;
+	for (auto actor : mWhiteBubbleActors)
+		if (actor->IsDead())
+			bubble = actor;
+
+	if (!bubble)
+	{
+		bubble = new WhiteBubbleActor(this);
+		mWhiteBubbleActors.push_back(bubble);
+	}
+
+	return bubble;
 }
 
 UpgradeTreat *Game::GetUpgradeTreatActor()

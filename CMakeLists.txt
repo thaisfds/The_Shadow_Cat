@@ -115,6 +115,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/WhiteSlash.h
         Source/Components/Skills/WhiteBomb.cpp
         Source/Components/Skills/WhiteBomb.h
+        Source/Components/Skills/WhiteBubble.cpp
+        Source/Components/Skills/WhiteBubble.h
         Source/Components/Skills/BossHealing.cpp
         Source/Components/Skills/BossHealing.h
         Source/Debug/EnemyDebugDrawer.cpp

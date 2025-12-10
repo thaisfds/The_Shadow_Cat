@@ -3,7 +3,7 @@
 	"name": "White Bomb",
 	"description": "Launch a bomb that follows the player and deals damage on impact.",
 	"iconPath": "../Assets/Icons/BombAttackCard.png",
-	"cooldown": 5.0,
+	"cooldown": 10.0,
 	"range": 500,
 	"areaOfEffect":
 	{
@@ -14,11 +14,11 @@
 	[
 		{
 			"type": "damage",
-			"value": 25
+			"value": 20
 		},
 		{
 			"type": "projectileSpeed",
-			"value": 200
+			"value": 160
 		}
 	]
 }

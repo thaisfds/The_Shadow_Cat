@@ -8,10 +8,10 @@
 #include "../Physics/CollisionFilter.h"
 #include "../../DelayedActionSystem.h"
 
-class WhiteBomb : public SkillBase
+class WhiteBubble : public SkillBase
 {
 public:
-	WhiteBomb(Actor* owner, int updateOrder = 100);
+	WhiteBubble(Actor* owner, int updateOrder = 100);
 
 	void StartSkill(Vector2 targetPosition) override;
 	void EndSkill() override;
@@ -21,39 +21,38 @@ public:
 	bool EnemyShouldUse() override;
 
 private:
-	float mProjectileSpeed;
-	float mDamage;
+	int mDamage;
+	float mDuration; // 20 seconds
 	Collider* mAreaOfEffect;
 
 	nlohmann::json LoadSkillDataFromJSON(const std::string& fileName) override;
 };
 
-class WhiteBombActor : public Actor
+class WhiteBubbleActor : public Actor
 {
 public:
-	WhiteBombActor(class Game* game);
-	~WhiteBombActor();
+	WhiteBubbleActor(class Game* game);
+	~WhiteBubbleActor();
 
 	void OnUpdate(float deltaTime) override;
 
 	void Kill() override;
-	void Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter, Collider* areaOfEffect, float lifetime);
+	void Awake(Vector2 position, int damage, CollisionFilter filter, Collider* areaOfEffect, float duration);
 
 	bool IsDead() const { return mDead; }
 
 private:
 	bool mDead;
 
-	float mSpeed;
 	int mDamage;
-    Vector2 mDirection;
-	float mLifetime;
+	float mDuration;
+	float mDamageCooldown; // Cooldown between damage ticks
+	float mLastDamageTime; // Last time damage was dealt
 
 	class DelayedActionSystem mDelayedActions;
 
 	class AnimatorComponent *mAnimatorComponent;
 	class ColliderComponent *mColliderComponent;
-	class RigidBodyComponent *mRigidBodyComponent;
 
 	void AddDelayedAction(float delay, std::function<void()> action)
 	{

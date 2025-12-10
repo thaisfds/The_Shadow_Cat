@@ -68,6 +68,17 @@ void WhiteBomb::EndSkill()
 	mCharacter->SetMovementLock(false);
 }
 
+bool WhiteBomb::EnemyShouldUse()
+{
+	auto player = mCharacter->GetGame()->GetPlayer();
+	if (!player) return false;
+
+	Vector2 toPlayer = player->GetPosition() - mCharacter->GetPosition();
+	float distanceToPlayer = toPlayer.Length();
+
+	return distanceToPlayer <= mRange;
+}
+
 WhiteBombActor::WhiteBombActor(class Game* game)
 	: Actor(game)
 {

@@ -1,6 +1,8 @@
 #include "SkillBehavior.h"
 #include "../../Game.h"
 #include "../../Actors/Characters/ShadowCat.h"
+#include "../../Random.h"
+#include <vector>
 
 SkillBehavior::SkillBehavior(Character* owner)
 	: AIBehavior(owner, "Skill")
@@ -17,14 +19,23 @@ void SkillBehavior::Update(float deltaTime)
 	if (!player) return;
 
 	auto playerPos = player->GetPosition();
+	
+	// Collect all available skills
+	std::vector<SkillBase*> availableSkills;
 	for (auto& skill : mOwner->GetSkills())
 	{
 		if (!skill) continue; // Skip null skills
 		if (skill->CanUse(playerPos) && skill->EnemyShouldUse())
 		{
-			skill->StartSkill(playerPos);
-			break;
+			availableSkills.push_back(skill);
 		}
+	}
+	
+	// If we have available skills, choose one randomly
+	if (!availableSkills.empty())
+	{
+		int randomIndex = Random::GetIntRange(0, static_cast<int>(availableSkills.size()) - 1);
+		availableSkills[randomIndex]->StartSkill(playerPos);
 	}
 }
 

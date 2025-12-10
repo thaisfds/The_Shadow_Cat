@@ -1,0 +1,22 @@
+{
+	"id": "WhiteBubbleSkill",
+	"name": "White Bubble",
+	"description": "Creates a circular area that damages the player over time.",
+	"iconPath": "../Assets/Icons/BombAttackCard.png",
+	"cooldown": 30.0,
+	"range": 500,
+	"duration": 10.0,
+	"areaOfEffect":
+	{
+		"type": "circle",
+		"radius": 80
+	},
+	"effects":
+	[
+		{
+			"type": "damage",
+			"value": 2
+		}
+	]
+}
+

@@ -32,13 +32,4 @@ private:
 
     // Cursor
     UIImage* mCursorImage;
-
-    // Boss health bar
-    UIImage* mBossHealthBackground;
-    UIImage* mBossHealthLeft;
-    UIImage* mBossHealthMiddle;
-    UIImage* mBossHealthRight;
-    std::vector<UIImage*> mBossHealthSegments; // Individual BossLife_3.png segments (40 total, each = 2 HP)
-    void InitBossHealthBar();
-    void UpdateBossHealth();
 };
