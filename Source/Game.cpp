@@ -146,6 +146,21 @@ void Game::UnloadScene()
 		actor->SetState(ActorState::Destroy);
 	}
 
+	// delete actors before clearing lists
+	std::vector<Actor *> deadActors;
+	for (auto actor : mActors)
+	{
+		if (actor->GetState() == ActorState::Destroy)
+		{
+			deadActors.emplace_back(actor);
+		}
+	}
+
+	for (auto actor : deadActors)
+	{
+		delete actor;
+	}
+
 	mStompActors.clear();
 	mFurBallActors.clear();
 	mEnemies.clear();
@@ -191,17 +206,32 @@ void Game::ResumeGame()
 
 void Game::ResetGame()
 {
-	// // Stop background music
-	// if (mBackgroundMusic.IsValid())
-	// {
-	// 	mAudio->StopSound(mBackgroundMusic);
-	// 	mBackgroundMusic.Reset();
-	// }
+	// kill ui screens except huds
+	auto iter = mUIStack.begin();
+	while (iter != mUIStack.end())
+	{
+		if ((*iter)->GetState() == UIScreen::UIState::Closing)
+		{
+			delete *iter;
+			iter = mUIStack.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
 
-	// mRenderer->CleanUIElements();
-	// Game();
+	// reset game over conditions
+	SetGameOver(false);
+	SetGameWon(false);
 
-	// SetScene(GameScene::MainMenu);
+	SetScene(GameScene::Level1);
+
+	mCurrentBoss = nullptr;
+
+	mShadowCat->SetHP(mShadowCat->GetMaxHP());
+
+	ResumeGame();
 }
 
 void Game::SetScene(GameScene nextScene)

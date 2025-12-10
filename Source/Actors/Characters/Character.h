@@ -30,6 +30,7 @@ public:
     void SetAnimationLock(bool isLocked);
 
     int GetHP() const { return hp; }
+    int SetHP(int newHP) { hp = std::clamp(newHP, 0, maxHp); return hp; }
     int GetMaxHP() const { return maxHp; }
 
     bool GetMovementLock() const { return mIsMovementLocked; }
