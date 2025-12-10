@@ -6,6 +6,10 @@ WinScreen::WinScreen(class Game* game, const std::string& fontName)
 {
     const float SCALE = 0.7f;
 
+    // Stop all sounds and play victory music
+    game->GetAudio()->StopAllSounds();
+    game->GetAudio()->PlaySound("m02_victory.mp3", true, 0.5f);
+
     AddImage("../Assets/HUD/Background/WinBackground.png", Vector2::Zero, 1.0f, 0.0f, -1);
 
     AddText("YOU WIN!", Vector2(0.0f, -150.0f), SCALE, 0.0f, 60);

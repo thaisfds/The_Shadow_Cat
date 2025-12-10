@@ -206,6 +206,9 @@ void Game::ResumeGame()
 
 void Game::ResetGame()
 {
+	// Stop all sounds including game over/victory music
+	mAudio->StopAllSounds();
+
 	// kill ui screens except huds
 	auto iter = mUIStack.begin();
 	while (iter != mUIStack.end())
@@ -726,13 +729,27 @@ void Game::UpdateGame(float deltaTime)
 	{
 		PauseGame();
 
-		if (mIsGameOver)
+		// Only create the screen if it doesn't already exist
+		bool screenExists = false;
+		for (auto screen : mUIStack)
 		{
-			new GameOver(this, "../Assets/Fonts/Pixellari.ttf");
+			if (dynamic_cast<GameOver*>(screen) != nullptr || dynamic_cast<WinScreen*>(screen) != nullptr)
+			{
+				screenExists = true;
+				break;
+			}
 		}
-		else
+
+		if (!screenExists)
 		{
-			new WinScreen(this, "../Assets/Fonts/Pixellari.ttf");
+			if (mIsGameOver)
+			{
+				new GameOver(this, "../Assets/Fonts/Pixellari.ttf");
+			}
+			else
+			{
+				new WinScreen(this, "../Assets/Fonts/Pixellari.ttf");
+			}
 		}
 	}
 
