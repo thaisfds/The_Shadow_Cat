@@ -31,8 +31,52 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
     }
 }
 
+void HUD::InitSkillIcons() {
+    for (auto img : mSkillBorders) delete img;
+    for (auto img : mSkillIcons) delete img;
+    for (auto txt : mSkillCDText) delete txt;
+    mSkillBorders.clear();
+    mSkillIcons.clear();
+    mSkillCDText.clear();
+
+    // Create skill icons
+    const float SCALE = 1.0f;
+    const float SPACING = 40.0f * SCALE;
+    Vector2 startOffset(-500.0f, -300.0f);
+
+    ShadowCat* player = mGame->GetPlayer();
+    if (!player) return;
+
+    const auto& skills = player->GetSkills();
+
+    for (size_t i = 0; i < skills.size(); ++i) {
+        Vector2 offset = startOffset + Vector2(i * SPACING, 0.0f);
+
+        UIImage* border = AddImage("../Assets/HUD/ShadowCat/ItemSlot.png", offset, SCALE, 0.0f, 1);
+        //UIImage* icon = AddImage(skills[i]->GetIconPath(), offset, SCALE, 0.0f, 2);
+
+        SDL_Log("skill path : %s", skills[i]->GetIconPath().c_str());
+        UIText* cdText = AddText("", offset + Vector2(0.0f, 20.0f), 0.5f);
+
+        mSkillBorders.push_back(border);
+        //mSkillIcons.push_back(icon);
+        mSkillCDText.push_back(cdText);
+
+        // Update cooldown text
+        float cdRemaining = skills[i]->GetCooldown();
+        if (cdRemaining > 0.0f) {
+            cdText->SetText(std::to_string(static_cast<int>(std::ceil(cdRemaining))));
+        } else {
+            cdText->SetText("");
+        }
+    }
+}
+
 void HUD::Update(float deltaTime)
 {
+    // Update skills
+    InitSkillIcons();
+
     // Update cursor pos  ------------------- //
     Vector2 mouseAbsPos = mGame->GetMouseAbsolutePosition();
     Vector2 mouseRelPos = mGame->GetMouseWorldPosition();

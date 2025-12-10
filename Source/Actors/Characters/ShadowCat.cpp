@@ -32,6 +32,11 @@ ShadowCat::ShadowCat(Game *game, Vector2 position, const float forwardSpeed)
     maxHp = hp;
 }
 
+std::vector<SkillBase*> ShadowCat::GetSkills() const
+{
+    return mSkillInputHandler->GetAssignedSkills();
+}
+
 void ShadowCat::OnProcessInput(const uint8_t *state)
 {
     if (mIsDead || mIsMovementLocked) return;

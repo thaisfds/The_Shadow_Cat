@@ -38,7 +38,7 @@ public:
     bool IsUsingSkill() const { return mIsUsingSkill; }
     void SetIsUsingSkill(bool isUsing) { mIsUsingSkill = isUsing; }
 
-    std::vector<SkillBase*> GetSkills() const { return mSkills; }
+    virtual std::vector<SkillBase*> GetSkills() const { return mSkills; }
     
     bool IsDead() const { return mIsDead; }
 

@@ -20,6 +20,8 @@ private:
     void InitHealthIcons();
     void SetHealth(int health);
     void UpdateMaxHealth(int maxHealth, bool fill = false);
+
+    void InitSkillIcons();
     
     // HUD elements
     std::vector<UIImage*> mFullHeartIcons;
@@ -32,4 +34,9 @@ private:
 
     // Cursor
     UIImage* mCursorImage;
+
+    // Skill feedback
+    std::vector<UIImage*> mSkillBorders;
+    std::vector<UIImage*> mSkillIcons;
+    std::vector<UIText*> mSkillCDText;
 };
