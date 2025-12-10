@@ -149,7 +149,6 @@ void Game::UnloadScene()
 	mStompActors.clear();
 	mFurBallActors.clear();
 	mEnemies.clear();
-	mPendingBossSpawns.clear();
 
 	// Delete UI screens
 	for (auto ui : mUIStack)
@@ -537,9 +536,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 	int lastRow = height - 1;
 	float portalX = (centerColumn * GameConstants::TILE_SIZE) + (GameConstants::TILE_SIZE / 2.0f);
 	float portalY = (lastRow * GameConstants::TILE_SIZE) + (GameConstants::TILE_SIZE / 2.0f);
-
-	SDL_Log("[BUILD] Creating portal at (%.1f, %.1f) - Scene=%d, PendingBosses=%zu, Debug=%d",
-			portalX, portalY, (int)mCurrentScene, mPendingBossSpawns.size(), mIsDebugging);
 
 	mLevelPortal = new LevelPortal(this);
 	mLevelPortal->SetPosition(Vector2(portalX, portalY));

@@ -200,15 +200,6 @@ private:
 	std::vector<class EnemyBase *> mEnemies;
 	class BossBase *mCurrentBoss;  // Pointer to active boss in current room (null when no boss)
 
-	// Boss spawn data (stored until enemies are defeated)
-	struct BossSpawnData
-	{
-		Vector2 arenaCenter;
-		Boss::BossType bossType;
-		bool playSpawnAnimation;
-	};
-	std::vector<BossSpawnData> mPendingBossSpawns;
-
 	// Debug
 	bool mIsDebugging;
 	bool mIsGodMode;
