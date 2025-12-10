@@ -2,6 +2,7 @@
 	"id": "clawAttackSkill",
 	"name": "Claw Attack",
 	"description": "Perform a ferocious pounce, slashing with your claws.",
+	"iconPath": "../Assets/Icons/ClawAttack.png",
 	"cooldown": 3.0,
 	"range": 70,
 	"areaOfEffect":

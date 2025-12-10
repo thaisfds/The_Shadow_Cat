@@ -17,8 +17,8 @@ private:
     const float CARD_SPACING = 200.0f;
     const float CARD_INIT_X = -400.0f;
     const float CARD_Y = 0.0f;
-    const float CARD_SCALE = 5.0f;
-    const float TEXT_OFFSET_Y = -3.0f;
+    const float CARD_SCALE = 6.0f;
+    const float TEXT_OFFSET_Y = -5.0f;
     const float BUTTON_OFFSET_Y = -150.0f;
 
     void Clear();

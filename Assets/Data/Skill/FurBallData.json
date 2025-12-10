@@ -2,6 +2,7 @@
 	"id": "furBallSkill",
 	"name": "Fur Ball",
 	"description": "Launch a ball of fur that damages an enemy on impact.",
+	"iconPath": "../Assets/Sprites/FurBall/FurBall.png",
 	"cooldown": 4.0,
 	"range": 300,
 	"areaOfEffect":
@@ -24,19 +25,23 @@
 	[
 		{
 			"type": "damage",
+			"name": "Damage",
 			"value": 5
 		},
 		{
 			"type": "range",
+			"name": "Range",
 			"value": 20
 		},
 		{
 			"type": "cooldown",
+			"name": "Cooldown",
 			"value": -0.4,
 			"max": 4
 		},
 		{
 			"type": "projectileSpeed",
+			"name": "Speed",
 			"value": 50
 		}
 	]
