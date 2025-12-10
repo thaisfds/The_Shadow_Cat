@@ -4,6 +4,7 @@
 #include <fstream>
 #include "Actors/Characters/Dummy.h"
 #include "Actors/Characters/Enemies/WhiteCat.h"
+#include "Actors/Characters/EnemyBase.h"
 #include "CSV.h"
 #include "Game.h"
 #include "Components/Skills/Stomp.h"
@@ -21,7 +22,6 @@
 #include "Actors/Spawner.h"
 #include "Actors/Characters/ShadowCat.h"
 #include "Components/AnimatedParticleSystemComponent.h"
-#include "Actors/Characters/Enemy.h"
 #include "Actors/Characters/Boss.h"
 #include "Actors/LevelPortal.h"
 
@@ -1012,13 +1012,6 @@ void Game::GenerateOutput()
 			// Call debug draw for actor
 			auto actor = drawable->GetOwner();
 
-			// Check if actor is an Enemy and call its debug draw
-			auto enemy = dynamic_cast<Enemy *>(actor);
-			if (enemy)
-			{
-				enemy->OnDebugDraw(mRenderer);
-			}
-
 			// Check if actor is a Boss and call its debug draw
 			auto boss = dynamic_cast<Boss *>(actor);
 			if (boss)
@@ -1149,7 +1142,7 @@ FurBallActor *Game::GetFurBallActor()
 	return furball;
 }
 
-void Game::RegisterEnemy(Enemy *enemy)
+void Game::RegisterEnemy(EnemyBase *enemy)
 {
 	if (enemy)
 		mEnemies.push_back(enemy);
@@ -1173,7 +1166,7 @@ void Game::RegisterBoss(Boss *boss)
 	}
 }
 
-void Game::UnregisterEnemy(Enemy *enemy)
+void Game::UnregisterEnemy(EnemyBase *enemy)
 {
 	auto iter = std::find(mEnemies.begin(), mEnemies.end(), enemy);
 	if (iter != mEnemies.end())

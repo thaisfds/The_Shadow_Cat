@@ -1,5 +1,4 @@
 #include "PatrolBehavior.h"
-#include "../../Actors/Characters/Enemy.h"
 #include "../../Math.h"
 #include "../../Random.h"
 #include "../../Game.h"

@@ -13,6 +13,8 @@ public:
 	void OnUpdate(float deltaTime) override;
 	void ResetCollisionFilter() const override;
 
+	void Kill() override;
+
 protected:
 	class AIStateMachine *mStateMachine;
 	

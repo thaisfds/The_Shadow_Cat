@@ -3,11 +3,13 @@
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../../SkillFactory.h"
 #include <fstream>
+#include "../../Game.h"
 
 EnemyBase::EnemyBase(class Game* game, Vector2 position, float forwardSpeed)
 	: Character(game, position, forwardSpeed)
 	, mStateMachine(nullptr)
 {
+	mGame->RegisterEnemy(this);
 	mSkillFilter.belongsTo = CollisionFilter::GroupMask({ CollisionGroup::EnemySkills });
 	mSkillFilter.collidesWith = CollisionFilter::GroupMask({ CollisionGroup::Player });
 	ResetCollisionFilter();
@@ -16,6 +18,12 @@ EnemyBase::EnemyBase(class Game* game, Vector2 position, float forwardSpeed)
 EnemyBase::~EnemyBase()
 {
 	delete mStateMachine;
+}
+
+void EnemyBase::Kill()
+{
+	mGame->UnregisterEnemy(this);
+	Character::Kill();
 }
 
 void EnemyBase::OnUpdate(float deltaTime)
