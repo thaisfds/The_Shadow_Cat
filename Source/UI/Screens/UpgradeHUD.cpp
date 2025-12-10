@@ -48,21 +48,21 @@ void UpgradeHUD::InitCards() {
         UIImage* border = AddImage("../Assets/HUD/Cards/Cards9.png", cardPos, CARD_SCALE, 0.0f, 1);
         UIImage* selectedBorder = AddImage("../Assets/HUD/Cards/Cards10.png", cardPos, CARD_SCALE, 0.0f, 3);
         
-        std::string descText = upgrades[i].type + "\n\n\n\n\n\n\nLevel: " + std::to_string(upgrades[i].currentLevel) + (upgrades[i].maxLevel >= 0 ? ("/" + std::to_string(upgrades[i].maxLevel)) : "") + (upgrades[i].value > 0 ? "\n+" : "\n") + std::to_string(upgrades[i].value);
+        std::string descText = upgrades[i].name + "\n\n"+ upgrades[i].skill->GetName() + "\n\n\n\n\n\n\n\nLevel: " + std::to_string(upgrades[i].currentLevel) + (upgrades[i].maxLevel >= 0 ? ("/" + std::to_string(upgrades[i].maxLevel)) : "") + (upgrades[i].value > 0 ? "\n+" : "\n") + std::to_string(upgrades[i].value);
         // Cut 2 decimnal places for float values
         size_t dotPos = descText.find('.');
         if (dotPos != std::string::npos && dotPos + 3 < descText.length()) {
             descText = descText.substr(0, dotPos + 3);
         }
         
-        UIText* desc = AddText(descText, cardPos + Vector2(200.0f, TEXT_OFFSET_Y), 0.45f);
+        UIText* desc = AddText(descText, cardPos + Vector2(170.0f, TEXT_OFFSET_Y), 0.4f);
 
-        //UIImage* icon = AddImage("../Assets/HUD/Upgrade/Upgrade_Icon.png", cardPos + Vector2(0.0f, 30.0f), CARD_SCALE * 0.5f, 0.0f, 2);
+        UIImage* icon = AddImage(upgrades[i].skill->GetIconPath(), cardPos + Vector2(0.0f, -10.0f), CARD_SCALE * 0.5f, 0.0f, 2);
        
         mUpgradeCardBorders.push_back(border);
         mUpgradeCardSelectedBorders.push_back(selectedBorder);
         mUpgradeTexts.push_back(desc);
-        //mUpgradeCardIcons.push_back(icon);
+        mUpgradeCardIcons.push_back(icon);
     }
 
     // Format
