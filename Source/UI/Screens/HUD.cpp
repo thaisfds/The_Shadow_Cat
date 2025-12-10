@@ -24,7 +24,7 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
 
     mAreaClearTxt = AddText("            Area clear!\nProceed to the red carpet!", Vector2(630.0f, -220.0f), 0.5f);
     mAreaClearTxt->SetIsVisible(false);
-    
+
     for (auto &txt : mTexts) {
         txt->SetTextColor(Vector3::One); // White
         txt->SetBackgroundColor(Vector4::Zero); // Transparent
@@ -34,15 +34,17 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
 void HUD::Update(float deltaTime)
 {
     // Update cursor pos  ------------------- //
-    Vector2 mousePos = mGame->GetMouseAbsolutePosition();
+    Vector2 mouseAbsPos = mGame->GetMouseAbsolutePosition();
+    Vector2 mouseRelPos = mGame->GetMouseWorldPosition();
+    Vector2 playerPos = mGame->GetPlayer() ? mGame->GetPlayer()->GetPosition() : Vector2::Zero;
 
-    // Rotate cursor based on deviation from center
-    Vector2 center(GameConstants::WINDOW_WIDTH / 2.0f, GameConstants::WINDOW_HEIGHT / 2.0f);
-    Vector2 dir = mousePos - center;
+    // Rotate cursor based on relative deviation from player
+    Vector2 dir = mouseRelPos - playerPos;
 
     float angle = Math::Atan2(dir.y, dir.x) + Math::PiOver2;
+
     mCursorImage->SetAngle(angle);
-    mCursorImage->SetAbsolutePos(mousePos);
+    mCursorImage->SetAbsolutePos(mouseAbsPos);
 
     // Update enemies left  ------------------- //
     int enemiesLeft = mGame->CountAliveEnemies();
