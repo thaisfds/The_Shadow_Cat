@@ -14,6 +14,7 @@ public:
 	void StartSkill(Vector2 targetPosition) override;
 
 	bool CanUse(Vector2 targetPosition, bool showRangeOnFalse) const override;
+	bool EnemyShouldUse() override { return true; }
 	
 private:
 	float mDamage;

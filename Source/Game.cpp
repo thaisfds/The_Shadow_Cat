@@ -4,6 +4,7 @@
 #include <fstream>
 #include "Actors/Characters/BossBase.h"
 #include "Actors/Characters/Dummy.h"
+#include "Actors/Characters/Enemies/SylvesterCat.h"
 #include "Actors/Characters/Enemies/WhiteBoss.h"
 #include "Actors/Characters/Enemies/SylvesterBoss.h"
 #include "Actors/Characters/Enemies/OrangeBoss.h"
@@ -574,6 +575,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			}
 			else if (tileID == 3)
 			{
+				auto sylvesterCat = new SylvesterCat(this, position);
 			}
 			// Blocks (excluding tile 9 - carpet/portal, handled by LevelPortal actor)
 			else if (tileID >= 4 && tileID <= 10)

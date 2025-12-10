@@ -1,0 +1,29 @@
+{
+	"id": "SylvesterCat",
+	"name": "Sylvester Cat",
+	"hp": 150,
+	"speed": 130,
+	"dropChance": 0.7,
+	"skills":
+	[
+		"stompSkill",
+		"shadowFormSkill"
+	],
+	"aiBehaviors":
+	{
+		"patrol":
+		{
+			"radius": 300.0,
+			"pauseMinDuration": 0.5,
+			"pauseMaxDuration": 2.0,
+			"detectionRange": 300.0,
+			"visionRange": 450.0,
+			"detectionAngleDegrees": 80.0
+		},
+		"flee":
+		{
+			"distance": 500.0,
+			"cooldown": 4.0
+		}
+	}
+}

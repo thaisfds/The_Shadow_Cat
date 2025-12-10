@@ -161,6 +161,8 @@ add_executable(${PROJECT_NAME}
         Source/AI/Behaviors/FleeBehavior.h
         Source/Actors/Characters/Enemies/OrangeCat.cpp
         Source/Actors/Characters/Enemies/OrangeCat.h
+        Source/Actors/Characters/Enemies/SylvesterCat.cpp
+        Source/Actors/Characters/Enemies/SylvesterCat.h
 )
 
 configure_local_linking(${PROJECT_NAME})
