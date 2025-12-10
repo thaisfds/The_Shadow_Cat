@@ -2,6 +2,7 @@
 	"id": "dashSkill",
 	"name": "Dash",
 	"description": "Quickly dash in a direction to evade attacks or close distance.",
+	"iconPath": "../Assets/Icons/Dash.png",
 	"cooldown": 3.0,
 	"range": 250,
 	"effects":
@@ -15,15 +16,18 @@
 	[
 		{
 			"type": "range",
+			"name": "Range",
 			"value": 20
 		},
 		{
 			"type": "cooldown",
+			"name": "Cooldown",
 			"value": -0.3,
 			"max": 5
 		},
 		{
 			"type": "speed",
+			"name": "Speed",
 			"value": 50
 		}
 	]

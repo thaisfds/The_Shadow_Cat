@@ -2,6 +2,7 @@
 	"id": "shadowFormSkill",
 	"name": "Shadow Form",
 	"description": "Transform into a shadow, gaining speed and becoming intangible for a short duration.",
+	"iconPath": "../Assets/Icons/ShadowForm.png",
 	"cooldown": 4.0,
 	"range": 0.0,
 	"duration": 6.0,

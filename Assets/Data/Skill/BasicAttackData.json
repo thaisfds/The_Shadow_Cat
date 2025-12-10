@@ -2,6 +2,7 @@
 	"id": "BasicAttackSkill",
 	"name": "Basic Attack",
 	"description": "A simple melee attack.",
+	"iconPath": "../Assets/Icons/BasicAttack.png",
 	"cooldown": 2.5,
 	"range": 50,
 	"areaOfEffect":

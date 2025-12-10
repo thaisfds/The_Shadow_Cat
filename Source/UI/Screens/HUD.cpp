@@ -16,7 +16,7 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
     InitHealthIcons();
 
     // Cursor
-    mCursorImage = AddImage("../Assets/HUD/ShadowCat/Cursor.png", Vector2(0.0f, 0.0f), 1.0f, 0.0f, 20000);
+    mCursorImage = AddImage("../Assets/Icons/Cursor.png", Vector2(0.0f, 0.0f), 1.0f, 0.0f, 20000);
 
     // Enemy counter top right
     AddText("Enemies Left:", Vector2(500.0f, -300.0f), 0.7f);
@@ -89,9 +89,9 @@ void HUD::InitHealthIcons() {
         int row = i > mMaxHealth / 4 - 1 ? 1 : 0;
         Vector2 offset(-580.0f + (i - row * (mMaxHealth / 4)) * SPACING, +300.0f - row * VERTICAL_SPACING);
 
-        UIImage* emptyHeart = AddImage("../Assets/HUD/ShadowCat/LifeBar_2.png", offset, SCALE, 0.0f, 1);
-        UIImage* halfHeart = AddImage("../Assets/HUD/ShadowCat/LifeBar_1.png", offset, SCALE, 0.0f, 2);
-        UIImage* fullHeart = AddImage("../Assets/HUD/ShadowCat/LifeBar_0.png", offset, SCALE, 0.0f, 3);
+        UIImage* emptyHeart = AddImage("../Assets/Icons/LifeBar_2.png", offset, SCALE, 0.0f, 1);
+        UIImage* halfHeart = AddImage("../Assets/Icons/LifeBar_1.png", offset, SCALE, 0.0f, 2);
+        UIImage* fullHeart = AddImage("../Assets/Icons/LifeBar_0.png", offset, SCALE, 0.0f, 3);
 
         mEmptyHeartIcons.push_back(emptyHeart);
         mHalfHeartIcons.push_back(halfHeart);
