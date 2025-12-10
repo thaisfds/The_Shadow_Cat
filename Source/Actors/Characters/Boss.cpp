@@ -84,13 +84,13 @@ Boss::Boss(class Game* game, Vector2 arenaCenter, BossType type, bool playSpawnA
     mBasicAttack = new BasicAttack(this);
     
     // Register with Game for tracking
-    game->RegisterBoss(this);
+    // game->RegisterBoss(this);
 }
 
 Boss::~Boss()
 {
     // Unregister from Game
-    GetGame()->UnregisterBoss(this);
+    // GetGame()->UnregisterBoss(this);
 }
 
 void Boss::OnUpdate(float deltaTime)

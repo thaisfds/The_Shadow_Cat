@@ -3,7 +3,6 @@
 #include <functional>
 #include <string>
 
-// Forward declaration to avoid circular dependency
 class SkillBase;
 
 struct UpgradeInfo

@@ -11,6 +11,8 @@ public:
 	void Update(float deltaTime) override;
 	void OnExit() override;
 
+	void LoadBehaviorData(const nlohmann::json& data) override {}
+
 	bool SkillToPatrol();
 	bool AnySkillAvailable() const;
 };

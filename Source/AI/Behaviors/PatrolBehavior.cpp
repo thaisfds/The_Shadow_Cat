@@ -8,18 +8,25 @@ namespace
 {
     constexpr float WAYPOINT_REACHED_DISTANCE = 10.0f;
     constexpr float MIN_POSITION_CHANGE_TO_DETECT_STUCK = 0.1f;
-    constexpr float PATROL_PAUSE_MIN_DURATION = 1.0f;
-    constexpr float PATROL_PAUSE_MAX_DURATION = 3.0f;
-
-    constexpr float CHASE_DETECTION_RANGE = 100.0f;
-    constexpr float VISION_DETECTION_RANGE = 250.0f;
-    constexpr float DETECTION_ANGLE = Math::ToRadians(45.0f);
 }
 
-PatrolBehavior::PatrolBehavior(Character *owner, float patrolRadius)
-    : AIBehavior(owner, "Patrol"), mPatrolRadius(patrolRadius)
+PatrolBehavior::PatrolBehavior(Character *owner, float patrolRadius, float patrolPauseMinDuration, float patrolPauseMaxDuration,
+                               float chaseDetectionRange, float visionDetectionRange, float detectionAngleDegrees)
+    : AIBehavior(owner, "Patrol"), mRadius(patrolRadius), mPauseMinDuration(patrolPauseMinDuration), mPauseMaxDuration(patrolPauseMaxDuration),
+      mDetectionRange(chaseDetectionRange), mVisionRange(visionDetectionRange), mDetectionAngle(Math::ToRadians(detectionAngleDegrees))
 {
     mPatrolCenter = mOwner->GetPosition();
+}
+
+void PatrolBehavior::LoadBehaviorData(const nlohmann::json& data)
+{
+    mRadius = GameJsonParser::GetValue<float>(data, "aiBehaviors.patrol.radius", mRadius);
+    mPauseMinDuration = GameJsonParser::GetValue<float>(data, "aiBehaviors.patrol.pauseMinDuration", mPauseMinDuration);
+    mPauseMaxDuration = GameJsonParser::GetValue<float>(data, "aiBehaviors.patrol.pauseMaxDuration", mPauseMaxDuration);
+    mDetectionRange = GameJsonParser::GetValue<float>(data, "aiBehaviors.patrol.detectionRange", mDetectionRange);
+    mVisionRange = GameJsonParser::GetValue<float>(data, "aiBehaviors.patrol.visionRange", mVisionRange);
+    float detectionAngleDegrees = GameJsonParser::GetValue<float>(data, "aiBehaviors.patrol.detectionAngleDegrees", Math::ToDegrees(mDetectionAngle));
+    mDetectionAngle = detectionAngleDegrees > 0.0f ? Math::ToRadians(detectionAngleDegrees) : mDetectionAngle;
 }
 
 void PatrolBehavior::OnEnter()
@@ -41,7 +48,7 @@ void PatrolBehavior::Update(float deltaTime)
     if (mPatrolPauseTimer > 0.0f) return;
 
     if (ShouldSelectNewWaypoint())
-        mCurrentWaypoint = Random::GetUnitVector() * Random::GetFloatRange(0.2f, mPatrolRadius) + mPatrolCenter;
+        mCurrentWaypoint = Random::GetUnitVector() * Random::GetFloatRange(0.2f, mRadius) + mPatrolCenter;
 
     mOwner->MoveToward(mCurrentWaypoint);
     mPreviousPosition = mOwner->GetPosition();
@@ -65,7 +72,7 @@ void PatrolBehavior::OnExit()
 
 void PatrolBehavior::ResetPatrolPauseTimer()
 {
-    mPatrolPauseTimer = Random::GetFloatRange(PATROL_PAUSE_MIN_DURATION, PATROL_PAUSE_MAX_DURATION);
+    mPatrolPauseTimer = Random::GetFloatRange(mPauseMinDuration, mPauseMaxDuration);
 }
 
 bool PatrolBehavior::PatrolToChase()
@@ -76,12 +83,12 @@ bool PatrolBehavior::PatrolToChase()
     Vector2 toPlayer = player->GetPosition() - mOwner->GetPosition();
     float distanceToPlayer = toPlayer.Length();
 
-    if (distanceToPlayer > VISION_DETECTION_RANGE) return false;
-    if (distanceToPlayer <= CHASE_DETECTION_RANGE) return true;
+    if (distanceToPlayer <= mDetectionRange) return true;
+    if (distanceToPlayer > mVisionRange) return false;
 
     toPlayer.Normalize();
     Vector2 forwardDir = mOwner->GetForward();
 
     float angleToPlayer = Math::Acos(Vector2::Dot(forwardDir, toPlayer));;
-    return angleToPlayer <= DETECTION_ANGLE;
+    return angleToPlayer <= mDetectionAngle;
 }

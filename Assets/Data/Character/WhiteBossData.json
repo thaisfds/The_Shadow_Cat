@@ -1,0 +1,23 @@
+{
+	"id": "WhiteBoss",
+	"name": "White Boss",
+	"hp": 500,
+	"speed": 150,
+	"skills":
+	[
+		"BasicAttackSkill"
+	],
+	"aiBehaviors":
+	{
+		"patrol":
+		{
+			"radius": 400.0,
+			"pauseMinDuration": 0.5,
+			"pauseMaxDuration": 2.0
+		},
+		"chase":
+		{
+			"range": 10000.0
+		}
+	}
+}

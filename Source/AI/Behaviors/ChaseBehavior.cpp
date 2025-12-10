@@ -3,11 +3,15 @@
 
 namespace
 {
-    constexpr float CHASE_RANGE = 250.0f;
     constexpr float LAST_KNOWN_POS_THRESHOLD = 20.0f;
 }
 
-ChaseBehavior::ChaseBehavior(Character* owner) : AIBehavior(owner, "Chase") {}
+ChaseBehavior::ChaseBehavior(Character* owner, float chaseRange) : AIBehavior(owner, "Chase"), mChaseRange(chaseRange) {}
+
+void ChaseBehavior::LoadBehaviorData(const nlohmann::json& data)
+{
+    mChaseRange = GameJsonParser::GetValue<float>(data, "aiBehaviors.chase.range", mChaseRange);
+}
 
 void ChaseBehavior::OnEnter()
 {
@@ -22,7 +26,7 @@ void ChaseBehavior::Update(float deltaTime)
     mOwner->StopMovement();
     
     float distanceToPlayer = (player->GetPosition() - mOwner->GetPosition()).Length();
-    auto pos = distanceToPlayer <= CHASE_RANGE ? player->GetPosition() : mLastKnownPlayerPos;
+    auto pos = distanceToPlayer <= mChaseRange ? player->GetPosition() : mLastKnownPlayerPos;
     mLastKnownPlayerPos = pos;
     
     mOwner->MoveToward(pos);

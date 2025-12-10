@@ -139,6 +139,10 @@ add_executable(${PROJECT_NAME}
         Source/AI/Behaviors/ChaseBehavior.h
         Source/AI/Behaviors/SkillBehavior.cpp
         Source/AI/Behaviors/SkillBehavior.h
+        Source/Actors/Characters/BossBase.cpp
+        Source/Actors/Characters/BossBase.h
+        Source/Actors/Characters/Enemies/WhiteBoss.cpp
+        Source/Actors/Characters/Enemies/WhiteBoss.h
 )
 
 configure_local_linking(${PROJECT_NAME})
