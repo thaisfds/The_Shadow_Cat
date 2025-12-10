@@ -63,6 +63,7 @@ void Character::OnUpdate(float deltaTime)
 void Character::TakeDamage(int damage)
 {
     hp -= damage;
+    mAnimatorComponent->PlayAnimationOnce("Hit");
     if (hp <= 0) Kill();
 }
 
