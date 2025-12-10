@@ -90,8 +90,7 @@ T GameJsonParser::ResolveReference(const nlohmann::json& data, const std::string
 	if (data.contains(reference))
 		return data[reference].get<T>();
 	
-	SDL_Log("Could not resolve reference: @%s", reference.c_str());
-	return T{};
+	throw std::runtime_error("Key not found: " + reference);
 }
 
 template<typename T>

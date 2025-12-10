@@ -75,7 +75,7 @@ void SkillBase::ComponentDraw(class Renderer* renderer)
 
 bool SkillBase::CanUse(Vector2 targetPosition, bool showRangeOnFalse) const
 {
-	return mCurrentCooldown <= 0.0f;
+	return mCurrentCooldown <= 0.0f && !mCharacter->IsUsingSkill();
 }
 
 void SkillBase::RegisterUpgrade(const std::string& type, float value, int maxLevel, float* variable)

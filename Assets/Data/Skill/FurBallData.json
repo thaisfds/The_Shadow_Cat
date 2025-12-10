@@ -2,7 +2,7 @@
 	"id": "furBallSkill",
 	"name": "Fur Ball",
 	"description": "Launch a ball of fur that damages an enemy on impact.",
-	"iconPath": "../Assets/Sprites/FurBall/FurBall.png",
+	"iconPath": "../Assets/Icons/FurBall.png",
 	"cooldown": 4.0,
 	"range": 300,
 	"areaOfEffect":

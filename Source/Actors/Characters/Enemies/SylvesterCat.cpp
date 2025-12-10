@@ -1,47 +1,48 @@
-#include "OrangeCat.h"
+#include "SylvesterCat.h"
 #include "../../../GameConstants.h"
 #include "../../../AI/AIStateMachine.h"
 #include "../../../Components/Skills/Dash.h"
 #include "../ShadowCat.h"
+#include "../../../Components/Skills/ShadowForm.h"
 
-OrangeCat::OrangeCat(Game* game, Vector2 position)
+SylvesterCat::SylvesterCat(Game* game, Vector2 position)
 	: EnemyBase(game, position, 150.0f)
 {
-	mAnimatorComponent = new AnimatorComponent(this, "OrangeCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+	mAnimatorComponent = new AnimatorComponent(this, "SylvesterCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
 
-	auto data = LoadEnemyDataFromJSON("OrangeCatData");
+	auto data = LoadEnemyDataFromJSON("SylvesterCatData");
 
 	for (auto skill : mSkills)
 	{
-		if (auto furBall = dynamic_cast<FurBall*>(skill))
+		if (auto shadowForm = dynamic_cast<ShadowForm*>(skill))
 		{
-			furBall->ApplyUpgrade("range", 100);
-			furBall->ApplyUpgrade("damage", 2);
-			furBall->ApplyUpgrade("cooldown", 3);
-			furBall->ApplyUpgrade("projectileSpeed", 2);
-			furBall->SetAnimation("orange");
+			shadowForm->ApplyUpgrade("duration", -4);
+			shadowForm->ApplyUpgrade("speedMultiplier", 5);
+			shadowForm->ApplyUpgrade("cooldown", 14);
+		}
+		if (auto stomp = dynamic_cast<Stomp*>(skill))
+		{
+			stomp->ApplyUpgrade("damage", 3);
+			stomp->ApplyUpgrade("radius", 3);
+			stomp->ApplyUpgrade("range", 100);
+			stomp->ApplyUpgrade("cooldown", 2);
 		}
 	}
 	
 	SetupAIBehaviors(data);
 }
 
-void OrangeCat::SetupAIBehaviors(const nlohmann::json& data)
+void SylvesterCat::SetupAIBehaviors(const nlohmann::json& data)
 {
 	mStateMachine = new AIStateMachine(this);
 
-	SkillBase *dashSkill = nullptr;
+	SkillBase *shadowFormSkill = nullptr;
 	for (auto skill : mSkills)
-	{
-		if (auto dash = dynamic_cast<Dash*>(skill))
-		{
-			dashSkill = dash;
-			break;
-		}
-	}
+		if (auto shadowForm = dynamic_cast<ShadowForm*>(skill))
+			shadowFormSkill = shadowForm;
 
 	mPatrolBehavior = new PatrolBehavior(this);
-	mFleeBehavior = new FleeBehavior(this, dashSkill);
+	mFleeBehavior = new FleeBehavior(this, shadowFormSkill);
 	mSkillBehavior = new SkillBehavior(this);
 
 	mPatrolBehavior->LoadBehaviorData(data);
@@ -64,11 +65,11 @@ void OrangeCat::SetupAIBehaviors(const nlohmann::json& data)
 		return mFleeBehavior->ShouldLeaveState() && !mIsUsingSkill;
 	});
 	mSkillBehavior->AddTransition(mPatrolBehavior->GetName(), [this]() { return !mIsUsingSkill; });
-	
+
 	mStateMachine->SetInitialState(mPatrolBehavior->GetName());
 }
 
-void OrangeCat::OnUpdate(float deltaTime)
+void SylvesterCat::OnUpdate(float deltaTime)
 {
 	mFleeTimer -= deltaTime;
 	EnemyBase::OnUpdate(deltaTime);

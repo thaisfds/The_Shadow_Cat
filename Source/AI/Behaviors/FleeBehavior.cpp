@@ -2,9 +2,10 @@
 
 #include "../../Actors/Characters/ShadowCat.h"
 #include "../../Actors/Characters/Enemies/OrangeCat.h"
+#include "../../Components/Skills/Dash.h"
 
 FleeBehavior::FleeBehavior(Character* owner, SkillBase* fleeSkill, float fleeDistance)
-	: AIBehavior(owner, "Flee"), mFleeDistance(fleeDistance), mFleeSkill(fleeSkill)
+	: AIBehavior(owner, "Flee"), mFleeDistance(fleeDistance), mFleeSkill(fleeSkill), mSpeedMultiplier(1.0f)
 {
 }
 
@@ -25,7 +26,7 @@ void FleeBehavior::Update(float deltaTime)
 {
 	const ShadowCat* player = mOwner->GetGame()->GetPlayer();
 	if (!player) return;
-	if (mOwner->IsUsingSkill()) return;
+	if (mOwner->GetMovementLock()) return;
 
 	mOwner->StopMovement();
 
@@ -42,15 +43,12 @@ void FleeBehavior::Update(float deltaTime)
 	Vector2 fleeTarget = playerPos - toPlayer * mFleeDistance;
 
 	if (mFleeSkill && mFleeSkill->CanUse(fleeTarget))
+	{
 		mFleeSkill->StartSkill(fleeTarget);
+		mLeaveState = true;
+	}
 
 	mOwner->MoveToward(fleeTarget);
-	SDL_Log("Fleeing to (%.2f, %.2f)", fleeTarget.x, fleeTarget.y);
-	SDL_Log("Player at (%.2f, %.2f)", playerPos.x, playerPos.y);
-	SDL_Log("Distance to player: %.2f", distanceToPlayer);
-
-	mLeaveState = Math::NearlyZero(Vector2::Distance(mOwner->GetPosition(), mLastPosition));
-
 	mLastPosition = mOwner->GetPosition();
 }
 

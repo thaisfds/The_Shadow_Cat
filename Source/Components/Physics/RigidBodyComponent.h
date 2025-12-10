@@ -16,7 +16,10 @@ public:
     void Update(float deltaTime) override;
 
     const Vector2& GetVelocity() const { return mVelocity; }
-    void SetVelocity(const Vector2& velocity) { mVelocity = velocity; }
+    void SetVelocity(const Vector2& velocity)
+    {
+        mVelocity = velocity;
+    }
 
     const Vector2& GetAcceleration() const { return mAcceleration; }
     void SetAcceleration(const Vector2& acceleration) { mAcceleration = acceleration; }
