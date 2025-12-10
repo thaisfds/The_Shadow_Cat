@@ -29,10 +29,10 @@ nlohmann::json FurBall::LoadSkillDataFromJSON(const std::string& fileName)
 	auto id = GameJsonParser::GetStringValue(data, "id");
 	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new FurBall(owner); });
 
-	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "projectileSpeed", &mProjectileSpeed));
-	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "damage", &mDamage));
-	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));
-	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "range", &mRange));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "projectileSpeed", &mProjectileSpeed));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "damage", &mDamage));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "cooldown", &mCooldown));
+	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "range", &mRange));
 
 	return data;
 }

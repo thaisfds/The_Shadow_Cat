@@ -1,8 +1,9 @@
 #pragma once
 
-#include "SkillBase.h"
 #include <functional>
 #include <string>
+
+class SkillBase;
 
 struct UpgradeInfo
 {

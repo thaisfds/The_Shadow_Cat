@@ -195,7 +195,7 @@ Collider* GameJsonParser::GetAreaOfEffect(const nlohmann::json& skillData)
 	return nullptr;
 }
 
-UpgradeInfo GameJsonParser::GetUpgradeInfo(const SkillBase *skill, const nlohmann::json& skillData, const std::string& upgradeType, float *upgradeTarget)
+UpgradeInfo GameJsonParser::GetUpgradeInfo(SkillBase *skill, const nlohmann::json& skillData, const std::string& upgradeType, float *upgradeTarget)
 {
 	UpgradeInfo info;
 	if (skillData.contains("upgrades") && skillData["upgrades"].is_array())
