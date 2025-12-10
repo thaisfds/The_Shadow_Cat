@@ -12,7 +12,7 @@ UpgradeTreat::UpgradeTreat(class Game* game)
 	filter.belongsTo = CollisionFilter::GroupMask({ CollisionGroup::Collectible });
 	filter.collidesWith = CollisionFilter::GroupMask({ CollisionGroup::Player });
 
-	Collider *collider = new AABBCollider(GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
+	Collider *collider = new AABBCollider(GameConstants::TILE_SIZE / 2, GameConstants::TILE_SIZE / 2);
 	mColliderComponent = new ColliderComponent(this, Vector2::Zero, collider);
 	mColliderComponent->SetFilter(filter);
 	mColliderComponent->SetEnabled(false);
