@@ -95,5 +95,5 @@ bool BasicAttack::EnemyShouldUse()
     Vector2 toPlayer = player->GetPosition() - mCharacter->GetPosition();
     float distanceToPlayer = toPlayer.Length();
 
-    return distanceToPlayer <= mRange * 0.8f;
+    return distanceToPlayer <= mRange;
 }
