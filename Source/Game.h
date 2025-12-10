@@ -23,6 +23,13 @@ enum class GameScene
 	Level3_Boss
 };
 
+enum class GroundType
+{
+	Grass,
+	Brick,
+	Stone
+};
+
 class Game
 {
 public:
@@ -49,6 +56,7 @@ public:
 	// Scene Handling
 	void SetScene(GameScene scene);
 	void UnloadScene();
+	GroundType GetGroundType() const;
 
 	// Pause Handling
 	void PauseGame();

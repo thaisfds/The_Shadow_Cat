@@ -305,6 +305,28 @@ void Game::SetScene(GameScene nextScene)
 	}
 }
 
+GroundType Game::GetGroundType() const
+{
+	switch (mCurrentScene)
+	{
+	case GameScene::Lobby:
+	case GameScene::Level1:
+	case GameScene::Level1_Boss:
+		return GroundType::Grass;
+	
+	case GameScene::Level2:
+	case GameScene::Level2_Boss:
+		return GroundType::Brick;
+	
+	case GameScene::Level3:
+	case GameScene::Level3_Boss:
+		return GroundType::Stone;
+	
+	default:
+		return GroundType::Grass;
+	}
+}
+
 void Game::InitializeActors()
 {
 	mCollisionQueryActor = new Actor(this);
