@@ -818,7 +818,11 @@ void Game::UpdateGame(float deltaTime)
 			}
 
 			if (!mIsGameWon)
+			{
+				// Play room change sound
+				mAudio->PlaySound("e16_change_room.mp3", false, 0.3f);
 				SetScene(nextScene);
+			}
 		}
 	}
 
