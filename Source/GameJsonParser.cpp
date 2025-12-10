@@ -200,6 +200,8 @@ UpgradeInfo GameJsonParser::GetUpgradeInfo(SkillBase *skill, const nlohmann::jso
 	UpgradeInfo info;
 	if (skillData.contains("upgrades") && skillData["upgrades"].is_array())
 	{
+		info.skill = skill;
+		info.upgradeTarget = upgradeTarget;
 		for (const auto& upgrade : skillData["upgrades"])
 		{
 			if (upgrade.contains("type") && upgrade["type"].get<std::string>() == upgradeType)
@@ -211,8 +213,6 @@ UpgradeInfo GameJsonParser::GetUpgradeInfo(SkillBase *skill, const nlohmann::jso
 				return info;
 			}
 		}
-		info.skill = skill;
-		info.upgradeTarget = upgradeTarget;
 	}
 
 	SDL_Log("Skill data does not contain upgrade of type: %s", upgradeType.c_str());
