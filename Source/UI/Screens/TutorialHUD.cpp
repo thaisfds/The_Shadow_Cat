@@ -4,23 +4,35 @@
 
 TutorialHUD::TutorialHUD(class Game* game, const std::string& fontName)
     :UIScreen(game, fontName)
-{
+{   
+    AddImage("../Assets/HUD/Menu/Scroll1.png", Vector2(0.0f, -178.0f), 13.0f, 0.0f, 1);
+
     // WASD
-    
-    AddText("Move WASD", Vector2(-100.0f, 40.0f), 0.4f);
+    AddImage("../Assets/HUD/Menu/KeyboardW.png", Vector2(-220.0f, -240.0f), 0.8f, 0.0f);
+    AddImage("../Assets/HUD/Menu/KeyboardA.png", Vector2(-195.0f, -240.0f), 0.8f, 0.0f);
+    AddImage("../Assets/HUD/Menu/KeyboardS.png", Vector2(-170.0f, -240.0f), 0.8f, 0.0f);
+    AddImage("../Assets/HUD/Menu/KeyboardD.png", Vector2(-145.0f, -240.0f), 0.8f, 0.0f);
 
     // Skills
+    AddImage("../Assets/HUD/Menu/KeyboardLMB.png", Vector2(-220.0f, -200.0f), 0.8f, 0.0f);
+    AddImage("../Assets/HUD/Menu/KeyboardRMB.png", Vector2(-100.0f, -200.0f), 0.8f, 0.0f);
 
-    AddText("Left Mouse: Basic Attack", Vector2(200.0f, -20.0f), 0.4f);
-    AddText("Right Mouse: Claw Attack", Vector2(200.0f, 10.0f), 0.4f);
-    AddText("E: Furball, Aim with mouse", Vector2(160.0f, 40.0f), 0.4f);
-    AddText("Q: Stomp, Aim with mouse", Vector2(160.0f, 70.0f), 0.4f);
-    AddText("Shift: Dash, Aim with mouse", Vector2(160.0f, 100.0f), 0.4f);
+    AddImage("../Assets/HUD/Menu/KeyboardQ.png", Vector2(40.0f, -240.0f), 0.8f, 0.0f);
+    AddImage("../Assets/HUD/Menu/KeyboardE.png", Vector2(40.0f, -215.0f), 0.8f, 0.0f);
+    AddImage("../Assets/HUD/Menu/KeyboardSHIFT.png", Vector2(40.0f, -190.0f), 1.0f, 0.0f);
+
+    AddText("Move", Vector2(-110.0f, -240.0f), 0.4f);
+    AddText("Basic Attack", Vector2(-165.0f, -200.0f), 0.4f);
+    AddText("Claw Attack", Vector2(-45.0f, -200.0f), 0.4f);
+
+    AddText("Furball - Aim with mouse", Vector2(150.0f, -240.0f), 0.4f);
+    AddText("Stomp - Aim with mouse", Vector2(150.0f, -215.0f), 0.4f);
+    AddText("Dash - Aim with mouse", Vector2(150.0f, -190.0f), 0.4f);
 
     // Toggle visibility instruction
-    AddText("Press H to hide/show controls guide", Vector2(0.0f, 200.0f), 0.4f);
+    AddImage("../Assets/HUD/Menu/KeyboardH.png", Vector2(-110.0f, -165.0f), 0.8f, 0.0f);
 
-    AddText("Go to the red carpet to advance to the next level", Vector2(0.0f, 250.0f), 0.5f);
+    AddText("Hide/Show controls guide", Vector2(0.0f, -165.0f), 0.4f);
 
     for (auto &txt : mTexts) {
         txt->SetTextColor(Vector3::Zero); // Black

@@ -11,18 +11,25 @@ public:
 
     void Update(float deltaTime) override;
 
-    void SetHealth(int health);
-    void UpdateMaxHealth(int maxHealth, bool fill = false);
-
 private:
+    // Current health values
     int mHealth;
     int mMaxHealth;
 
     // Health image handling
     void InitHealthIcons();
+    void SetHealth(int health);
+    void UpdateMaxHealth(int maxHealth, bool fill = false);
     
     // HUD elements
     std::vector<UIImage*> mFullHeartIcons;
     std::vector<UIImage*> mHalfHeartIcons;
     std::vector<UIImage*> mEmptyHeartIcons;
+
+    // Enemies left
+    UIText* mEnemiesLeftCount;
+    UIText* mAreaClearTxt;
+
+    // Cursor
+    UIImage* mCursorImage;
 };
