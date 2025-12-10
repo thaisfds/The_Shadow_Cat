@@ -125,8 +125,8 @@ add_executable(${PROJECT_NAME}
         Source/Components/Skills/ShadowForm.h
         Source/Debug/BossDebugDrawer.cpp
         Source/Debug/BossDebugDrawer.h
-        Source/Actors/Characters/BaseEnemy.cpp
-        Source/Actors/Characters/BaseEnemy.h
+        Source/Actors/Characters/EnemyBase.cpp
+        Source/Actors/Characters/EnemyBase.h
         Source/AI/AIStateMachine.cpp
         Source/AI/AIStateMachine.h
         Source/AI/AIBehavior.cpp

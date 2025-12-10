@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../BaseEnemy.h"
+#include "../EnemyBase.h"
 
-class WhiteCat : public BaseEnemy {
+class WhiteCat : public EnemyBase {
 public:
     WhiteCat(class Game* game, Vector2 position, float forwardSpeed = 200.0f);
 

@@ -1,10 +1,10 @@
-#include "BaseEnemy.h"
+#include "EnemyBase.h"
 #include "../../AI/AIStateMachine.h"
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../../SkillFactory.h"
 #include <fstream>
 
-BaseEnemy::BaseEnemy(class Game* game, Vector2 position, float forwardSpeed)
+EnemyBase::EnemyBase(class Game* game, Vector2 position, float forwardSpeed)
 	: Character(game, position, forwardSpeed)
 	, mStateMachine(nullptr)
 {
@@ -13,12 +13,12 @@ BaseEnemy::BaseEnemy(class Game* game, Vector2 position, float forwardSpeed)
 	ResetCollisionFilter();
 }
 
-BaseEnemy::~BaseEnemy()
+EnemyBase::~EnemyBase()
 {
 	delete mStateMachine;
 }
 
-void BaseEnemy::OnUpdate(float deltaTime)
+void EnemyBase::OnUpdate(float deltaTime)
 {
 	Character::OnUpdate(deltaTime);
 	
@@ -27,7 +27,7 @@ void BaseEnemy::OnUpdate(float deltaTime)
 	if (mStateMachine) mStateMachine->Update(deltaTime);
 }
 
-void BaseEnemy::ResetCollisionFilter() const
+void EnemyBase::ResetCollisionFilter() const
 {
 	CollisionFilter filter;
 	filter.belongsTo = CollisionFilter::GroupMask({ CollisionGroup::Enemy });
@@ -35,7 +35,7 @@ void BaseEnemy::ResetCollisionFilter() const
 	mColliderComponent->SetFilter(filter);
 }
 
-nlohmann::json BaseEnemy::LoadEnemyDataFromJSON(const std::string& fileName)
+nlohmann::json EnemyBase::LoadEnemyDataFromJSON(const std::string& fileName)
 {
 	std::ifstream enemyFile("../Assets/Data/Character/" + fileName + ".json");
 

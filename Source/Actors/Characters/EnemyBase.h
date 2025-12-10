@@ -4,11 +4,11 @@
 #include <vector>
 #include "../../Components/Skills/SkillBase.h"
 
-class BaseEnemy : public Character
+class EnemyBase : public Character
 {
 public:
-	BaseEnemy(class Game* game, Vector2 position, float forwardSpeed);
-	virtual ~BaseEnemy();
+	EnemyBase(class Game* game, Vector2 position, float forwardSpeed);
+	virtual ~EnemyBase();
 
 	void OnUpdate(float deltaTime) override;
 	void ResetCollisionFilter() const override;
