@@ -12,6 +12,12 @@ class GameJsonParser
 public:
 	GameJsonParser() = delete;
 
+	template<typename T>
+	static T GetValue(const nlohmann::json& data, const std::string& key);
+	
+	template<typename T>
+	static T GetValue(const nlohmann::json& data, const std::string& key, const T& defaultValue);
+
 	static int GetIntValue(const nlohmann::json& skillData, const std::string& key);
 	static float GetFloatValue(const nlohmann::json& skillData, const std::string& key);
 	static std::string GetStringValue(const nlohmann::json& skillData, const std::string& key);
@@ -20,9 +26,12 @@ public:
 	// SkillData specific methods
 	static float GetFloatEffectValue(const nlohmann::json& skillData, const std::string& effectName);
 	static Collider* GetAreaOfEffect(const nlohmann::json& skillData);
-	static UpgradeInfo GetUpgradeInfo(const SkillBase *skill, const nlohmann::json& skillData, const std::string& upgradeType, float *upgradeTarget);
+	static UpgradeInfo GetUpgradeInfo(SkillBase *skill, const nlohmann::json& skillData, const std::string& upgradeType, float *upgradeTarget);
 
 private:
-	static float ResolveReference(const nlohmann::json& skillData, const std::string& reference);
-	static float ExtractFloatValue(const nlohmann::json& skillData, const nlohmann::json& value);
+	template<typename T>
+	static T ResolveReference(const nlohmann::json& data, const std::string& reference);
+
+	template<typename T>
+	static T ExtractValue(const nlohmann::json& data, const nlohmann::json& value);
 };

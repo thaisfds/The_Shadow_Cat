@@ -6,5 +6,21 @@
 	"skills":
 	[
 		"BasicAttackSkill"
-	]
+	],
+	"aiBehaviors":
+	{
+		"patrol":
+		{
+			"radius": 200.0,
+			"pauseMinDuration": 1.0,
+			"pauseMaxDuration": 3.0,
+			"detectionRange": 150.0,
+			"visionRange": 250.0,
+			"detectionAngleDegrees": 60.0
+		},
+		"chase":
+		{
+			"range": 250.0
+		}
+	}
 }

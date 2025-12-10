@@ -4,6 +4,7 @@
 #include <SDL_mixer.h>
 #include <vector>
 #include "Actors/Actor.h"
+#include "Actors/Characters/BossBase.h"
 #include "Actors/Characters/EnemyBase.h"
 #include "Actors/DebugActor.h"
 #include "Actors/Characters/Boss.h"
@@ -92,14 +93,14 @@ public:
 
 	// Game specific
 	class ShadowCat *GetPlayer() { return mShadowCat; }
-	class Boss *GetCurrentBoss() const { return mCurrentBoss; }
+	class BossBase *GetCurrentBoss() const { return mCurrentBoss; }
 	class HUD *GetHUD() { return mHUD; }
 
 	// Enemy and Boss tracking
 	void RegisterEnemy(class EnemyBase *enemy);
-	void RegisterBoss(class Boss *boss);
+	void RegisterBoss(class BossBase *boss);
 	void UnregisterEnemy(class EnemyBase *enemy);
-	void UnregisterBoss(class Boss *boss);
+	void UnregisterBoss(class BossBase *boss);
 	int CountAliveEnemies() const;
 	int CountAliveBosses() const;
 
@@ -190,8 +191,7 @@ private:
 
 	// Enemy and Boss tracking
 	std::vector<class EnemyBase *> mEnemies;
-	std::vector<class Boss *> mBosses;
-	class Boss *mCurrentBoss;  // Pointer to active boss in current room (null when no boss)
+	class BossBase *mCurrentBoss;  // Pointer to active boss in current room (null when no boss)
 
 	// Boss spawn data (stored until enemies are defeated)
 	struct BossSpawnData

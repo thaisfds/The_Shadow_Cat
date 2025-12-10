@@ -11,18 +11,22 @@ WhiteCat::WhiteCat(class Game* game, Vector2 position, float forwardSpeed)
 {
 	mAnimatorComponent = new AnimatorComponent(this, "WhiteCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
 
-	SetupAIBehaviors();
-	LoadEnemyDataFromJSON("WhiteCatData");
+	auto data = LoadEnemyDataFromJSON("WhiteCatData");
+	SetupAIBehaviors(data);
 }
 
-void WhiteCat::SetupAIBehaviors()
+void WhiteCat::SetupAIBehaviors(const nlohmann::json& data)
 {
 	mStateMachine = new AIStateMachine(this);
 
-	auto patrol = new PatrolBehavior(this, 150.0f);
+	auto patrol = new PatrolBehavior(this);
 	auto chase = new ChaseBehavior(this);
 	auto skill = new SkillBehavior(this);
     
+	patrol->LoadBehaviorData(data);
+	chase->LoadBehaviorData(data);
+	skill->LoadBehaviorData(data);
+	
 	mStateMachine->RegisterState(patrol);
 	mStateMachine->RegisterState(chase);
 	mStateMachine->RegisterState(skill);
@@ -30,6 +34,7 @@ void WhiteCat::SetupAIBehaviors()
 	patrol->AddTransition(chase->GetName(), [patrol]() { return patrol->PatrolToChase(); });
 	chase->AddTransition(patrol->GetName(), [chase]() { return chase->ChaseToPatrol(); });
 	skill->AddTransition(patrol->GetName(), [skill]() { return skill->SkillToPatrol(); });
+	skill->AddTransitionCondition([skill]() { return skill->AnySkillAvailable(); });
 	
 	mStateMachine->SetInitialState(patrol->GetName());
 

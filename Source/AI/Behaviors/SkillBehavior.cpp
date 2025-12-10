@@ -5,7 +5,6 @@
 SkillBehavior::SkillBehavior(Character* owner)
 	: AIBehavior(owner, "Skill")
 {
-	mTransitionConditions.push_back([this]() { return AnySkillAvailable(); });
 }
 
 void SkillBehavior::OnEnter()

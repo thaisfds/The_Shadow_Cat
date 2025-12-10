@@ -2,7 +2,9 @@
 #include <vector>
 #include <map>
 #include <fstream>
+#include "Actors/Characters/BossBase.h"
 #include "Actors/Characters/Dummy.h"
+#include "Actors/Characters/Enemies/WhiteBoss.h"
 #include "Actors/Characters/Enemies/WhiteCat.h"
 #include "Actors/Characters/EnemyBase.h"
 #include "CSV.h"
@@ -145,7 +147,6 @@ void Game::UnloadScene()
 	mStompActors.clear();
 	mFurBallActors.clear();
 	mEnemies.clear();
-	mBosses.clear();
 	mPendingBossSpawns.clear();
 
 	// Delete UI screens
@@ -463,23 +464,6 @@ int **Game::LoadLevel(const std::string &fileName, int &outWidth, int &outHeight
 
 void Game::BuildLevel(int **levelData, int width, int height)
 {
-	// Determine if this is a boss level
-	bool isBossLevel = (mCurrentScene == GameScene::Level1_Boss ||
-						mCurrentScene == GameScene::Level2_Boss ||
-						mCurrentScene == GameScene::Level3_Boss);
-
-	// Determine boss type for boss levels
-	Boss::BossType currentBossType = Boss::BossType::WhiteBoss;
-	if (mCurrentScene == GameScene::Level1_Boss)
-	{
-		currentBossType = Boss::BossType::WhiteBoss;
-	}
-	else if (mCurrentScene == GameScene::Level3_Boss)
-	{
-		currentBossType = Boss::BossType::OrangeBoss;
-	}
-	// Level2_Boss não implementado ainda, usa WhiteBoss como padrão
-
 	for (int i = 0; i < height; ++i)
 	{
 		for (int j = 0; j < width; ++j)
@@ -530,53 +514,18 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				auto block = new Block(this, tileID);
 				block->SetPosition(position);
 			}
-			// ========== IMMEDIATE ENEMY SPAWNS (spawn when level loads) ==========
-			// Tile ID 12: Enemy - small patrol (100px) OR Boss in boss levels
 			else if (tileID == 12)
 			{
-				if (isBossLevel)
-				{
-					auto boss = new Boss(this, position, currentBossType, false);
-				}
+				auto boss = new WhiteBoss(this, position);
 			}
-			// Tile ID 13: Enemy with larger patrol (200px) OR Boss in boss levels
 			else if (tileID == 13)
 			{
-				if (isBossLevel)
-				{
-					auto boss = new Boss(this, position, currentBossType, false);
-				}
 			}
-			// ========== DELAYED SPAWNERS (spawn when player approaches) ==========
-			// Tile ID 14: Spawner - small patrol (100px) OR Boss in boss levels
-			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 14)
 			{
-				if (isBossLevel)
-				{
-					auto boss = new Boss(this, position, currentBossType, false);
-				}
 			}
-			// Tile ID 15: Spawner - large patrol (200px) OR Boss in boss levels
-			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 15)
 			{
-				if (isBossLevel)
-				{
-					// Spawn boss in boss levels
-					auto boss = new Boss(this, position, currentBossType, false);
-				}
-			}
-			// ========== BOSS SPAWNS ==========
-			// Tile ID 16: WhiteBoss
-			else if (tileID == 16)
-			{
-				auto boss = new Boss(this, position, Boss::BossType::WhiteBoss, false);
-			}
-			// Tile ID 17: OrangeBoss
-			else if (tileID == 17)
-			{
-				auto boss = new Boss(this, position, Boss::BossType::OrangeBoss, false);
 			}
 		}
 	}
@@ -1208,22 +1157,11 @@ void Game::RegisterEnemy(EnemyBase *enemy)
 		mEnemies.push_back(enemy);
 }
 
-void Game::RegisterBoss(Boss *boss)
+void Game::RegisterBoss(BossBase *boss)
 {
-	if (boss)
-	{
-		mBosses.push_back(boss);
-		
-		// Set as current boss if in a boss level
-		bool isBossLevel = (mCurrentScene == GameScene::Level1_Boss ||
-							mCurrentScene == GameScene::Level2_Boss ||
-							mCurrentScene == GameScene::Level3_Boss);
-		
-		if (isBossLevel && !mCurrentBoss)
-		{
-			mCurrentBoss = boss;
-		}
-	}
+	if (!boss) return;
+
+	mCurrentBoss = boss;
 }
 
 void Game::UnregisterEnemy(EnemyBase *enemy)
@@ -1233,17 +1171,11 @@ void Game::UnregisterEnemy(EnemyBase *enemy)
 		mEnemies.erase(iter);
 }
 
-void Game::UnregisterBoss(Boss *boss)
+void Game::UnregisterBoss(BossBase *boss)
 {
-	// Clear current boss pointer if this is the current boss
-	if (mCurrentBoss == boss)
-	{
-		mCurrentBoss = nullptr;
-	}
+	if (mCurrentBoss != boss) return;
 	
-	auto iter = std::find(mBosses.begin(), mBosses.end(), boss);
-	if (iter != mBosses.end())
-		mBosses.erase(iter);
+	mCurrentBoss = nullptr;
 }
 
 int Game::CountAliveEnemies() const
@@ -1260,10 +1192,6 @@ int Game::CountAliveEnemies() const
 int Game::CountAliveBosses() const
 {
 	int count = 0;
-	for (auto boss : mBosses)
-	{
-		if (boss && boss->GetState() == ActorState::Active && !boss->IsDead())
-			count++;
-	}
+	if (mCurrentBoss) count += !mCurrentBoss->IsDead();
 	return count;
 }
