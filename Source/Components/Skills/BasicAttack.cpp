@@ -32,7 +32,6 @@ nlohmann::json BasicAttack::LoadSkillDataFromJSON(const std::string& fileName)
     mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
     mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
     auto id = GameJsonParser::GetStringValue(data, "id");
-    SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new BasicAttack(owner); });
 
     return data;
 }
@@ -45,7 +44,6 @@ void BasicAttack::StartSkill(Vector2 targetPosition)
 
     mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("BasicAttack");
     mCharacter->SetMovementLock(true);
-    mCharacter->SetAnimationLock(true);  // Lock animations so attack anim isn't overridden
     
     // Play appropriate sound based on character type
     std::string sound;

@@ -53,6 +53,8 @@ public:
 	void AddPersistentActor(class Actor *actor);
 	void RemovePersistentActor(class Actor *actor);
 
+	void InitializeSkills();
+
 	// UI functions
 	void PushUI(class UIScreen *screen) { mUIStack.emplace_back(screen); }
 	const std::vector<class UIScreen *> &GetUIStack() { return mUIStack; }

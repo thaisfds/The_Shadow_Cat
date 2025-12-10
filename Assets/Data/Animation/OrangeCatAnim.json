@@ -5,7 +5,10 @@
   {
     "Idle": [0],
     "Run": [0, 1, 2, 3],
-    "BasicAttack": { "start": 5, "end": 11}
+    "BasicAttack": { "start": 5, "end": 11},
+    "DashBegin": { "start": 12, "end": 15 },
+    "DashMid": [16],
+    "DashEnd": { "start": 15, "end": 12 }
   },
   "base": "Idle"
 }

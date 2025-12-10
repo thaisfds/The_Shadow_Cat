@@ -35,7 +35,7 @@ public:
     const std::string& GetDescription() const { return mDescription; }
     const std::string& GetIconPath() const { return mIconPath; }
     std::vector<UpgradeInfo> GetAvailableUpgrades() const;
-    void ApplyUpgrade(const std::string& upgradeType);
+    void ApplyUpgrade(const std::string& upgradeType, int levels = 1);
 
 protected:
     class Character *mCharacter;
