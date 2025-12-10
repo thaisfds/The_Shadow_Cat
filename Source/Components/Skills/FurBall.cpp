@@ -27,7 +27,6 @@ nlohmann::json FurBall::LoadSkillDataFromJSON(const std::string& fileName)
 	mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
 	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
 	auto id = GameJsonParser::GetStringValue(data, "id");
-	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new FurBall(owner); });
 
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "projectileSpeed", &mProjectileSpeed));
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(this, data, "damage", &mDamage));
@@ -51,7 +50,8 @@ void FurBall::Execute()
 		mDamage,
 		mCharacter->GetSkillFilter(),
 		mAreaOfEffect,
-		lifetime
+		lifetime,
+		mAnim
 	);
 }
 
@@ -124,10 +124,11 @@ void FurBallActor::Kill()
 	mDelayedActions.Clear();
 }
 
-void FurBallActor::Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter, Collider* areaOfEffect, float lifetime)
+void FurBallActor::Awake(Vector2 position, Vector2 direction, float speed, int damage, CollisionFilter filter, Collider* areaOfEffect, float lifetime, std::string anim)
 {
 	mAnimatorComponent->SetEnabled(true);
 	mAnimatorComponent->SetVisible(true);
+	mAnimatorComponent->LoopAnimation(anim);
 	mColliderComponent->SetFilter(filter);
 	mColliderComponent->SetCollider(areaOfEffect);
 	mColliderComponent->SetDebugDrawIfDisabled(true);

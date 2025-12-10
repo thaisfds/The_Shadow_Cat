@@ -6,6 +6,7 @@
 #include "Actors/Characters/Dummy.h"
 #include "Actors/Characters/Enemies/WhiteBoss.h"
 #include "Actors/Characters/Enemies/WhiteCat.h"
+#include "Actors/Characters/Enemies/OrangeCat.h"
 #include "Actors/Characters/EnemyBase.h"
 #include "Actors/UpgradeTreat.h"
 #include "CSV.h"
@@ -15,6 +16,7 @@
 #include "Components/Drawing/DrawComponent.h"
 #include "Components/Physics/RigidBodyComponent.h"
 #include "Random.h"
+#include "SkillFactory.h"
 #include "UI/Screens/MainMenu.h"
 #include "UI/Screens/HUD.h"
 #include "UI/Screens/TutorialHUD.h"
@@ -28,6 +30,9 @@
 #include "Components/AnimatedParticleSystemComponent.h"
 #include "Actors/Characters/Boss.h"
 #include "Actors/LevelPortal.h"
+#include "Components/Skills/ClawAttack.h"
+#include "Components/Skills/Dash.h"
+#include "Components/Skills/ShadowForm.h"
 
 Game::Game()
 	: mWindow(nullptr),
@@ -126,6 +131,8 @@ bool Game::Initialize()
 	SetScene(GameScene::MainMenu);
 
 	mTicksCount = SDL_GetTicks();
+
+	InitializeSkills();
 
 	return true;
 }
@@ -483,6 +490,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			}
 			else if (tileID == 1)
 			{
+				auto orangeCat = new OrangeCat(this, position);
 			}
 			else if (tileID == 2)
 			{
@@ -1226,4 +1234,16 @@ int Game::CountAliveBosses() const
 	int count = 0;
 	if (mCurrentBoss) count += !mCurrentBoss->IsDead();
 	return count;
+}
+
+void Game::InitializeSkills()
+{
+    SkillFactory::Instance().RegisterSkill("basicAttackSkill", [](Actor* owner) { return new BasicAttack(owner); });
+	SkillFactory::Instance().RegisterSkill("clawAttackSkill", [](Actor* owner) { return new ClawAttack(owner); });
+	SkillFactory::Instance().RegisterSkill("dashSkill", [](Actor* owner) { return new Dash(owner); });
+	SkillFactory::Instance().RegisterSkill("shadowFormSkill", [](Actor* owner) { return new ShadowForm(owner); });
+    SkillFactory::Instance().RegisterSkill("stompSkill", [](Actor* owner) { return new Stomp(owner); });
+	SkillFactory::Instance().RegisterSkill("furBallSkill", [](Actor* owner) { return new FurBall(owner); });
+
+    
 }
