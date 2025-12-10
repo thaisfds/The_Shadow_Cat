@@ -6,6 +6,7 @@
 #include "Actors/Characters/Dummy.h"
 #include "Actors/Characters/Enemies/WhiteBoss.h"
 #include "Actors/Characters/Enemies/SylvesterBoss.h"
+#include "Actors/Characters/Enemies/OrangeBoss.h"
 #include "Actors/Characters/Enemies/WhiteCat.h"
 #include "Actors/Characters/Enemies/OrangeCat.h"
 #include "Actors/Characters/EnemyBase.h"
@@ -608,6 +609,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			}
 			else if (tileID == 14)
 			{
+				auto boss = new OrangeBoss(this, position);
 			}
 			else if (tileID == 15)
 			{
