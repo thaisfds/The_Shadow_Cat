@@ -28,8 +28,6 @@ nlohmann::json WhiteBubble::LoadSkillDataFromJSON(const std::string& fileName)
 	mDamage = static_cast<int>(GameJsonParser::GetFloatEffectValue(data, "damage"));
 	mDuration = GameJsonParser::GetValue<float>(data, "duration", 20.0f);
 	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
-	auto id = GameJsonParser::GetStringValue(data, "id");
-	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new WhiteBubble(owner); });
 
 	return data;
 }

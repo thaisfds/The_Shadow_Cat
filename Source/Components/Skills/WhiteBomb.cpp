@@ -27,8 +27,6 @@ nlohmann::json WhiteBomb::LoadSkillDataFromJSON(const std::string& fileName)
 	mProjectileSpeed = GameJsonParser::GetFloatEffectValue(data, "projectileSpeed");
 	mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
 	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
-	auto id = GameJsonParser::GetStringValue(data, "id");
-	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new WhiteBomb(owner); });
 
 	return data;
 }

@@ -34,9 +34,6 @@ nlohmann::json BossHealing::LoadSkillDataFromJSON(const std::string& fileName)
         }
     }
 
-    auto id = GameJsonParser::GetStringValue(data, "id");
-    SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new BossHealing(owner); });
-
     return data;
 }
 
