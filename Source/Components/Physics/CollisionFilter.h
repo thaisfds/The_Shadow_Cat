@@ -9,6 +9,7 @@ enum class CollisionGroup : int {
     Environment,
     PlayerSkills,
     EnemySkills,
+	Collectible,
 };
 
 struct CollisionFilter

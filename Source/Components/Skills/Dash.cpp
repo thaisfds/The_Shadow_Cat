@@ -11,12 +11,7 @@ Dash::Dash(Actor* owner, int updateOrder)
 {
 	LoadSkillDataFromJSON("DashData");
 
-	float dashDuration = mRange / mDashSpeed;
-	float dashEndDelay = dashDuration - mCharacter->GetComponent<AnimatorComponent>()->GetAnimationDuration("DashEnd");
-	AddDelayedAction(dashEndDelay, [this]() { 
-		mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("DashEnd", false); 
-	});
-	AddDelayedAction(dashDuration, [this]() { EndSkill(); });
+	
 }
 
 nlohmann::json Dash::LoadSkillDataFromJSON(const std::string& fileName)
@@ -64,6 +59,14 @@ void Dash::StartSkill(Vector2 targetPosition)
 	filter.collidesWith = CollisionFilter::RemoveGroups(filter.collidesWith,
 		{CollisionGroup::Player, CollisionGroup::Enemy, CollisionGroup::PlayerSkills, CollisionGroup::EnemySkills});
 	mCharacter->GetComponent<ColliderComponent>()->SetFilter(filter);
+
+	float dashDuration = mRange / mDashSpeed;
+	float dashEndDelay = dashDuration - animator->GetAnimationDuration("DashEnd");
+	
+	AddDelayedAction(dashEndDelay, [this]() { 
+		mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("DashEnd", false);
+	});
+	AddDelayedAction(dashDuration, [this]() { EndSkill(); });
 }
 
 void Dash::EndSkill()
@@ -74,4 +77,6 @@ void Dash::EndSkill()
 	mCharacter->SetMovementLock(false);
 
 	mCharacter->ResetCollisionFilter();
+
+	mDelayedActions.Clear();
 }

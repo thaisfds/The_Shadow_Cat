@@ -24,7 +24,7 @@ SkillInputHandler::SkillInputHandler(Actor* owner, int updateOrder)
     mKeyToSkill[rightMouseInput] = new ClawAttack(owner);
     mKeyToSkill[keyEInput] = new FurBall(owner);
     mKeyToSkill[keyQInput] = new Stomp(owner);
-    mKeyToSkill[keyShiftInput] = new Dash(owner);
+    mKeyToSkill[keyShiftInput] = new ShadowForm(owner);
 }
 
 void SkillInputHandler::HandleEvent(const SDL_Event& event)

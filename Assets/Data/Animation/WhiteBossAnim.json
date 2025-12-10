@@ -4,8 +4,8 @@
   "animations": 
   {
     "Idle": [0],
-    "Walk": [1, 2],
-    "Attack": [3, 4],
+    "Run": [1, 2],
+    "BasicAttack": [3, 4],
     "Hit": [0, 3],
     "Death": [4, 3, 2, 1, 0]
   },

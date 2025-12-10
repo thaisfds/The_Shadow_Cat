@@ -143,6 +143,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Characters/BossBase.h
         Source/Actors/Characters/Enemies/WhiteBoss.cpp
         Source/Actors/Characters/Enemies/WhiteBoss.h
+        Source/Actors/UpgradeTreat.cpp
+        Source/Actors/UpgradeTreat.h
 )
 
 configure_local_linking(${PROJECT_NAME})

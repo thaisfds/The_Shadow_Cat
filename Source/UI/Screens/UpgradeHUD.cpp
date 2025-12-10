@@ -86,6 +86,9 @@ void UpgradeHUD::UpdateSelectedCard(int indexChange)
 
     mUpgradeCardSelectedBorders[mSelectedButtonIndex]->SetIsVisible(false);
     mSelectedButtonIndex += indexChange;
+    int upgradeCount = static_cast<int>(mUpgradeCardSelectedBorders.size());
+    if (mSelectedButtonIndex < 0) mSelectedButtonIndex = upgradeCount - 1;
+    if (mSelectedButtonIndex >= (int)upgradeCount) mSelectedButtonIndex = 0;
     mUpgradeCardSelectedBorders[mSelectedButtonIndex]->SetIsVisible(true);
 }
 
@@ -113,27 +116,18 @@ void UpgradeHUD::HandleKeyPress(int key)
     switch (key) {
     case SDLK_a:
     case SDLK_LEFT:
-        if (mSelectedButtonIndex == 0) break;
-
         UpdateSelectedCard(-1);
         break;
     
     case SDLK_d:
     case SDLK_RIGHT:
-        if (mSelectedButtonIndex == (int) mButtons.size() - 1) break;
-
         UpdateSelectedCard(1);
         break;
     
     case SDLK_e:
     case SDLK_RETURN:
     case SDLK_KP_ENTER:
-        // mCurrentUpgradeInfo[mSelectedButtonIndex];
-        // Apply upgrade
-        // TODO
-        SDL_Log("TODO DO UPGRADE: %d\n", mSelectedButtonIndex);
-            
-        mGame->GetPlayer()->SpendUpgradePoint();
+        mGame->GetPlayer()->SpendUpgradePoint(mCurrentUpgradeInfo[mSelectedButtonIndex]);
         mGame->ResumeGame();
 
         this->Clear();

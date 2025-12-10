@@ -30,6 +30,8 @@ ShadowCat::ShadowCat(Game *game, Vector2 position, const float forwardSpeed)
 
     hp = 200;
     maxHp = hp;
+
+    SetPersistent(true);
 }
 
 void ShadowCat::OnProcessInput(const uint8_t *state)
@@ -207,4 +209,12 @@ void ShadowCat::ResetCollisionFilter() const
     filter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Environment, CollisionGroup::Enemy, CollisionGroup::EnemySkills});
 
     mColliderComponent->SetFilter(filter);
+}
+
+void ShadowCat::SpendUpgradePoint(UpgradeInfo upgrade)
+{
+    if (mUpgradePoints <= 0) return;
+
+    mUpgradePoints--;
+    upgrade.skill->ApplyUpgrade(upgrade.type);
 }

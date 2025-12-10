@@ -7,6 +7,7 @@
 #include "Actors/Characters/Enemies/WhiteBoss.h"
 #include "Actors/Characters/Enemies/WhiteCat.h"
 #include "Actors/Characters/EnemyBase.h"
+#include "Actors/UpgradeTreat.h"
 #include "CSV.h"
 #include "Game.h"
 #include "Components/Skills/Stomp.h"
@@ -141,13 +142,13 @@ void Game::UnloadScene()
 	// Use state so we can call this from within an actor update
 	for (auto *actor : mActors)
 	{
+		if (actor->IsPersistent()) continue;
 		actor->SetState(ActorState::Destroy);
 	}
 
 	mStompActors.clear();
 	mFurBallActors.clear();
 	mEnemies.clear();
-	mPendingBossSpawns.clear();
 
 	// Delete UI screens
 	for (auto ui : mUIStack)
@@ -167,7 +168,6 @@ void Game::UnloadScene()
 		mUIStack.push_back(mUpgradeHUD);
 
 	// Reset states
-	mShadowCat = nullptr;
 	mLevelPortal = nullptr;
 	mCurrentBoss = nullptr;
 }
@@ -478,7 +478,8 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			// Player spawn
 			if (tileID == 0)
 			{
-				mShadowCat = new ShadowCat(this, position);
+				if (!mShadowCat) mShadowCat = new ShadowCat(this, position);
+				else mShadowCat->SetPosition(position);
 			}
 			else if (tileID == 1)
 			{
@@ -535,9 +536,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 	int lastRow = height - 1;
 	float portalX = (centerColumn * GameConstants::TILE_SIZE) + (GameConstants::TILE_SIZE / 2.0f);
 	float portalY = (lastRow * GameConstants::TILE_SIZE) + (GameConstants::TILE_SIZE / 2.0f);
-
-	SDL_Log("[BUILD] Creating portal at (%.1f, %.1f) - Scene=%d, PendingBosses=%zu, Debug=%d",
-			portalX, portalY, (int)mCurrentScene, mPendingBossSpawns.size(), mIsDebugging);
 
 	mLevelPortal = new LevelPortal(this);
 	mLevelPortal->SetPosition(Vector2(portalX, portalY));
@@ -911,6 +909,21 @@ void Game::RemoveActor(Actor *actor)
 	}
 }
 
+void Game::AddPersistentActor(Actor *actor)
+{
+	mPersistentActors.emplace_back(actor);
+}
+
+void Game::RemovePersistentActor(Actor *actor)
+{
+	auto iter = std::find(mPersistentActors.begin(), mPersistentActors.end(), actor);
+	if (iter != mPersistentActors.end())
+	{
+		std::iter_swap(iter, mPersistentActors.end() - 1);
+		mPersistentActors.pop_back();
+	}
+}
+
 void Game::AddDrawable(class DrawComponent *drawable)
 {
 	mDrawables.emplace_back(drawable);
@@ -1154,6 +1167,20 @@ FurBallActor *Game::GetFurBallActor()
 	}
 
 	return furball;
+}
+
+UpgradeTreat *Game::GetUpgradeTreatActor()
+{
+	UpgradeTreat *treat = nullptr;
+	for (auto actor : mUpgradeTreatActors)
+		if (actor->IsCollected())
+			treat = actor;
+	if (!treat)
+	{
+		treat = new UpgradeTreat(this);
+		mUpgradeTreatActors.push_back(treat);
+	}
+	return treat;
 }
 
 void Game::RegisterEnemy(EnemyBase *enemy)
