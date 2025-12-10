@@ -31,6 +31,11 @@
 #include "Components/AnimatedParticleSystemComponent.h"
 #include "Actors/Characters/Boss.h"
 #include "Actors/LevelPortal.h"
+#include "Components/Skills/WhiteSlash.h"
+#include "Components/Skills/WhiteBomb.h"
+#include "Components/Skills/WhiteBubble.h"
+#include "Components/Skills/BossHealing.h"
+#include "Actors/Characters/Dummy.h"
 #include "Components/Skills/ClawAttack.h"
 #include "Components/Skills/Dash.h"
 #include "Components/Skills/ShadowForm.h"
@@ -41,7 +46,7 @@ Game::Game()
 	  mTicksCount(0),
 	  mIsRunning(true),
 	  mIsDebugging(false),
-	  mIsGodMode(true),
+	  mIsGodMode(false),
 	  mUpdatingActors(false),
 	  mCameraPos(Vector2::Zero),
 	  mLevelData(nullptr),
@@ -63,7 +68,7 @@ Game::Game()
 
 bool Game::Initialize()
 {
-	
+
 	Random::Init();
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0)
@@ -150,7 +155,8 @@ void Game::UnloadScene()
 	// Use state so we can call this from within an actor update
 	for (auto *actor : mActors)
 	{
-		if (actor->IsPersistent()) continue;
+		if (actor->IsPersistent())
+			continue;
 		actor->SetState(ActorState::Destroy);
 	}
 
@@ -369,15 +375,15 @@ GroundType Game::GetGroundType() const
 	case GameScene::Level1:
 	case GameScene::Level1_Boss:
 		return GroundType::Grass;
-	
+
 	case GameScene::Level2:
 	case GameScene::Level2_Boss:
 		return GroundType::Brick;
-	
+
 	case GameScene::Level3:
 	case GameScene::Level3_Boss:
 		return GroundType::Stone;
-	
+
 	default:
 		return GroundType::Grass;
 	}
@@ -393,6 +399,30 @@ void Game::InitializeActors()
 
 	mAttackTrailActor = new Actor(this);
 	new AnimatedParticleSystemComponent(mAttackTrailActor, "AttackTrailAnim", false);
+
+	mWhiteSlashActor = new Actor(this);
+	new AnimatedParticleSystemComponent(mWhiteSlashActor, "WhiteSlashAnim", false);
+
+	// Pre-register boss skills before any enemies are created
+	// This ensures they are registered in SkillFactory before EnemyBase tries to create them
+	// Create temporary Character (Dummy) and skills just for registration
+	// The skills will register themselves in SkillFactory during construction
+	// Then delete the temporary Character (it will automatically clean up the skill components)
+	// Note: Skills are NOT added to the Character's mSkills vector, only registered in SkillFactory
+	{
+		Dummy *tempCharacter = new Dummy(this, Vector2::Zero, 0.0f);
+
+		// Create temporary instances to trigger registration
+		// These will register themselves in SkillFactory during construction
+		new WhiteSlash(tempCharacter);
+		new WhiteBomb(tempCharacter);
+		new WhiteBubble(tempCharacter);
+		new BossHealing(tempCharacter);
+
+		// Skills are now registered in SkillFactory
+		// Delete the temporary character (it will clean up the skill components automatically)
+		delete tempCharacter;
+	}
 
 	std::string levelPath;
 
@@ -528,8 +558,10 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			// Player spawn
 			if (tileID == 0)
 			{
-				if (!mShadowCat) mShadowCat = new ShadowCat(this, position);
-				else mShadowCat->SetPosition(position);
+				if (!mShadowCat)
+					mShadowCat = new ShadowCat(this, position);
+				else
+					mShadowCat->SetPosition(position);
 			}
 			else if (tileID == 1)
 			{
@@ -668,10 +700,10 @@ void Game::ProcessInput()
 				mUIStack.back()->HandleKeyPress(event.key.keysym.sym);
 			}
 
-			if (event.key.keysym.sym == SDLK_n && event.key.repeat == 0)
-			{
-				SetScene(GameScene::Level1);
-			}
+			// if (event.key.keysym.sym == SDLK_n && event.key.repeat == 0)
+			// {
+			// 	SetScene(GameScene::Level1);
+			// }
 
 			// Fullscreen toggle
 			if (event.key.keysym.sym == SDLK_F11 && event.key.repeat == 0)
@@ -698,11 +730,11 @@ void Game::ProcessInput()
 				mIsDebugging = !mIsDebugging;
 
 			// God Mode toggle
-			if (event.key.keysym.sym == SDLK_F2 && event.key.repeat == 0)
-			{
-				mIsGodMode = !mIsGodMode;
-				SDL_Log("[GOD MODE] %s", mIsGodMode ? "ENABLED" : "DISABLED");
-			}
+			// if (event.key.keysym.sym == SDLK_F2 && event.key.repeat == 0)
+			// {
+			// 	mIsGodMode = !mIsGodMode;
+			// 	SDL_Log("[GOD MODE] %s", mIsGodMode ? "ENABLED" : "DISABLED");
+			// }
 
 			// Tutorial HUD toggle
 			if (event.key.keysym.sym == SDLK_h && event.key.repeat == 0)
@@ -711,7 +743,8 @@ void Game::ProcessInput()
 
 			// Pause toggle
 			if (event.key.keysym.sym == SDLK_ESCAPE && event.key.repeat == 0)
-				if (mCurrentScene > GameScene::MainMenu && mShadowCat && mShadowCat->GetUpgradePoints() == 0) {
+				if (mCurrentScene > GameScene::MainMenu && mShadowCat && mShadowCat->GetUpgradePoints() == 0)
+				{
 					if (mIsPaused)
 						ResumeGame();
 					else
@@ -743,7 +776,7 @@ void Game::UpdateGame(float deltaTime)
 		bool screenExists = false;
 		for (auto screen : mUIStack)
 		{
-			if (dynamic_cast<GameOver*>(screen) != nullptr || dynamic_cast<WinScreen*>(screen) != nullptr)
+			if (dynamic_cast<GameOver *>(screen) != nullptr || dynamic_cast<WinScreen *>(screen) != nullptr)
 			{
 				screenExists = true;
 				break;
@@ -1239,6 +1272,38 @@ FurBallActor *Game::GetFurBallActor()
 	return furball;
 }
 
+WhiteBombActor *Game::GetWhiteBombActor()
+{
+	WhiteBombActor *bomb = nullptr;
+	for (auto actor : mWhiteBombActors)
+		if (actor->IsDead())
+			bomb = actor;
+
+	if (!bomb)
+	{
+		bomb = new WhiteBombActor(this);
+		mWhiteBombActors.push_back(bomb);
+	}
+
+	return bomb;
+}
+
+WhiteBubbleActor *Game::GetWhiteBubbleActor()
+{
+	WhiteBubbleActor *bubble = nullptr;
+	for (auto actor : mWhiteBubbleActors)
+		if (actor->IsDead())
+			bubble = actor;
+
+	if (!bubble)
+	{
+		bubble = new WhiteBubbleActor(this);
+		mWhiteBubbleActors.push_back(bubble);
+	}
+
+	return bubble;
+}
+
 UpgradeTreat *Game::GetUpgradeTreatActor()
 {
 	UpgradeTreat *treat = nullptr;
@@ -1261,7 +1326,8 @@ void Game::RegisterEnemy(EnemyBase *enemy)
 
 void Game::RegisterBoss(BossBase *boss)
 {
-	if (!boss) return;
+	if (!boss)
+		return;
 
 	mCurrentBoss = boss;
 }
@@ -1275,8 +1341,9 @@ void Game::UnregisterEnemy(EnemyBase *enemy)
 
 void Game::UnregisterBoss(BossBase *boss)
 {
-	if (mCurrentBoss != boss) return;
-	
+	if (mCurrentBoss != boss)
+		return;
+
 	mCurrentBoss = nullptr;
 }
 
@@ -1294,18 +1361,23 @@ int Game::CountAliveEnemies() const
 int Game::CountAliveBosses() const
 {
 	int count = 0;
-	if (mCurrentBoss) count += !mCurrentBoss->IsDead();
+	if (mCurrentBoss)
+		count += !mCurrentBoss->IsDead();
 	return count;
 }
 
 void Game::InitializeSkills()
 {
-    SkillFactory::Instance().RegisterSkill("basicAttackSkill", [](Actor* owner) { return new BasicAttack(owner); });
-	SkillFactory::Instance().RegisterSkill("clawAttackSkill", [](Actor* owner) { return new ClawAttack(owner); });
-	SkillFactory::Instance().RegisterSkill("dashSkill", [](Actor* owner) { return new Dash(owner); });
-	SkillFactory::Instance().RegisterSkill("shadowFormSkill", [](Actor* owner) { return new ShadowForm(owner); });
-    SkillFactory::Instance().RegisterSkill("stompSkill", [](Actor* owner) { return new Stomp(owner); });
-	SkillFactory::Instance().RegisterSkill("furBallSkill", [](Actor* owner) { return new FurBall(owner); });
-
-    
+	SkillFactory::Instance().RegisterSkill("basicAttackSkill", [](Actor *owner)
+										   { return new BasicAttack(owner); });
+	SkillFactory::Instance().RegisterSkill("clawAttackSkill", [](Actor *owner)
+										   { return new ClawAttack(owner); });
+	SkillFactory::Instance().RegisterSkill("dashSkill", [](Actor *owner)
+										   { return new Dash(owner); });
+	SkillFactory::Instance().RegisterSkill("shadowFormSkill", [](Actor *owner)
+										   { return new ShadowForm(owner); });
+	SkillFactory::Instance().RegisterSkill("stompSkill", [](Actor *owner)
+										   { return new Stomp(owner); });
+	SkillFactory::Instance().RegisterSkill("furBallSkill", [](Actor *owner)
+										   { return new FurBall(owner); });
 }

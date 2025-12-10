@@ -1,0 +1,10 @@
+{
+  "image": "../Assets/Sprites/AttackBoss/WhiteBomb.png",
+  "spriteSheetData": "../Assets/Sprites/AttackBoss/WhiteBomb.json",
+  "animations": 
+  {
+    "WhiteBomb": { "start": 0, "end": 5 }
+  },
+  "base": "WhiteBomb"
+}
+

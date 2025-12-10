@@ -1,0 +1,25 @@
+{
+	"id": "WhiteBombSkill",
+	"name": "White Bomb",
+	"description": "Launch a bomb that follows the player and deals damage on impact.",
+	"iconPath": "../Assets/Icons/BombAttackCard.png",
+	"cooldown": 10.0,
+	"range": 500,
+	"areaOfEffect":
+	{
+		"type": "circle",
+		"radius": 35
+	},
+	"effects":
+	[
+		{
+			"type": "damage",
+			"value": 20
+		},
+		{
+			"type": "projectileSpeed",
+			"value": 160
+		}
+	]
+}
+

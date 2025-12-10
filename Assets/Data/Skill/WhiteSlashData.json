@@ -1,0 +1,22 @@
+{
+	"id": "WhiteSlashSkill",
+	"name": "White Slash",
+	"description": "A basic slash attack in the aimed direction.",
+	"iconPath": "../Assets/Icons/SlashAttackCard.png",
+	"cooldown": 1.0,
+	"range": 100,
+	"areaOfEffect":
+	{
+		"type": "cone",
+		"length": "@range",
+		"angle": 60
+	},
+	"effects":
+	[
+		{
+			"type": "damage",
+			"value": 15
+		}
+	]
+}
+

@@ -73,7 +73,17 @@ nlohmann::json EnemyBase::LoadEnemyDataFromJSON(const std::string& fileName)
 	mUpgradeDropChance = GameJsonParser::GetValue<float>(enemyData, "dropChance", 0.1f);
 	auto skills = GameJsonParser::GetStringArrayValue(enemyData, "skills");
 	for (const auto& skillID : skills)
-		mSkills.push_back(SkillFactory::Instance().CreateSkill(skillID, this));
+	{
+		auto skill = SkillFactory::Instance().CreateSkill(skillID, this);
+		if (skill)
+		{
+			mSkills.push_back(skill);
+		}
+		else
+		{
+			SDL_Log("Error: Failed to create skill '%s' for enemy. Skill may not be registered.", skillID.c_str());
+		}
+	}
 
 	return enemyData;
 }

@@ -6,6 +6,9 @@
     "Idle": [0],
     "Run": [1, 2],
     "BasicAttack": [3, 4],
+    "WhiteSlash": [3, 4],
+    "WhiteBomb": [3, 4, 3, 4],
+    "BossHealing": [0],
     "Hit": [0, 3],
     "Death": [4, 3, 2, 1, 0]
   },
