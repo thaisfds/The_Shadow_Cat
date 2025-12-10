@@ -9,6 +9,13 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
     mMaxHealth(maxHealth),
     mHealth(maxHealth)
 {   
+    // Pause stuff, persistent
+    mPauseText = AddText("Game Paused", Vector2(0.0f, 0.0f), 1.0f, 0.0f, 60, 1024, 10000);
+    mPauseFade = AddImage("../Assets/HUD/Background/UpgradeBackground.png", Vector2::Zero, 1.0f, 0.0f, -1);
+    
+    mPauseFade->SetIsVisible(false);
+    mPauseText->SetIsVisible(false);
+
     // Main health icons, top left
     mMaxHealth = std::max(2, mMaxHealth); // Ensure at least 2
     mHealth = mMaxHealth;
@@ -23,6 +30,7 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
     mEnemiesLeftCount = AddText("0", Vector2(600.0f, -300.0f), 0.7f);
 
     mAreaClearTxt = AddText("            Area clear!\nProceed to the red carpet!", Vector2(630.0f, -220.0f), 0.5f);
+    mAreaClearTxt->SetIsVisible(false);
 
     for (auto &txt : mTexts) {
         txt->SetTextColor(Vector3::One); // White
@@ -30,26 +38,126 @@ HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
     }
 }
 
+void HUD::InitSkillIcons() {
+    for (auto img : mSkillBorders) delete img;
+    for (auto img : mSkillIcons) delete img;
+    for (auto txt : mSkillCDText) delete txt;
+    for (auto img : mSkillHints) delete img;
+    mSkillBorders.clear();
+    mSkillIcons.clear();
+    mSkillCDText.clear();
+    mSkillHints.clear();
+
+    // Create skill icons
+    const float SCALE = 1.1f;
+    const float SPACING = 60.0f * SCALE;
+    Vector2 startOffset(300.0f, 300.0f);
+
+    ShadowCat* player = mGame->GetPlayer();
+    if (!player) return;
+
+    auto skills = player->GetSkills();
+
+    // Change order to match input layout
+    auto skillsCopy = skills;
+
+    skills[0] = skillsCopy[4]; // LMB
+    skills[1] = skillsCopy[2]; // RMB
+    skills[2] = skillsCopy[0]; // Q
+    skills[3] = skillsCopy[1]; // E
+    skills[4] = skillsCopy[3]; // SHIFT
+
+    for (size_t i = 0; i < skills.size(); ++i) {
+        Vector2 offset = startOffset + Vector2(i * SPACING, 0.0f);
+
+        UIImage* border = AddImage("../Assets/Icons/ItemSlot.png", offset, SCALE * 1.4f, 0.0f, 1);
+        UIImage* icon = AddImage(skills[i]->GetIconPath(), offset, SCALE, 0.0f, 2);
+
+        UIText* cdText = AddText("", offset + Vector2(0.0f, 0.0f), 0.6f);
+
+        mSkillBorders.push_back(border);
+        mSkillIcons.push_back(icon);
+        mSkillCDText.push_back(cdText);
+
+        // Update cooldown text
+        float cdRemaining = skills[i]->GetCooldown();
+        if (cdRemaining > 0.0f) {
+            cdText->SetText(std::to_string(static_cast<int>(std::ceil(cdRemaining))));
+        } else {
+            cdText->SetText("");
+        }
+
+        // Add keyboard hints
+        switch (i) {
+            case 0: // LMB
+                mSkillHints.push_back(AddImage("../Assets/HUD/Menu/KeyboardLMB.png", offset + Vector2(20.0f, 20.0f), 0.7f, 0.0f));
+                break;
+
+            case 1: // RMB
+                mSkillHints.push_back(AddImage("../Assets/HUD/Menu/KeyboardRMB.png", offset + Vector2(20.0f, 20.0f), 0.7f, 0.0f));
+                break;
+
+            case 2: // Q
+                mSkillHints.push_back(AddImage("../Assets/HUD/Menu/KeyboardQ.png", offset + Vector2(20.0f, 20.0f), 0.7f, 0.0f));
+                break;
+
+            case 3: // E
+                mSkillHints.push_back(AddImage("../Assets/HUD/Menu/KeyboardE.png", offset + Vector2(20.0f, 20.0f), 0.7f, 0.0f));
+                break;
+
+            case 4: // SHIFT
+                mSkillHints.push_back(AddImage("../Assets/HUD/Menu/KeyboardSHIFT.png", offset + Vector2(20.0f, 20.0f), 0.9f, 0.0f));
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
+    for (auto &txt : mSkillCDText) {
+        txt->SetTextColor(Vector3::One); // White
+        txt->SetBackgroundColor(Vector4::Zero); // Transparent
+    }
+}
+
 void HUD::Update(float deltaTime)
 {
-    // Update cursor pos  ------------------- //
-    Vector2 mousePos = mGame->GetMouseAbsolutePosition();
+    // Update skills
+    InitSkillIcons();
 
-    // Rotate cursor based on deviation from center
-    Vector2 center(GameConstants::WINDOW_WIDTH / 2.0f, GameConstants::WINDOW_HEIGHT / 2.0f);
-    Vector2 dir = mousePos - center;
+    // Update cursor pos  ------------------- //
+    Vector2 mouseAbsPos = mGame->GetMouseAbsolutePosition();
+    Vector2 mouseRelPos = mGame->GetMouseWorldPosition();
+    Vector2 playerPos = mGame->GetPlayer() ? mGame->GetPlayer()->GetPosition() : Vector2::Zero;
+
+    // Rotate cursor based on relative deviation from player
+    Vector2 dir = mouseRelPos - playerPos;
 
     float angle = Math::Atan2(dir.y, dir.x) + Math::PiOver2;
+
     mCursorImage->SetAngle(angle);
-    mCursorImage->SetAbsolutePos(mousePos);
+    mCursorImage->SetAbsolutePos(mouseAbsPos);
+
+    // Pause handlers
+    if (mGame->IsPaused()) {
+        mCursorImage->SetIsVisible(false);
+    } else {
+        mCursorImage->SetIsVisible(true);
+    }
+
+    // Pause with no upgrades is normal pause
+    if (mGame->IsPaused() && mGame->GetPlayer() && mGame->GetPlayer()->GetUpgradePoints() == 0) {
+        mPauseFade->SetIsVisible(true);
+        mPauseText->SetIsVisible(true);
+    } else {
+        mPauseFade->SetIsVisible(false);
+        mPauseText->SetIsVisible(false);
+    }
 
     // Update enemies left  ------------------- //
     int enemiesLeft = mGame->CountAliveEnemies();
     mEnemiesLeftCount->SetText(std::to_string(enemiesLeft));
-    if (enemiesLeft == 0)
-        mAreaClearTxt->SetIsVisible(true);
-    else
-        mAreaClearTxt->SetIsVisible(false);
 
     // Update health ------------------- //
     if (!mGame->GetPlayer()) return;

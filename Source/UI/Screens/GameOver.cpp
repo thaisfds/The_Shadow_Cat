@@ -6,23 +6,38 @@ GameOver::GameOver(class Game* game, const std::string& fontName)
 {
     const float SCALE = 0.7f;
 
+    switch (mGame->GetCurrentScene()) {
+    case GameScene::Level1_Boss:
+        AddImage("../Assets/HUD/Background/DefeatBackground1.png", Vector2::Zero, 1.0f, 0.0f, -1);
+        break;
+    case GameScene::Level2_Boss:
+        AddImage("../Assets/HUD/Background/DefeatBackground3.png", Vector2::Zero, 1.0f, 0.0f, -1);
+        break;
+    case GameScene::Level3_Boss:
+        AddImage("../Assets/HUD/Background/DefeatBackground2.png", Vector2::Zero, 1.0f, 0.0f, -1);
+        break;
+    default:
+        AddImage("../Assets/HUD/Background/DefeatBackground4.png", Vector2::Zero, 1.0f, 0.0f, -1);
+        break;
+    }
+
     AddText("GAME OVER :(", Vector2(0.0f, -150.0f), SCALE, 0.0f, 60);
 
-    // AddButton("TRY AGAIN", [this, game]() {
-    //     this->Close();
-    //     game->ResetGame();
-    // }, Vector2(0.0f, +100.0f), SCALE);
+    AddButton("TRY AGAIN", [this, game]() {
+        this->Close();
+        game->ResetGame();
+    }, Vector2(0.0f, +100.0f), SCALE);
 
-    // // Setup UI Screen initial state
-    // mSelectedButtonIndex = 0;
-    // mButtons[0]->SetHighlighted(true); // new game
+    // Setup UI Screen initial state
+    mSelectedButtonIndex = 0;
+    mButtons[0]->SetHighlighted(true); // new game
 
-    // // Customize buttons
-    // for (auto button : mButtons) {
-    //     button->SetTextColor(Vector3::One);
-    //     button->SetTextHighlightColor(Vector3(0.8f, 0.0f, 0.8f)); // violet
-    //     button->SetBackgroundColor(Vector4::Zero); // white
-    // }
+    // Customize buttons
+    for (auto button : mButtons) {
+        button->SetTextColor(Vector3::One);
+        button->SetTextHighlightColor(Vector3(0.8f, 0.0f, 0.8f)); // violet
+        button->SetBackgroundColor(Vector4::Zero); // white
+    }
 
     // Customize text
     for (auto text : mTexts) {

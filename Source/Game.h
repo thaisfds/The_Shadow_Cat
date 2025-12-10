@@ -73,6 +73,7 @@ public:
 
 	void SetGameOver(bool isOver) { mIsGameOver = isOver; }
 	void SetGameWon(bool isWon) { mIsGameWon = isWon; }
+	GameScene GetCurrentScene() const { return mCurrentScene; }
 
 	// Renderer
 	class Renderer *GetRenderer() { return mRenderer; }
