@@ -3,6 +3,7 @@
 #include <map>
 #include <fstream>
 #include "Actors/Characters/Dummy.h"
+#include "Actors/Characters/Enemies/WhiteCat.h"
 #include "CSV.h"
 #include "Game.h"
 #include "Components/Skills/Stomp.h"
@@ -407,17 +408,6 @@ int **Game::LoadLevel(const std::string &fileName, int &outWidth, int &outHeight
 
 void Game::BuildLevel(int **levelData, int width, int height)
 {
-	// Determine enemy type based on current level
-	Enemy::EnemyType currentEnemyType = Enemy::EnemyType::WhiteCat;
-	if (mCurrentScene == GameScene::Level2)
-	{
-		currentEnemyType = Enemy::EnemyType::SylvesterCat;
-	}
-	else if (mCurrentScene == GameScene::Level3)
-	{
-		currentEnemyType = Enemy::EnemyType::OrangeCat;
-	}
-
 	// Determine if this is a boss level
 	bool isBossLevel = (mCurrentScene == GameScene::Level1_Boss ||
 						mCurrentScene == GameScene::Level2_Boss ||
@@ -449,38 +439,17 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			// Player spawn
 			if (tileID == 0)
 			{
-				mShadowCat = new ShadowCat(this);
-				mShadowCat->SetPosition(position);
+				mShadowCat = new ShadowCat(this, position);
 			}
-			// Tile ID 1: Spawner - small patrol (100px)
-			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 1)
 			{
-				// Create waypoints 100 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(100.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
-				spawner->SetPosition(position);
 			}
-			// Tile ID 2: Spawner - medium patrol (150px)
-			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 2)
 			{
-				// Create waypoints 150 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-150.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(150.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
-				spawner->SetPosition(position);
+				auto whiteCat = new WhiteCat(this, position);
 			}
-			// Tile ID 3: Spawner - large patrol (200px)
-			// Spawns enemy when player camera comes within ~700px of this position
 			else if (tileID == 3)
 			{
-				// Create waypoints 200 pixels to left and right of spawn position
-				Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
-				Vector2 waypointB = position + Vector2(200.0f, 0.0f);
-				auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
-				spawner->SetPosition(position);
 			}
 			// Blocks (excluding tile 9 - carpet/portal, handled by LevelPortal actor)
 			else if (tileID >= 4 && tileID <= 10)
@@ -498,8 +467,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			// Dummy
 			else if (tileID == 11)
 			{
-				auto dummy = new Dummy(this);
-				dummy->SetPosition(position);
+				auto dummy = new Dummy(this, position);
 			}
 			// Walls (paredes)
 			else if (tileID >= 16 && tileID <= 27)
@@ -515,14 +483,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				{
 					auto boss = new Boss(this, position, currentBossType, false);
 				}
-				else
-				{
-					// Create waypoints 100 pixels to left and right of spawn position
-					Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
-					Vector2 waypointB = position + Vector2(100.0f, 0.0f);
-					auto enemy = new Enemy(this, waypointA, waypointB, currentEnemyType);
-					enemy->SetPosition(position);
-				}
 			}
 			// Tile ID 13: Enemy with larger patrol (200px) OR Boss in boss levels
 			else if (tileID == 13)
@@ -530,14 +490,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				if (isBossLevel)
 				{
 					auto boss = new Boss(this, position, currentBossType, false);
-				}
-				else
-				{
-					// Create waypoints 200 pixels to left and right of spawn position
-					Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
-					Vector2 waypointB = position + Vector2(200.0f, 0.0f);
-					auto enemy = new Enemy(this, waypointA, waypointB, currentEnemyType);
-					enemy->SetPosition(position);
 				}
 			}
 			// ========== DELAYED SPAWNERS (spawn when player approaches) ==========
@@ -549,14 +501,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				{
 					auto boss = new Boss(this, position, currentBossType, false);
 				}
-				else
-				{
-					// Create waypoints 100 pixels to left and right of spawn position
-					Vector2 waypointA = position + Vector2(-100.0f, 0.0f);
-					Vector2 waypointB = position + Vector2(100.0f, 0.0f);
-					auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
-					spawner->SetPosition(position);
-				}
 			}
 			// Tile ID 15: Spawner - large patrol (200px) OR Boss in boss levels
 			// Spawns enemy when player camera comes within ~700px of this position
@@ -566,14 +510,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
 				{
 					// Spawn boss in boss levels
 					auto boss = new Boss(this, position, currentBossType, false);
-				}
-				else
-				{
-					// Create waypoints 200 pixels to left and right of spawn position
-					Vector2 waypointA = position + Vector2(-200.0f, 0.0f);
-					Vector2 waypointB = position + Vector2(200.0f, 0.0f);
-					auto spawner = new Spawner(this, waypointA, waypointB, currentEnemyType);
-					spawner->SetPosition(position);
 				}
 			}
 			// ========== BOSS SPAWNS ==========

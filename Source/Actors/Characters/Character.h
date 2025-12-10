@@ -1,6 +1,8 @@
 #pragma once
 #include "../Actor.h"
 #include "../../Components/Physics/CollisionFilter.h"
+#include "../../Components/Skills/SkillBase.h"
+#include <vector>
 
 class RigidBodyComponent;
 class AnimatorComponent;
@@ -9,6 +11,7 @@ class ColliderComponent;
 class Character : public Actor
 {
 public:
+    Character(class Game* game, Vector2 position, float forwardSpeed = 200.0f);
     Character(class Game* game, float forwardSpeed = 200.0f);
     virtual ~Character();
 
@@ -16,6 +19,12 @@ public:
 
     virtual void TakeDamage(int damage);
     void Kill() override;
+
+    void MoveToward(const Vector2& target);
+    void UpdateFacing(const Vector2& direction);
+    void StopMovement();
+
+    Vector2 GetForward() const;
 
     bool GetAnimationLock() const { return mIsAnimationLocked; }
     void SetAnimationLock(bool isLocked);
@@ -25,6 +34,11 @@ public:
 
     bool GetMovementLock() const { return mIsMovementLocked; }
     void SetMovementLock(bool isLocked);
+
+    bool IsUsingSkill() const { return mIsUsingSkill; }
+    void SetIsUsingSkill(bool isUsing) { mIsUsingSkill = isUsing; }
+
+    std::vector<SkillBase*> GetSkills() const { return mSkills; }
     
     bool IsDead() const { return mIsDead; }
 
@@ -48,6 +62,8 @@ protected:
     int hp;
     int maxHp;
 
+    std::vector<SkillBase*> mSkills;
+
     class RigidBodyComponent *mRigidBodyComponent;
     class AnimatorComponent *mAnimatorComponent;
     class ColliderComponent *mColliderComponent;
@@ -60,6 +76,8 @@ protected:
 
     bool mIsAnimationLocked;
     bool mIsMovementLocked;
+
+    bool mIsUsingSkill;
 
     bool mIsDead;
 };

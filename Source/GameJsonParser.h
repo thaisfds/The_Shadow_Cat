@@ -4,14 +4,18 @@
 #include "Components/Physics/Collider.h"
 #include "Components/Skills/UpgradeInfo.h"
 
-class SkillJsonParser
+class GameJsonParser
 {
 public:
-	SkillJsonParser() = delete;
+	GameJsonParser() = delete;
 
-	static float GetFloatEffectValue(const nlohmann::json& skillData, const std::string& effectName);
+	static int GetIntValue(const nlohmann::json& skillData, const std::string& key);
 	static float GetFloatValue(const nlohmann::json& skillData, const std::string& key);
 	static std::string GetStringValue(const nlohmann::json& skillData, const std::string& key);
+	static std::vector<std::string> GetStringArrayValue(const nlohmann::json& skillData, const std::string& key);
+
+	// SkillData specific methods
+	static float GetFloatEffectValue(const nlohmann::json& skillData, const std::string& effectName);
 	static Collider* GetAreaOfEffect(const nlohmann::json& skillData);
 	static UpgradeInfo GetUpgradeInfo(const nlohmann::json& skillData, const std::string& upgradeType, float *upgradeTarget);
 

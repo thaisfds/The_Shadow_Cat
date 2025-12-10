@@ -53,49 +53,6 @@ Enemy::Enemy(class Game* game, Vector2 patrolPointA, Vector2 patrolPointB, Enemy
     mPatrolWaypoints[0] = patrolPointA;
     mPatrolWaypoints[1] = patrolPointB;
     
-    // Select sprite based on enemy type
-    const char* animName = "WhiteCatAnim";
-    switch (type)
-    {
-        case EnemyType::OrangeCat:
-            animName = "OrangeCatAnim";
-            break;
-        case EnemyType::SylvesterCat:
-            animName = "SylvesterCatAnim";
-            break;
-        case EnemyType::WhiteCat:
-        default:
-            animName = "WhiteCatAnim";
-            break;
-    }
-    
-    mAnimatorComponent = new AnimatorComponent(this, animName, GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
-    mRigidBodyComponent = new RigidBodyComponent(this);
-    
-    // Collider dimensions: width=48 (slightly smaller than tile), height=32 (half tile), offset=16 for ground alignment
-    Collider *collider = new AABBCollider(48, 32);
-    mColliderComponent = new ColliderComponent(this, 0, 16, collider, GetBaseEnemyFilter());
-    
-    // Disable gravity for ground-based patrol enemy (moves horizontally only)
-    mRigidBodyComponent->SetApplyGravity(false);
-
-    // Set enemy health (lower than player's 10)
-    hp = 30;
-
-    // Setup animations
-    mAnimatorComponent->AddAnimation("Idle", {1});  // Frame 1 is idle (still frame)
-    mAnimatorComponent->AddAnimation("Run", {0, 2});  // Frames 0 and 2 for running (animated)
-    mAnimatorComponent->AddAnimation("Hit", {0, 1});  // Flicker between frames for hit effect
-    mAnimatorComponent->AddAnimation("Death", {2, 1, 0});  // Run animation frames as death effect
-
-    mAnimatorComponent->LoopAnimation("Run");
-
-    mSkillFilter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::EnemySkills});
-    mSkillFilter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Player});
-    mSkill = new BasicAttack(this);
-    
-    // Register with Game for tracking
-    game->RegisterEnemy(this);
 }
 
 Enemy::~Enemy()

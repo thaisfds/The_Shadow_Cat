@@ -6,15 +6,12 @@
 #include "../../Components/Physics/ColliderComponent.h"
 #include "Character.h"
 
-Dummy::Dummy(class Game* game, float forwardSpeed)
-    : Character(game, forwardSpeed)
+Dummy::Dummy(class Game* game, Vector2 position, float forwardSpeed)
+    : Character(game, position, forwardSpeed)
 {
     mAnimatorComponent = new AnimatorComponent(this, "DummyAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
-    mRigidBodyComponent = new RigidBodyComponent(this);
-    
-    Collider *collider = new AABBCollider(GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
-    mColliderComponent = new ColliderComponent(this, 0, 0, collider, GetBaseEnemyFilter());
-    mRigidBodyComponent->SetApplyGravity(false);
+    ((AABBCollider*)mColliderComponent->GetCollider())->SetSize(Vector2(GameConstants::TILE_SIZE, GameConstants::TILE_SIZE));
+    ResetCollisionFilter();
 }
 
 Dummy::~Dummy()

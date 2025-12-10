@@ -1,0 +1,10 @@
+{
+	"id": "WhiteCat",
+	"name": "White Cat",
+	"hp": 30,
+	"speed": 150,
+	"skills":
+	[
+		"BasicAttackSkill"
+	]
+}

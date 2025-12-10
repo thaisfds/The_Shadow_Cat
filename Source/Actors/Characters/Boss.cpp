@@ -53,9 +53,6 @@ Boss::Boss(class Game* game, Vector2 arenaCenter, BossType type, bool playSpawnA
     Collider* collider = new AABBCollider(112, 96);
     mColliderComponent = new ColliderComponent(this, 0, 16, collider, GetBaseEnemyFilter());
     
-    // Disable gravity for boss (stationary arena defender)
-    mRigidBodyComponent->SetApplyGravity(false);
-
     // Set boss health
     hp = mMaxHP;
 
