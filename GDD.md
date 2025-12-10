@@ -40,46 +40,56 @@ O reino está em conflito e o jogador passa cada fase em uma região
 diferente do reino, batalhando diferentes gatos. Os chefes das fases são
 os bípedes, gatos de maior status que conseguem andar em duas patas.
 
-O jogador começa com 7 vidas, perdendo uma vida a cada ataque, morrendo
-quando as vidas se esgotarem (finalizando a *run*). Itens e alguns
-elementos no mapa são capazes de recuperar as vidas do jogador, mas são
-um recurso mais escasso.
+O jogador possui um sistema de pontos de vida (HP), perdendo HP ao
+receber ataques. Quando o HP chega a zero, o jogador morre e a *run*
+se encerra. O HUD exibe a vida do jogador através de uma barra visual.
 
-A progressão do personagem acontece por meio de itens e habilidades.
-Inimigos podem deixar itens no chão quando morrem, esses itens podem ser
-ativos (efeitos diversos quando utilizados) ou passivos (melhoria de
-atributos do jogador). Habilidades podem ser aprimoradas de diversas
-maneiras, a depender do tipo (uma habilidade de atirar um projétil pode
-ter o alcance melhorado ou aumentar a velocidade do projétil, por
-exemplo).
+A progressão do personagem acontece principalmente através do sistema de
+habilidades. O jogador possui cinco habilidades principais:
+
+-   **Ataque Básico (Basic Attack):** Ataque corpo-a-corpo rápido
+
+-   **Claw Attack:** Ataque especial corpo-a-corpo mais poderoso
+
+-   **Furball:** Projétil de longo alcance
+
+-   **Stomp:** Ataque de área ao redor do jogador
+
+-   **Dash:** Movimento rápido evasivo
+
+Habilidades podem ser aprimoradas de diversas maneiras através de
+upgrades. Por exemplo, uma habilidade de projétil pode ter o alcance,
+dano, velocidade ou cooldown melhorados.
 
 ### 2.2. Controles & Heads-up Display (HUD)
 
-Esse jogo é desenvolvido para PC, e por isso os controles são baseados
-nos jogos clássicos. O seguinte mapeamento será utilizado para teclado e
-controle de Xbox, respectivamente:
-
-**Interação:** F / Y (Xbox)
+Esse jogo é desenvolvido para PC, utilizando teclado e mouse. O seguinte mapeamento de controles foi implementado:
 
 **Movimentação:**
 
--   **Cima:** W / Joystick para cima
+-   **Cima:** W
 
--   **Baixo:** S / Joystick para baixo
+-   **Baixo:** S
 
--   **Esquerda:** A / Joystick para esquerda
+-   **Esquerda:** A
 
--   **Direita:** D / Joystick para direita
+-   **Direita:** D
 
-**Ataque básico:** Botão esquerdo / X (Xbox)
+**Ataque básico:** Botão esquerdo do mouse (LMB)
 
-**Ataque carregado:** Botão esquerdo segurado / X (Xbox)
+**Ataque especial (Claw Attack):** Botão direito do mouse (RMB)
 
-**Ataque especial:** Botão direito / B (Xbox)
+**Habilidades:**
 
-**Dodge:** Shift / RT (Xbox)
+-   **Furball (projétil):** E
 
-**Pause:** Esc / Start (Xbox)
+-   **Stomp (área):** Q
+
+-   **Dash (movimento rápido):** Shift
+
+**Tutorial:** H (mostrar/esconder controles)
+
+**Debug:** F1 (desenvolvedores)
 
 
 ## 3. Arte
@@ -119,43 +129,80 @@ source* e desenvolvimento próprio através do Aseprite[^4].
 
 ## 4. Música e Efeitos Sonoros
 
-A música do jogo é inspirada em jogos clássicos 16-bit, tendo
-características e instrumentação simples, mas com qualidades modernas,
-como a usada em *Enter The Gungeon*[^5]*,* por exemplo. A ambientação
-desejada para o jogador é usar uma melodia com batidas suaves e ritmo
-lento, para transmitir o aspecto fofo do jogo em cenários tranquilos e
-exposição de *lore*. Em batalhas intensas, a melodia se torna mais
-errática com um ritmo acelerado, representando a intensidade da batalha
-e o lado feroz dos felinos.
+O jogo possui um sistema de áudio completo implementado com SDL_mixer,
+contando com músicas dinâmicas e efeitos sonoros contextuais.
 
-De maneira similar, os efeitos sonoros vão ter ritmo e melodia alinhados
-com o item ou ação em questão, sendo tranquilos para ações inofensivas,
-e agressivos para ações violentas, como infligir ou receber dano.
+### 4.1. Músicas
+
+Cada cena do jogo possui trilha sonora exclusiva:
+
+-   **Menu Principal:** "Sweet Dreams" (8bit Doves) - melodia relaxante
+
+-   **Lobby/Tutorial:** "House" (Zelda: Ocarina of Time) - tema acolhedor
+
+-   **Level 1:** "Kokiri Forest" (Zelda: Ocarina of Time) - ambiente tranquilo
+
+-   **Level 2:** "Opening Scene" (Zelda: Majora's Mask) - transição para intensidade
+
+-   **Level 3:** "A Bitter Cold" (Return of the Obra Dinn) - atmosfera tensa
+
+-   **Boss 1:** "Nightmare" (8bit Doves) - batalha intensa
+
+-   **Boss 2:** "Dinosaur Boss Battle" (Zelda: Ocarina of Time) - combate épico
+
+-   **Boss 3:** "Boss Battle" (Zelda: Ocarina of Time) - confronto final
+
+-   **Vitória:** "8-bit Game" (Pixabay) - celebração
+
+-   **Game Over:** "Boss Clear" (Zelda: Ocarina of Time) - encerramento
+
+### 4.2. Efeitos Sonoros
+
+Os efeitos sonoros são contextuais e incluem:
+
+-   **Habilidades:** Cada habilidade (Basic Attack, Claw Attack, Stomp,
+    Furball, Dash) possui sons únicos criados com bfxr.net
+
+-   **Passos:** Sons de passos variam conforme o terreno (grama, tijolo,
+    pedra), com alternância para maior realismo
+
+-   **Ambiente:** Som de transição ao mudar de sala
+
+-   **Interface:** Sons de menu e interações (Zelda: Breath of the Wild)
+
+Todos os volumes foram balanceados individualmente para garantir uma
+experiência auditiva agradável.
 
 ## 5. Tecnologias
 
 ### 5.1. Game Engine
 
-O jogo será implementado em C++, utilizando a biblioteca SDL para
-gerenciamento de janela, I/O, sons e gráficos. Adicionalmente, a
-biblioteca GLEW vai ser utilizada para compilar shaders OpenGL no
-formato .glsl, permitindo a criação de um renderizador customizado para
-implementação dos efeitos e visuais requeridos.
+O jogo foi implementado em C++, utilizando as seguintes bibliotecas:
 
-Com essas tecnologias, o jogo será desenvolvido para duas plataformas:
+-   **SDL2:** Gerenciamento de janela, input e renderização base
+
+-   **SDL_mixer:** Sistema de áudio (músicas e efeitos sonoros)
+
+-   **SDL_image:** Carregamento de texturas
+
+-   **SDL_ttf:** Renderização de fontes
+
+-   **OpenGL com GLEW:** Compilação de shaders customizados (.glsl) para
+    efeitos visuais avançados
+
+Com essas tecnologias, o jogo foi desenvolvido para duas plataformas:
 Windows e Linux.
 
 ### 5.2. Áudio e Arte
 
-Por questões de tempo, a trilha sonora e quaisquer efeitos sonoros serão
-provenientes de fontes *copyright free* e sintetizadores gratuitos como
-Bfxr[^6]. Se necessário, *remixes* e edições leves podem ser feitas com
-o Audacity[^7].
+A trilha sonora utiliza músicas de *The Legend of Zelda: Ocarina of Time*,
+*Majora's Mask*, *Return of the Obra Dinn* e *8bit Doves*. Os efeitos sonoros foram criados com bfxr.net[^6] e
+alguns provenientes de *The Legend of Zelda: Breath of the Wild*.
 
-A arte do jogo será criada no Aseprite, como mencionado em seções
-anteriores. Os sprites de personagens vão ter leves animações, o
-background será estático e animações podem ser adicionadas ao longo do
-andamento do projeto se possível.
+A arte do jogo foi criada no Aseprite[^4], como mencionado em seções
+anteriores. Os sprites de personagens possuem animações suaves para
+movimento, ataques e habilidades. Os backgrounds e tilesets são estáticos
+com alguns elementos animados.
 
 ### 5.3. Declaração de Uso de IA
 
