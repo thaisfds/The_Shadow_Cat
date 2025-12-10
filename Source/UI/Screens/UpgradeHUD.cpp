@@ -27,6 +27,11 @@ void UpgradeHUD::Clear() {
         mBackImage = nullptr;
     }
 
+    if (mInfoText) {
+        delete mInfoText;
+        mInfoText = nullptr;
+    }
+
     mSelectedButtonIndex = 0;
 }
 
@@ -36,6 +41,10 @@ void UpgradeHUD::InitCards() {
 
     // Opacity background
     mBackImage = AddImage("../Assets/HUD/Background/UpgradeBackground.png", Vector2::Zero, 1.0f, 0.0f, -1);
+
+    mInfoText = AddText("Select an Upgrade", Vector2(0.0f, -250.0f), 0.8f);
+    mInfoText->SetTextColor(Vector3::One); // White
+    mInfoText->SetBackgroundColor(Vector4::Zero); // Transparent
 
     std::vector<UpgradeInfo> upgrades = mGame->GetPlayer()->GetRandomUpgrades();
     // Copy for reference
@@ -125,6 +134,7 @@ void UpgradeHUD::HandleKeyPress(int key)
         break;
     
     case SDLK_e:
+    case SDLK_SPACE:
     case SDLK_RETURN:
     case SDLK_KP_ENTER:
         mGame->GetPlayer()->SpendUpgradePoint(mCurrentUpgradeInfo[mSelectedButtonIndex]);

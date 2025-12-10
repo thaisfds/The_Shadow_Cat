@@ -153,6 +153,21 @@ void Game::UnloadScene()
 		actor->SetState(ActorState::Destroy);
 	}
 
+	// delete actors before clearing lists
+	std::vector<Actor *> deadActors;
+	for (auto actor : mActors)
+	{
+		if (actor->GetState() == ActorState::Destroy)
+		{
+			deadActors.emplace_back(actor);
+		}
+	}
+
+	for (auto actor : deadActors)
+	{
+		delete actor;
+	}
+
 	mStompActors.clear();
 	mFurBallActors.clear();
 	mEnemies.clear();
@@ -198,8 +213,35 @@ void Game::ResumeGame()
 
 void Game::ResetGame()
 {
-	// Bugged so return for now
-	return;
+	// Stop all sounds including game over/victory music
+	mAudio->StopAllSounds();
+
+	// kill ui screens except huds
+	auto iter = mUIStack.begin();
+	while (iter != mUIStack.end())
+	{
+		if ((*iter)->GetState() == UIScreen::UIState::Closing)
+		{
+			delete *iter;
+			iter = mUIStack.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
+
+	// reset game over conditions
+	SetGameOver(false);
+	SetGameWon(false);
+
+	SetScene(GameScene::Level1);
+
+	mCurrentBoss = nullptr;
+
+	mShadowCat->SetHP(mShadowCat->GetMaxHP());
+
+	ResumeGame();
 }
 
 void Game::SetScene(GameScene nextScene)
@@ -665,10 +707,14 @@ void Game::ProcessInput()
 				if (mTutorialHUD)
 					mTutorialHUD->ToggleControlVisibility(); // Pass event to actors
 
-					// TEST
-			if (event.key.keysym.sym == SDLK_p && event.key.repeat == 0)
-				if (mShadowCat)
-					mShadowCat->AddUpgradePoint();
+			// Pause toggle
+			if (event.key.keysym.sym == SDLK_ESCAPE && event.key.repeat == 0)
+				if (mCurrentScene > GameScene::MainMenu && mShadowCat && mShadowCat->GetUpgradePoints() == 0) {
+					if (mIsPaused)
+						ResumeGame();
+					else
+						PauseGame();
+				}
 
 			for (auto actor : mActors)
 				actor->OnHandleEvent(event);
@@ -691,13 +737,27 @@ void Game::UpdateGame(float deltaTime)
 	{
 		PauseGame();
 
-		if (mIsGameOver)
+		// Only create the screen if it doesn't already exist
+		bool screenExists = false;
+		for (auto screen : mUIStack)
 		{
-			new GameOver(this, "../Assets/Fonts/Pixellari.ttf");
+			if (dynamic_cast<GameOver*>(screen) != nullptr || dynamic_cast<WinScreen*>(screen) != nullptr)
+			{
+				screenExists = true;
+				break;
+			}
 		}
-		else
+
+		if (!screenExists)
 		{
-			new WinScreen(this, "../Assets/Fonts/Pixellari.ttf");
+			if (mIsGameOver)
+			{
+				new GameOver(this, "../Assets/Fonts/Pixellari.ttf");
+			}
+			else
+			{
+				new WinScreen(this, "../Assets/Fonts/Pixellari.ttf");
+			}
 		}
 	}
 
