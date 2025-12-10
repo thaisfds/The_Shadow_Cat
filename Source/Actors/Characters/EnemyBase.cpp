@@ -4,6 +4,7 @@
 #include "../../SkillFactory.h"
 #include <fstream>
 #include "../../Game.h"
+#include "../../Random.h"
 
 EnemyBase::EnemyBase(class Game* game, Vector2 position, float forwardSpeed)
 	: Character(game, position, forwardSpeed)
@@ -23,6 +24,13 @@ EnemyBase::~EnemyBase()
 void EnemyBase::Kill()
 {
 	mGame->UnregisterEnemy(this);
+
+	if (Random::GetFloatRange(0.0f, 1.0f) <= mUpgradeDropChance)
+	{
+		auto upgradeTreatActor = mGame->GetUpgradeTreatActor();
+		upgradeTreatActor->Awake(mPosition);
+	}
+	
 	Character::Kill();
 }
 
@@ -62,6 +70,7 @@ nlohmann::json EnemyBase::LoadEnemyDataFromJSON(const std::string& fileName)
 
 	hp = GameJsonParser::GetIntValue(enemyData, "hp");
 	mForwardSpeed = GameJsonParser::GetFloatValue(enemyData, "speed");
+	mUpgradeDropChance = GameJsonParser::GetValue<float>(enemyData, "dropChance", 0.1f);
 	auto skills = GameJsonParser::GetStringArrayValue(enemyData, "skills");
 	for (const auto& skillID : skills)
 		mSkills.push_back(SkillFactory::Instance().CreateSkill(skillID, this));

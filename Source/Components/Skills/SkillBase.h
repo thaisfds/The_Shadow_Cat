@@ -35,6 +35,7 @@ public:
     const std::string& GetDescription() const { return mDescription; }
     const std::string& GetIconPath() const { return mIconPath; }
     std::vector<UpgradeInfo> GetAvailableUpgrades() const;
+    void ApplyUpgrade(const std::string& upgradeType);
 
 protected:
     class Character *mCharacter;
@@ -67,7 +68,6 @@ protected:
     std::vector<UpgradeInfo> mUpgrades;
 
     void RegisterUpgrade(const std::string& type, float value, int maxLevel, float* variable);
-    void ApplyUpgrade(const std::string& upgradeType);
     bool CanUpgrade(const std::string& upgradeType) const;
     
     virtual nlohmann::json LoadSkillDataFromJSON(const std::string& fileName);

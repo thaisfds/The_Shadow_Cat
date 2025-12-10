@@ -3,7 +3,7 @@
 	"name": "Shadow Form",
 	"description": "Transform into a shadow, gaining speed and becoming intangible for a short duration.",
 	"iconPath": "../Assets/Icons/ShadowForm.png",
-	"cooldown": 4.0,
+	"cooldown": 12.0,
 	"range": 0.0,
 	"duration": 6.0,
 	"effects":
@@ -16,17 +16,15 @@
 	"upgrades":
 	[
 		{
-			"type": "duration",
-			"value": 0.5
-		},
-		{
 			"type": "cooldown",
+			"name": "Cooldown",
 			"value": -0.5,
-			"max": 4
+			"max": 5
 		},
 		{
 			"type": "speedMultiplier",
-			"value": 0.1,
+			"name": "Speed Boost",
+			"value": 0.2,
 			"max": 5
 		}
 	]

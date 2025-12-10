@@ -212,8 +212,8 @@ UpgradeInfo GameJsonParser::GetUpgradeInfo(SkillBase *skill, const nlohmann::jso
 				else
 					info.name = upgradeType;
 				info.value = ExtractValue<float>(skillData, upgrade["value"]);
-				if (upgrade.contains("maxLevel") && upgrade["maxLevel"].is_number())
-					info.maxLevel = upgrade["maxLevel"].get<int>();
+				if (upgrade.contains("max") && upgrade["max"].is_number())
+					info.maxLevel = upgrade["max"].get<int>();
 				return info;
 			}
 		}

@@ -13,6 +13,6 @@ struct UpgradeInfo
     int currentLevel = 0;
     int maxLevel = -1;
 
-    const SkillBase *skill = nullptr;
+    SkillBase *skill = nullptr;
     float *upgradeTarget = nullptr;
 };

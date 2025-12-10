@@ -8,10 +8,12 @@
 #include "Actors/Characters/EnemyBase.h"
 #include "Actors/DebugActor.h"
 #include "Actors/Characters/Boss.h"
+#include "Actors/UpgradeTreat.h"
 #include "Renderer/Renderer.h"
 #include "AudioSystem.h"
 #include "Components/Skills/FurBall.h"
 #include "Components/Skills/Stomp.h"
+#include "Actors/UpgradeTreat.h"
 
 enum class GameScene
 {
@@ -47,6 +49,9 @@ public:
 	void UpdateActors(float deltaTime);
 	void AddActor(class Actor *actor);
 	void RemoveActor(class Actor *actor);
+
+	void AddPersistentActor(class Actor *actor);
+	void RemovePersistentActor(class Actor *actor);
 
 	// UI functions
 	void PushUI(class UIScreen *screen) { mUIStack.emplace_back(screen); }
@@ -117,6 +122,7 @@ public:
 	Actor *GetAttackTrailActor() { return mAttackTrailActor; }
 	StompActor *GetStompActor();
 	FurBallActor *GetFurBallActor();
+	UpgradeTreat *GetUpgradeTreatActor();
 
 private:
 	void ProcessInput();
@@ -135,6 +141,7 @@ private:
 	// All the actors in the game
 	std::vector<class Actor *> mActors;
 	std::vector<class Actor *> mPendingActors;
+	std::vector<class Actor *> mPersistentActors;
 
 	// Camera
 	Vector2 mCameraPos;
@@ -184,6 +191,7 @@ private:
 
 	class std::vector<StompActor *> mStompActors;
 	class std::vector<FurBallActor *> mFurBallActors;
+	class std::vector<UpgradeTreat *> mUpgradeTreatActors;
 
 	// Global particle system
 	class Actor *mAttackTrailActor;
