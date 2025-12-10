@@ -39,6 +39,12 @@ void UIImage::Draw(class Shader* shader)
     // Translate to position on screen
     Matrix4 transMat = Matrix4::CreateTranslation(Vector3(mOffset.x + GameConstants::WINDOW_WIDTH / 2, mOffset.y + GameConstants::WINDOW_HEIGHT / 2, 0.0f));
 
+    if (mAbsolutePos.x >= 0.0f && mAbsolutePos.y >= 0.0f)
+    {
+        // Override position with absolute pos
+        transMat = Matrix4::CreateTranslation(Vector3(mAbsolutePos.x, mAbsolutePos.y, 0.0f));
+    }
+
     // Set world transform
     Matrix4 world = scaleMat * rotMat * transMat;
     shader->SetMatrixUniform("uWorldTransform", world);

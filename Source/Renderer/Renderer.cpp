@@ -85,7 +85,7 @@ void Renderer::AddUIElement(UIElement *comp)
 {
     mUIComps.emplace_back(comp);
 
-    std::sort(mUIComps.begin(), mUIComps.end(),[](UIElement* a, UIElement* b) {
+    std::stable_sort(mUIComps.begin(), mUIComps.end(),[](UIElement* a, UIElement* b) {
         return a->GetDrawOrder() < b->GetDrawOrder();
     });
 }
