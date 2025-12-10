@@ -34,6 +34,8 @@ public:
 	void SolveCollisions(const RigidBodyComponent* rigidBody) override;
 	void DebugDraw(class Renderer* renderer) override;
 
+	void SetSize(Vector2 size) { mHalfDimensions = size * 0.5f; }
+
 	Vector2 GetMinAt(Vector2 position) const;
 	Vector2 GetMaxAt(Vector2 position) const;
 

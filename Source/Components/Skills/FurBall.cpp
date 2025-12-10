@@ -5,6 +5,7 @@
 #include "../../Actors/Characters/Character.h"
 #include "../Physics/ColliderComponent.h"
 #include "../Physics/Physics.h"
+#include "../../SkillFactory.h"
 
 FurBall::FurBall(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
@@ -25,6 +26,8 @@ nlohmann::json FurBall::LoadSkillDataFromJSON(const std::string& fileName)
 	mProjectileSpeed = GameJsonParser::GetFloatEffectValue(data, "projectileSpeed");
 	mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
 	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
+	auto id = GameJsonParser::GetStringValue(data, "id");
+	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new FurBall(owner); });
 
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "projectileSpeed", &mProjectileSpeed));
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "damage", &mDamage));

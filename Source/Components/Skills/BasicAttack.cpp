@@ -8,6 +8,8 @@
 #include "../Physics/Physics.h"
 #include "../../Game.h"
 #include "SkillBase.h"
+#include "../../SkillFactory.h"
+#include "../../Actors/Characters/ShadowCat.h"
 
 
 BasicAttack::BasicAttack(Actor* owner, int updateOrder)
@@ -27,6 +29,8 @@ nlohmann::json BasicAttack::LoadSkillDataFromJSON(const std::string& fileName)
 
     mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
     mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
+    auto id = GameJsonParser::GetStringValue(data, "id");
+    SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new BasicAttack(owner); });
 
     return data;
 }
@@ -81,4 +85,15 @@ void BasicAttack::EndSkill()
     
     mCharacter->SetMovementLock(false);
     mCharacter->SetAnimationLock(false);  // Unlock animations
+}
+
+bool BasicAttack::EnemyShouldUse()
+{
+    auto player = mCharacter->GetGame()->GetPlayer();
+    if (!player) return false;
+
+    Vector2 toPlayer = player->GetPosition() - mCharacter->GetPosition();
+    float distanceToPlayer = toPlayer.Length();
+
+    return distanceToPlayer <= mRange;
 }

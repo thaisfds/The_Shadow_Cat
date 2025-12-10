@@ -4,6 +4,7 @@
 #include "../Drawing/AnimatorComponent.h"
 #include "../Physics/Physics.h"
 #include "../Physics/ColliderComponent.h"
+#include "../../SkillFactory.h"
 
 ClawAttack::ClawAttack(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
@@ -35,6 +36,8 @@ nlohmann::json ClawAttack::LoadSkillDataFromJSON(const std::string& fileName)
 	mForwardSpeed = GameJsonParser::GetFloatEffectValue(data, "forwardSpeed");
 	mBackwardDistancePercentage = GameJsonParser::GetFloatEffectValue(data, "backwardDistancePercentage");
 	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
+	auto id = GameJsonParser::GetStringValue(data, "id");
+	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new ClawAttack(owner); });
 
 	return data;
 }

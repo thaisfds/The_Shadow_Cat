@@ -21,13 +21,9 @@ public:
     const Vector2& GetAcceleration() const { return mAcceleration; }
     void SetAcceleration(const Vector2& acceleration) { mAcceleration = acceleration; }
 
-    void SetApplyGravity(const bool applyGravity) { mApplyGravity = applyGravity; }
-
     void ApplyForce(const Vector2 &force);
 
 private:
-    bool mApplyGravity;
-
     // Physical properties
     float mFrictionCoefficient;
     float mMass;

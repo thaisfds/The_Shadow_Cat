@@ -23,9 +23,10 @@ public:
     void ComponentDraw(class Renderer* renderer) override;
     
     virtual bool CanUse(Vector2 targetPosition, bool showRangeOnFalse = false) const;
+    virtual bool EnemyShouldUse() { return false; }
     
     virtual void StartSkill(Vector2 targetPosition);
-    virtual void EndSkill() { mIsUsing = false; }
+    virtual void EndSkill();
     
     float GetCooldown() const { return mCurrentCooldown; }
     bool IsOnCooldown() const { return mCurrentCooldown > 0.0f; }

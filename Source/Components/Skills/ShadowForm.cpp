@@ -1,6 +1,7 @@
 #include "ShadowForm.h"
 #include "../../Actors/Characters/Character.h"
 #include "../Drawing/AnimatorComponent.h"
+#include "../../SkillFactory.h"
 
 ShadowForm::ShadowForm(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
@@ -24,6 +25,8 @@ nlohmann::json ShadowForm::LoadSkillDataFromJSON(const std::string& fileName)
 
 	mDuration = GameJsonParser::GetFloatValue(data, "duration");
 	mSpeed = GameJsonParser::GetFloatEffectValue(data, "speedMultiplier");
+	auto id = GameJsonParser::GetStringValue(data, "id");
+	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new ShadowForm(owner); });
 
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "duration", &mDuration));
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));

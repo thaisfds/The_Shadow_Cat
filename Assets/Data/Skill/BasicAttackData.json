@@ -2,7 +2,7 @@
 	"id": "BasicAttackSkill",
 	"name": "Basic Attack",
 	"description": "A simple melee attack.",
-	"cooldown": 1.5,
+	"cooldown": 2.5,
 	"range": 50,
 	"areaOfEffect":
 	{

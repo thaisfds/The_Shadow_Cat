@@ -31,6 +31,9 @@ public:
 	// Get a random vector given the min/max bounds
 	static Vector2 GetVector(const Vector2& min, const Vector2& max);
 	static Vector3 GetVector(const Vector3& min, const Vector3& max);
+	
+	// Get a random unit vector
+	static Vector2 GetUnitVector();
 private:
 	static std::mt19937 sGenerator;
 };

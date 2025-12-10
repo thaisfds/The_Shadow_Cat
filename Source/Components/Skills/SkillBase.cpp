@@ -50,6 +50,7 @@ void SkillBase::Update(float deltaTime)
 
 void SkillBase::StartSkill(Vector2 targetPosition)
 {
+	mCharacter->SetIsUsingSkill(true);
 	mCurrentCooldown = mCooldown;
 	mIsUsing = true;
 	mDelayedActions.Reset();
@@ -57,6 +58,12 @@ void SkillBase::StartSkill(Vector2 targetPosition)
 
 	if (mTargetVector.x - mCharacter->GetPosition().x < 0.0f) mCharacter->SetScale(Vector2(-1.0f, 1.0f));
 	else mCharacter->SetScale(Vector2(1.0f, 1.0f));
+}
+
+void SkillBase::EndSkill()
+{
+	mIsUsing = false;
+	mCharacter->SetIsUsingSkill(false);
 }
 
 void SkillBase::ComponentDraw(class Renderer* renderer)

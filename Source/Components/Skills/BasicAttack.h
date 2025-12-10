@@ -13,6 +13,8 @@ public:
     void StartSkill(Vector2 targetPosition) override;
     void EndSkill() override;
 
+    bool EnemyShouldUse() override;
+
     void Execute();
 
 private:

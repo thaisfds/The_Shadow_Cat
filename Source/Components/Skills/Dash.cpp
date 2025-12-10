@@ -4,6 +4,7 @@
 #include "../../Game.h"
 #include "../Drawing/AnimatorComponent.h"
 #include "../Physics/ColliderComponent.h"
+#include "../../SkillFactory.h"
 
 Dash::Dash(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
@@ -23,6 +24,8 @@ nlohmann::json Dash::LoadSkillDataFromJSON(const std::string& fileName)
 	auto data = SkillBase::LoadSkillDataFromJSON(fileName);
 
 	mDashSpeed = GameJsonParser::GetFloatEffectValue(data, "speed");
+	auto id = GameJsonParser::GetStringValue(data, "id");
+	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new Dash(owner); });
 
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "range", &mRange));
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "speed", &mDashSpeed));

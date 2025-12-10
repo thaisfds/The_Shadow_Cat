@@ -15,28 +15,17 @@
 #include <random>
 #include <algorithm>
 
-ShadowCat::ShadowCat(Game *game, const float forwardSpeed)
-    : Character(game, forwardSpeed)
+ShadowCat::ShadowCat(Game *game, Vector2 position, const float forwardSpeed)
+    : Character(game, position, forwardSpeed)
 {
     mAnimatorComponent = new AnimatorComponent(this, "ShadowCatAnim", GameConstants::TILE_SIZE, GameConstants::TILE_SIZE);
-    mRigidBodyComponent = new RigidBodyComponent(this);
     
-    Collider *collider = new AABBCollider(48, 32);
-    mColliderComponent = new ColliderComponent(this, Vector2(0, 16), collider);
     ResetCollisionFilter();
 
     mSkillFilter.belongsTo = CollisionFilter::GroupMask({CollisionGroup::PlayerSkills});
     mSkillFilter.collidesWith = CollisionFilter::GroupMask({CollisionGroup::Enemy});
     
     mSkillInputHandler = new SkillInputHandler(this);
-    mRigidBodyComponent->SetApplyGravity(false);
-
-    // Setup animations
-    mAnimatorComponent->AddAnimation("Idle", {0});
-    mAnimatorComponent->AddAnimation("Run", {0, 1, 2, 3});
-    mAnimatorComponent->AddAnimation("BasicAttack", {4, 5, 6, 7, 8, 0});
-    
-    mAnimatorComponent->LoopAnimation("Idle");
 
     hp = 200;
     maxHp = hp;

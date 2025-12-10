@@ -8,6 +8,7 @@
 #include "../../GameConstants.h"
 #include "../Physics/ColliderComponent.h"
 #include "SkillBase.h"
+#include "../../SkillFactory.h"
 
 
 Stomp::Stomp(Actor* owner, int updateOrder)
@@ -23,6 +24,8 @@ nlohmann::json Stomp::LoadSkillDataFromJSON(const std::string& fileName)
 	mDamage = GameJsonParser::GetFloatEffectValue(data, "damage");
 	mAreaOfEffect = GameJsonParser::GetAreaOfEffect(data);
 	mRadius = mAreaOfEffect ? ((CircleCollider*)mAreaOfEffect)->GetRadius() : 0.0f;
+	auto id = GameJsonParser::GetStringValue(data, "id");
+	SkillFactory::Instance().RegisterSkill(id, [](Actor* owner) { return new Stomp(owner); });
 
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "damage", &mDamage));
 	mUpgrades.push_back(GameJsonParser::GetUpgradeInfo(data, "cooldown", &mCooldown));

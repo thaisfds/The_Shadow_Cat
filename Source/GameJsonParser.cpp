@@ -31,6 +31,15 @@ float GameJsonParser::GetFloatValue(const nlohmann::json& skillData, const std::
 	return 0.0f;
 }
 
+int GameJsonParser::GetIntValue(const nlohmann::json& skillData, const std::string& key)
+{
+	if (skillData.contains(key) && skillData[key].is_number_integer())
+		return skillData[key].get<int>();
+
+	SDL_Log("Skill data does not contain key: %s or it is not an integer", key.c_str());
+	return 0;
+}
+
 float GameJsonParser::ResolveReference(const nlohmann::json& skillData, const std::string& reference)
 {
 	// Handle nested paths with dot notation (e.g., "effects.range")
@@ -75,6 +84,20 @@ std::string GameJsonParser::GetStringValue(const nlohmann::json& skillData, cons
 
 	SDL_Log("Skill data does not contain key: %s or it is not a string", key.c_str());
 	return "";
+}
+
+std::vector<std::string> GameJsonParser::GetStringArrayValue(const nlohmann::json& skillData, const std::string& key)
+{
+	std::vector<std::string> result;
+	if (skillData.contains(key) && skillData[key].is_array())
+	{
+		for (const auto& item : skillData[key])
+			if (item.is_string()) result.push_back(item.get<std::string>());
+		return result;
+	}
+
+	SDL_Log("Skill data does not contain key: %s or it is not an array of strings", key.c_str());
+	return result;
 }
 
 Collider* GameJsonParser::GetAreaOfEffect(const nlohmann::json& skillData)
