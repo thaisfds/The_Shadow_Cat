@@ -55,18 +55,23 @@ public:
     // System Access
     class Renderer* GetRenderer() { return mRenderer; }
     class AudioSystem* GetAudio() { return mAudio; }
+    SDL_Window* GetWindow() { return mWindow; }
     
     // UI Access
     class HUD* GetHUD() { return mHUD; }
+    class TutorialHUD* GetTutorialHUD() { return mTutorialHUD; }
 
     // Debug
     bool IsDebugging() const { return mIsDebugging; }
+    void SetDebugging(bool debug) { mIsDebugging = debug; }
+
+    // Fullscreen
+    bool IsFullscreen() const { return mIsFullscreen; }
+    void SetFullscreen(bool fullscreen) { mIsFullscreen = fullscreen; }
 
     // Mouse position (used by UI)
     Vector2 GetMouseWorldPosition();
     Vector2 GetMouseAbsolutePosition();
-
-	SDL_GameController* GetController() const { return mController; }
 
 private:
     void ProcessInput();
@@ -80,7 +85,6 @@ private:
 
     // SDL
     SDL_Window* mWindow;
-    SDL_GameController* mController;
 
     // UI
     std::vector<class UIScreen*> mUIStack;

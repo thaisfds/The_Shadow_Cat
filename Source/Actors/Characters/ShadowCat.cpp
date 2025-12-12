@@ -14,6 +14,7 @@
 #include <cmath>
 #include <random>
 #include <algorithm>
+#include "../../InputHandler.h"
 
 ShadowCat::ShadowCat(Game *game, Vector2 position, const float forwardSpeed)
     : Character(game, position, forwardSpeed)
@@ -65,7 +66,7 @@ void ShadowCat::OnProcessInput(const uint8_t *state)
     }
 
     // Gamepad input
-    SDL_GameController *controller = GetGame()->GetController();
+    SDL_GameController *controller = InputHandler::Instance().GetController();
     if (controller)
     {
         // Left Stick (analog)

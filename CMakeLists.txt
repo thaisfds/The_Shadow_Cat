@@ -168,6 +168,8 @@ add_executable(${PROJECT_NAME}
         Source/SystemInitializer.h
         Source/LevelManager.cpp
         Source/LevelManager.h
+        Source/InputHandler.cpp
+        Source/InputHandler.h
 )
 
 configure_local_linking(${PROJECT_NAME})

@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "LevelManager.h"
+#include "InputHandler.h"
 #include "SystemInitializer.h"
 #include "SkillFactory.h"
 #include "Random.h"
@@ -21,7 +22,6 @@ Game::Game()
     : mRenderer(nullptr),
       mAudio(nullptr),
       mWindow(nullptr),
-      mController(nullptr),
       mHUD(nullptr),
       mUpgradeHUD(nullptr),
       mTutorialHUD(nullptr),
@@ -56,7 +56,8 @@ bool Game::Initialize()
     mRenderer = new Renderer(mWindow);
     mRenderer->Initialize(GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT);
 
-    mController = SystemInitializer::FindGameController();
+    // Initialize input handler
+    InputHandler::Instance().Initialize(this);
 
     SDL_ShowCursor(SDL_DISABLE);
 
@@ -88,7 +89,7 @@ void Game::RunLoop()
 
         mTicksCount = SDL_GetTicks();
 
-        ProcessInput();
+        InputHandler::Instance().ProcessInput();
         UpdateGame(deltaTime);
         GenerateOutput();
 
@@ -100,92 +101,7 @@ void Game::RunLoop()
     }
 }
 
-void Game::ProcessInput()
-{
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
-        switch (event.type)
-        {
-        case SDL_QUIT:
-            Quit();
-            break;
 
-        case SDL_CONTROLLERDEVICEADDED:
-            if (!mController)
-            {
-                mController = SDL_GameControllerOpen(event.cdevice.which);
-                if (mController)
-                    SDL_Log("Game controller added: %s", SDL_GameControllerName(mController));
-            }
-            break;
-
-        case SDL_CONTROLLERDEVICEREMOVED:
-            if (mController && SDL_GameControllerGetJoystick(mController) == SDL_JoystickFromInstanceID(event.cdevice.which))
-            {
-                SDL_Log("Game controller removed");
-                SDL_GameControllerClose(mController);
-                mController = nullptr;
-            }
-            break;
-
-        case SDL_KEYDOWN:
-        case SDL_MOUSEBUTTONDOWN:
-            // UI input
-            if (!mUIStack.empty())
-            {
-                mUIStack.back()->HandleKeyPress(event.key.keysym.sym);
-            }
-
-            // Fullscreen toggle
-            if (event.key.keysym.sym == SDLK_F11 && event.key.repeat == 0)
-            {
-                mIsFullscreen = !mIsFullscreen;
-                if (mIsFullscreen)
-                {
-                    SDL_SetWindowFullscreen(mWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-                    int w, h;
-                    SDL_GetWindowSize(mWindow, &w, &h);
-                    mRenderer->UpdateViewport(w, h);
-                }
-                else
-                {
-                    SDL_SetWindowFullscreen(mWindow, 0);
-                    mRenderer->UpdateViewport(GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT);
-                }
-            }
-
-            // Debug toggle
-            if (event.key.keysym.sym == SDLK_F1 && event.key.repeat == 0)
-                mIsDebugging = !mIsDebugging;
-
-            // Tutorial HUD toggle
-            if (event.key.keysym.sym == SDLK_h && event.key.repeat == 0)
-                if (mTutorialHUD)
-                    mTutorialHUD->ToggleControlVisibility();
-
-            // Pause toggle
-            if (event.key.keysym.sym == SDLK_ESCAPE && event.key.repeat == 0)
-            {
-                if (mCurrentScene > GameScene::MainMenu && LevelManager::Instance().GetPlayer() && LevelManager::Instance().GetPlayer()->GetUpgradePoints() == 0)
-                {
-                    if (mIsPaused)
-                        ResumeGame();
-                    else
-                        PauseGame();
-                }
-            }
-
-            // Pass to actors
-            for (auto actor : LevelManager::Instance().GetActors())
-                actor->OnHandleEvent(event);
-            break;
-        }
-    }
-
-    const Uint8* state = SDL_GetKeyboardState(nullptr);
-    LevelManager::Instance().ProcessInput(state);
-}
 
 void Game::UpdateGame(float deltaTime)
 {
@@ -530,6 +446,7 @@ Vector2 Game::GetMouseAbsolutePosition()
 
 void Game::Shutdown()
 {
+    InputHandler::Instance().Shutdown();
     LevelManager::Instance().Shutdown();
 
     for (auto ui : mUIStack)
@@ -544,12 +461,6 @@ void Game::Shutdown()
 
     delete mAudio;
     mAudio = nullptr;
-
-    if (mController)
-    {
-        SDL_GameControllerClose(mController);
-        mController = nullptr;
-    }
 
     SDL_DestroyWindow(mWindow);
     SDL_Quit();
