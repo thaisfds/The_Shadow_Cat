@@ -4,6 +4,7 @@
 #include "../../Components/Drawing/AnimatorComponent.h"
 #include "../../Game.h"
 #include "../../GameConstants.h"
+#include "../../LevelManager.h"
 
 Character::Character(class Game *game, Vector2 position, float forwardSpeed)
     : Actor(game)
@@ -51,8 +52,8 @@ void Character::OnUpdate(float deltaTime)
     const float margin = 15.0f;
     
     // Use actual level dimensions from Game instead of constants
-    const float maxX = mGame->GetLevelWidth() * GameConstants::TILE_SIZE - margin;
-    const float maxY = mGame->GetLevelHeight() * GameConstants::TILE_SIZE - margin;
+    const float maxX = LevelManager::Instance().GetLevelWidth() * GameConstants::TILE_SIZE - margin;
+    const float maxY = LevelManager::Instance().GetLevelHeight() * GameConstants::TILE_SIZE - margin;
 
     mPosition.x = Math::Clamp(mPosition.x, margin, maxX);
     mPosition.y = Math::Clamp(mPosition.y, margin, maxY);

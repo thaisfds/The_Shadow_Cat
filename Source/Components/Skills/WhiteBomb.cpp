@@ -1,6 +1,7 @@
 #include "WhiteBomb.h"
 #include "../../Game.h"
 #include "../../GameConstants.h"
+#include "../../LevelManager.h"
 #include "../Drawing/AnimatorComponent.h"
 #include "../../Actors/Characters/Character.h"
 #include "../Physics/ColliderComponent.h"
@@ -38,7 +39,7 @@ void WhiteBomb::Execute()
 	// Play bomb sound
 	mCharacter->GetGame()->GetAudio()->PlaySound("s05_furball_launch1.wav", false, 0.7f);
 
-	mCharacter->GetGame()->GetWhiteBombActor()->Awake(
+	LevelManager::Instance().GetWhiteBombActor()->Awake(
 		mCharacter->GetPosition() + mTargetVector * 20.0f,
 		mTargetVector,
 		mProjectileSpeed,
@@ -68,7 +69,7 @@ void WhiteBomb::EndSkill()
 
 bool WhiteBomb::EnemyShouldUse()
 {
-	auto player = mCharacter->GetGame()->GetPlayer();
+	auto player = LevelManager::Instance().GetPlayer();
 	if (!player) return false;
 
 	Vector2 toPlayer = player->GetPosition() - mCharacter->GetPosition();
@@ -103,7 +104,7 @@ void WhiteBombActor::OnUpdate(float deltaTime)
 	}
 
 	// Always follow the player
-	auto player = GetGame()->GetPlayer();
+	auto player = LevelManager::Instance().GetPlayer();
 	if (player && !player->IsDead())
 	{
 		Vector2 toPlayer = player->GetPosition() - GetPosition();

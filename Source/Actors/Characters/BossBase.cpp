@@ -1,14 +1,15 @@
 #include "BossBase.h"
 #include "../../Game.h"
+#include "../../LevelManager.h"
 
 BossBase::BossBase(class Game* game, Vector2 position, float forwardSpeed)
 	: EnemyBase(game, position, forwardSpeed)
 {
-	mGame->RegisterBoss(this);
+	LevelManager::Instance().RegisterBoss(this);
 }
 
 void BossBase::Kill()
 {
-	mGame->UnregisterBoss(this);
+	LevelManager::Instance().UnregisterBoss(this);
 	EnemyBase::Kill();
 }

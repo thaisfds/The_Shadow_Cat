@@ -65,7 +65,7 @@ void ShadowCat::OnProcessInput(const uint8_t *state)
     }
 
     // Gamepad input
-    SDL_GameController *controller = GetGame()->mController;
+    SDL_GameController *controller = GetGame()->GetController();
     if (controller)
     {
         // Left Stick (analog)

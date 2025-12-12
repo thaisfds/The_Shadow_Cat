@@ -5,15 +5,17 @@
 #include "../Game.h"
 #include <SDL.h>
 
+#include "../LevelManager.h"
+
 void BossDebugDrawer::Draw(Renderer* renderer, const Boss* boss, Game* game)
 {
     if (!game->IsDebugging()) return;
     
     Vector2 position = boss->GetPosition();
-    Vector2 cameraPos = game->GetCameraPos();
+    Vector2 cameraPos = LevelManager::Instance().GetCameraPos();
     
     // Draw line to player if player exists
-    auto player = game->GetPlayer();
+    auto player = LevelManager::Instance().GetPlayer();
     if (player && boss->GetCurrentState() != Boss::BossState::Dead)
     {
         Vector2 playerPos = player->GetPosition();
@@ -60,7 +62,7 @@ void BossDebugDrawer::Draw(Renderer* renderer, const Boss* boss, Game* game)
 void BossDebugDrawer::DrawSpawningState(Renderer* renderer, const Boss* boss, Game* game)
 {
     Vector2 position = boss->GetPosition();
-    Vector2 cameraPos = game->GetCameraPos();
+    Vector2 cameraPos = LevelManager::Instance().GetCameraPos();
     Vector3 spawnColor = Vector3(1.0f, 1.0f, 0.0f); // Yellow
     
     // Draw pulsing circle during spawn
@@ -71,7 +73,7 @@ void BossDebugDrawer::DrawIdleState(Renderer* renderer, const Boss* boss, Game* 
 {
     Vector2 position = boss->GetPosition();
     Vector2 arenaCenter = boss->GetArenaCenter();
-    Vector2 cameraPos = game->GetCameraPos();
+    Vector2 cameraPos = LevelManager::Instance().GetCameraPos();
     
     // Draw detection radius (arena range)
     DrawDetectionRadius(renderer, position, boss->GetDetectionRadius(), false, cameraPos);
@@ -84,7 +86,7 @@ void BossDebugDrawer::DrawCombatState(Renderer* renderer, const Boss* boss, Game
 {
     Vector2 position = boss->GetPosition();
     Vector2 arenaCenter = boss->GetArenaCenter();
-    Vector2 cameraPos = game->GetCameraPos();
+    Vector2 cameraPos = LevelManager::Instance().GetCameraPos();
     
     // Draw detection radius (player detected - red)
     DrawDetectionRadius(renderer, position, boss->GetDetectionRadius(), true, cameraPos);
@@ -100,7 +102,7 @@ void BossDebugDrawer::DrawAttackingState(Renderer* renderer, const Boss* boss, G
 {
     Vector2 position = boss->GetPosition();
     Vector2 arenaCenter = boss->GetArenaCenter();
-    Vector2 cameraPos = game->GetCameraPos();
+    Vector2 cameraPos = LevelManager::Instance().GetCameraPos();
     
     // Draw attack range (bright red during attack)
     DrawAttackRange(renderer, position, boss->GetAttackRange(), cameraPos);

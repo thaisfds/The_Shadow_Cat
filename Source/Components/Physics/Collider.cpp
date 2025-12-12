@@ -1,6 +1,7 @@
 #include "Collider.h"
 #include "Physics.h"
 #include "../../Game.h"
+#include "../../LevelManager.h"
 
 bool Collider::CheckCollision(const Collider* other)
 {
@@ -88,7 +89,7 @@ bool PolygonCollider::CheckCollisionAt(Vector2* newPosition, const Collider* oth
 std::vector<ColliderComponent*> AABBCollider::GetOverlappingCollidersAt(Vector2* newPosition) const
 {
 	std::vector<ColliderComponent*> hitColliders;
-	auto colliderComponents = mComponent->GetOwner()->GetGame()->GetColliders();
+	auto colliderComponents = LevelManager::Instance().GetColliders();
 	CollisionFilter filter = mComponent->GetFilter();
 	for (auto c : colliderComponents)
 	{
@@ -104,7 +105,7 @@ std::vector<ColliderComponent*> AABBCollider::GetOverlappingCollidersAt(Vector2*
 std::vector<ColliderComponent*> CircleCollider::GetOverlappingCollidersAt(Vector2* newPosition) const
 {
 	std::vector<ColliderComponent*> hitColliders;
-	auto colliderComponents = mComponent->GetOwner()->GetGame()->GetColliders();
+	auto colliderComponents = LevelManager::Instance().GetColliders();
 	CollisionFilter filter = mComponent->GetFilter();
 	for (auto c : colliderComponents)
 	{
@@ -120,7 +121,7 @@ std::vector<ColliderComponent*> CircleCollider::GetOverlappingCollidersAt(Vector
 std::vector<ColliderComponent*> PolygonCollider::GetOverlappingCollidersAt(Vector2* newPosition) const
 {
 	std::vector<ColliderComponent*> hitColliders;
-	auto colliderComponents = mComponent->GetOwner()->GetGame()->GetColliders();
+	auto colliderComponents = LevelManager::Instance().GetColliders();
 	CollisionFilter filter = mComponent->GetFilter();
 	for (auto c : colliderComponents)
 	{
@@ -193,21 +194,21 @@ void AABBCollider::DebugDraw(class Renderer* renderer)
 	Vector2 max = GetMax();
 	Vector2 size = max - min;
 	renderer->DrawRect(mComponent->GetPosition(), size, 0.0f,
-					   Color::Green, mComponent->GetOwner()->GetGame()->GetCameraPos(), RendererMode::LINES);
+					   Color::Green, LevelManager::Instance().GetCameraPos(), RendererMode::LINES);
 }
 
 void CircleCollider::DebugDraw(class Renderer* renderer)
 {
 	Vector2 center = mComponent->GetPosition();
 	renderer->DrawCircle(center, mRadius, Color::Green,
-						 mComponent->GetOwner()->GetGame()->GetCameraPos());
+						 LevelManager::Instance().GetCameraPos());
 }
 
 void PolygonCollider::DebugDraw(class Renderer* renderer)
 {
 	Vector2 offset = mComponent->GetPosition();
 	renderer->DrawPolygon(mVertices, Color::Green, offset,
-						 mComponent->GetOwner()->GetGame()->GetCameraPos());
+						 LevelManager::Instance().GetCameraPos());
 }
 
 void PolygonCollider::SetForward(Vector2 forward)

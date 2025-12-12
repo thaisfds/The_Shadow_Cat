@@ -6,6 +6,7 @@
 #include "../Drawing/AnimatorComponent.h"
 #include "../Physics/Physics.h"
 #include "../../Game.h"
+#include "../../LevelManager.h"
 #include "../../SkillFactory.h"
 #include "../../Actors/Characters/ShadowCat.h"
 
@@ -50,7 +51,7 @@ void WhiteSlash::StartSkill(Vector2 targetPosition)
 void WhiteSlash::Execute()
 {
     // Emit WhiteSlash particle effect (similar to AttackTrail)
-    mCharacter->GetGame()->GetWhiteSlashActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
+    LevelManager::Instance().GetWhiteSlashActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
         0.3f,
         0.0f,
         mCharacter->GetPosition() + mTargetVector * mRange,
@@ -58,7 +59,7 @@ void WhiteSlash::Execute()
         mCharacter->GetScale().x < 0.0f
     );
 
-    auto collisionActor = mCharacter->GetGame()->GetCollisionQueryActor();
+    auto collisionActor = LevelManager::Instance().GetCollisionQueryActor();
 
     ((PolygonCollider*)mAreaOfEffect)->SetForward(mTargetVector);
     collisionActor->GetComponent<ColliderComponent>()->SetCollider(mAreaOfEffect);
@@ -94,7 +95,7 @@ void WhiteSlash::EndSkill()
 
 bool WhiteSlash::EnemyShouldUse()
 {
-    auto player = mCharacter->GetGame()->GetPlayer();
+    auto player = LevelManager::Instance().GetPlayer();
     if (!player) return false;
 
     Vector2 toPlayer = player->GetPosition() - mCharacter->GetPosition();

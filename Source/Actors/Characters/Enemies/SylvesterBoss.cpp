@@ -1,5 +1,6 @@
 #include "SylvesterBoss.h"
 #include "../../../GameConstants.h"
+#include "../../../LevelManager.h"
 #include "../../../AI/AIStateMachine.h"
 #include "../../../AI/Behaviors/PatrolBehavior.h"
 #include "../../../AI/Behaviors/ChaseBehavior.h"
@@ -86,7 +87,7 @@ void SylvesterBoss::CheckAndTriggerHealing()
 	if (healingSkill->ShouldTriggerHealing())
 	{
 		// Get player position for skill target (healing doesn't need it, but StartSkill requires it)
-		auto player = GetGame()->GetPlayer();
+		auto player = LevelManager::Instance().GetPlayer();
 		Vector2 targetPos = player ? player->GetPosition() : GetPosition();
 		healingSkill->StartSkill(targetPos);
 	}

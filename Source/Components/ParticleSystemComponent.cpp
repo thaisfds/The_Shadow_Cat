@@ -3,6 +3,7 @@
 #include "Physics/ColliderComponent.h"
 #include "Physics/RigidBodyComponent.h"
 #include "Drawing/RectComponent.h"
+#include "Physics/Collider.h"
 
 Particle::Particle(class Game *game, int width, int height, bool hasCollider)
     : Actor(game), mDrawComponent(nullptr), mRigidBodyComponent(nullptr), mColliderComponent(nullptr), mIsDead(true), mLifeTime(1.0f)

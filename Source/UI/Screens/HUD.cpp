@@ -4,6 +4,8 @@
 #include "../../Actors/Characters/ShadowCat.h"
 #include <string>
 
+#include "../../LevelManager.h"
+
 HUD::HUD(class Game* game, const std::string& fontName, int maxHealth)
     :UIScreen(game, fontName),
     mMaxHealth(maxHealth),
@@ -53,7 +55,7 @@ void HUD::InitSkillIcons() {
     const float SPACING = 60.0f * SCALE;
     Vector2 startOffset(300.0f, 300.0f);
 
-    ShadowCat* player = mGame->GetPlayer();
+    ShadowCat* player = LevelManager::Instance().GetPlayer();
     if (!player) return;
 
     auto skills = player->GetSkills();
@@ -129,7 +131,8 @@ void HUD::Update(float deltaTime)
     // Update cursor pos  ------------------- //
     Vector2 mouseAbsPos = mGame->GetMouseAbsolutePosition();
     Vector2 mouseRelPos = mGame->GetMouseWorldPosition();
-    Vector2 playerPos = mGame->GetPlayer() ? mGame->GetPlayer()->GetPosition() : Vector2::Zero;
+    auto player = LevelManager::Instance().GetPlayer();
+    Vector2 playerPos = player ? player->GetPosition() : Vector2::Zero;
 
     // Rotate cursor based on relative deviation from player
     Vector2 dir = mouseRelPos - playerPos;
@@ -147,7 +150,7 @@ void HUD::Update(float deltaTime)
     }
 
     // Pause with no upgrades is normal pause
-    if (mGame->IsPaused() && mGame->GetPlayer() && mGame->GetPlayer()->GetUpgradePoints() == 0) {
+    if (mGame->IsPaused() && LevelManager::Instance().GetPlayer() && LevelManager::Instance().GetPlayer()->GetUpgradePoints() == 0) {
         mPauseFade->SetIsVisible(true);
         mPauseText->SetIsVisible(true);
     } else {
@@ -156,18 +159,18 @@ void HUD::Update(float deltaTime)
     }
 
     // Update enemies left  ------------------- //
-    int enemiesLeft = mGame->CountAliveEnemies();
+    int enemiesLeft = LevelManager::Instance().CountAliveEnemies();
     mEnemiesLeftCount->SetText(std::to_string(enemiesLeft));
 
     // Update health ------------------- //
-    if (!mGame->GetPlayer()) return;
+    if (!LevelManager::Instance().GetPlayer()) return;
 
     // If new max hp update otherwise just update health
-    if (mGame->GetPlayer()->GetMaxHP() != mMaxHealth) {
-        UpdateMaxHealth(mGame->GetPlayer()->GetMaxHP() / 10, true);
+    if (LevelManager::Instance().GetPlayer()->GetMaxHP() != mMaxHealth) {
+        UpdateMaxHealth(LevelManager::Instance().GetPlayer()->GetMaxHP() / 10, true);
     }
 
-    SetHealth(mGame->GetPlayer()->GetHP() / 10);
+    SetHealth(LevelManager::Instance().GetPlayer()->GetHP() / 10);
 }
 
 void HUD::InitHealthIcons() {

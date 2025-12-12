@@ -3,6 +3,7 @@
 #include "../Components/Physics/Physics.h"
 #include "Characters/ShadowCat.h"
 #include "../GameConstants.h"
+#include "../LevelManager.h"
 
 UpgradeTreat::UpgradeTreat(class Game* game)
 	: Actor(game)
@@ -43,7 +44,7 @@ void UpgradeTreat::OnUpdate(float deltaTime)
 {
 	if (mCollected) return;
 
-	auto player = mGame->GetPlayer();
+	auto player = LevelManager::Instance().GetPlayer();
 	auto playerCollider = player->GetComponent<ColliderComponent>()->GetCollider();
 	if (!mColliderComponent->GetCollider()->CheckCollision(playerCollider)) return;
 

@@ -2,7 +2,10 @@
 #include "../../../GameConstants.h"
 #include "../../../AI/AIStateMachine.h"
 #include "../../../Components/Skills/Dash.h"
+#include "../../../Components/Drawing/AnimatorComponent.h"
 #include "../ShadowCat.h"
+#include "../../../LevelManager.h"
+#include "../../../Components/Skills/FurBall.h"
 
 OrangeCat::OrangeCat(Game* game, Vector2 position)
 	: EnemyBase(game, position, 150.0f)
@@ -55,7 +58,7 @@ void OrangeCat::SetupAIBehaviors(const nlohmann::json& data)
 	mPatrolBehavior->AddTransition(mFleeBehavior->GetName(), [this]() 
 	{
 		if (mFleeTimer > 0.0f) return false;
-		float distanceToPlayer = (mGame->GetPlayer()->GetPosition() - mPosition).Length();
+		float distanceToPlayer = (LevelManager::Instance().GetPlayer()->GetPosition() - mPosition).Length();
 		return distanceToPlayer <= mFleeBehavior->GetFleeDistance() / 2.0f; 
 	});
 

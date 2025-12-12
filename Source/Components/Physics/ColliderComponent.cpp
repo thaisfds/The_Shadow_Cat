@@ -1,6 +1,8 @@
 #include "ColliderComponent.h"
 #include "../../Game.h"
 #include "CollisionFilter.h"
+#include "Collider.h"
+#include "../../LevelManager.h"
 
 ColliderComponent::ColliderComponent(class Actor *owner, int dx, int dy, Collider* collider, CollisionFilter filter, bool isStatic, int updateOrder)
 	: Component(owner, updateOrder)
@@ -10,7 +12,7 @@ ColliderComponent::ColliderComponent(class Actor *owner, int dx, int dy, Collide
 	  , mCollider(collider)
 {
 	if (mCollider) mCollider->SetComponent(this);
-	GetGame()->AddCollider(this);
+	LevelManager::Instance().AddCollider(this);
 }
 
 ColliderComponent::ColliderComponent(class Actor *owner, Vector2 offset, Collider* collider, bool isStatic, int updateOrder)
@@ -20,12 +22,12 @@ ColliderComponent::ColliderComponent(class Actor *owner, Vector2 offset, Collide
 	  , mCollider(collider)
 {
 	if (mCollider) mCollider->SetComponent(this);
-	GetGame()->AddCollider(this);
+	LevelManager::Instance().AddCollider(this);
 }
 
 ColliderComponent::~ColliderComponent()
 {
-	GetGame()->RemoveCollider(this);
+	LevelManager::Instance().RemoveCollider(this);
 }
 
 void ColliderComponent::DetectCollisions(RigidBodyComponent *rigidBody)

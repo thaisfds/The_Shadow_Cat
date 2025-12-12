@@ -4,6 +4,7 @@
 
 #include "../../Game.h"
 #include "../../GameConstants.h"
+#include "../../LevelManager.h"
 
 SkillBase::SkillBase(Actor* owner, int updateOrder)
 	: Component(owner, updateOrder)
@@ -70,7 +71,7 @@ void SkillBase::EndSkill()
 void SkillBase::ComponentDraw(class Renderer* renderer)
 {
 	if (mDrawRangeTimer <= 0.0f) return;
-	renderer->DrawCircle(mCharacter->GetPosition(), mRange, Color::Red, mCharacter->GetGame()->GetCameraPos());
+	renderer->DrawCircle(mCharacter->GetPosition(), mRange, Color::Red, LevelManager::Instance().GetCameraPos());
 }
 
 bool SkillBase::CanUse(Vector2 targetPosition, bool showRangeOnFalse) const

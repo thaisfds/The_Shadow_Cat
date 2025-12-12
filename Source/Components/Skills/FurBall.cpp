@@ -1,6 +1,7 @@
 #include "FurBall.h"
 #include "../../Game.h"
 #include "../../GameConstants.h"
+#include "../../LevelManager.h"
 #include "../Drawing/AnimatorComponent.h"
 #include "../../Actors/Characters/Character.h"
 #include "../Physics/ColliderComponent.h"
@@ -43,7 +44,7 @@ void FurBall::Execute()
 	// Play furball sound
 	mCharacter->GetGame()->GetAudio()->PlaySound("s05_furball_launch1.wav", false, 0.7f);
 
-	mCharacter->GetGame()->GetFurBallActor()->Awake(
+	LevelManager::Instance().GetFurBallActor()->Awake(
 		mCharacter->GetPosition() + mTargetVector * 20.0f,
 		mTargetVector,
 		mProjectileSpeed,

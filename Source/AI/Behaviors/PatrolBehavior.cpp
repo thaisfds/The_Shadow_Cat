@@ -2,6 +2,7 @@
 #include "../../Math.h"
 #include "../../Random.h"
 #include "../../Game.h"
+#include "../../LevelManager.h"
 #include "../../Actors/Characters/ShadowCat.h"
 
 namespace
@@ -77,7 +78,7 @@ void PatrolBehavior::ResetPatrolPauseTimer()
 
 bool PatrolBehavior::PatrolToChase()
 {
-    const ShadowCat* player = mOwner->GetGame()->GetPlayer();
+    const ShadowCat* player = LevelManager::Instance().GetPlayer();
     if (!player) return false;
 
     Vector2 toPlayer = player->GetPosition() - mOwner->GetPosition();

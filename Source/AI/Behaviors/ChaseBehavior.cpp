@@ -1,4 +1,6 @@
 #include "ChaseBehavior.h"
+
+#include "../../LevelManager.h"
 #include "../../Actors/Characters/ShadowCat.h"
 
 namespace
@@ -20,7 +22,7 @@ void ChaseBehavior::OnEnter()
 
 void ChaseBehavior::Update(float deltaTime)
 {
-    const ShadowCat* player = mOwner->GetGame()->GetPlayer();
+    const ShadowCat* player = LevelManager::Instance().GetPlayer();
     if (!player) return;
     
     mOwner->StopMovement();
@@ -39,7 +41,7 @@ void ChaseBehavior::OnExit()
 
 bool ChaseBehavior::ChaseToPatrol() const
 {
-    const ShadowCat* player = mOwner->GetGame()->GetPlayer();
+    const ShadowCat* player = LevelManager::Instance().GetPlayer();
     if (!player) return true;
 
     Vector2 toLastKnown = mLastKnownPlayerPos - mOwner->GetPosition();

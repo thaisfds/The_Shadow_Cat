@@ -166,6 +166,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Characters/Enemies/SylvesterCat.h
         Source/SystemInitializer.cpp
         Source/SystemInitializer.h
+        Source/LevelManager.cpp
+        Source/LevelManager.h
 )
 
 configure_local_linking(${PROJECT_NAME})

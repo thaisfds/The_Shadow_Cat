@@ -9,6 +9,7 @@
 #include "UIScreen.h"
 #include "../../Game.h"
 #include "../../Renderer/Shader.h"
+#include "../../Renderer/Renderer.h"
 
 UIScreen::UIScreen(Game* game, const std::string& fontName)
 	:mGame(game)

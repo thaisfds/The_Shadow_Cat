@@ -8,6 +8,7 @@
 #include "../../GameConstants.h"
 #include "../Physics/ColliderComponent.h"
 #include "SkillBase.h"
+#include "../../LevelManager.h"
 #include "../../SkillFactory.h"
 
 
@@ -44,7 +45,7 @@ void Stomp::StartSkill(Vector2 targetPosition)
 	std::string sound = rand() % 2 ? "s03_stomp_attack1.wav" : "s04_stomp_attack2.wav";
 	mCharacter->GetGame()->GetAudio()->PlaySound(sound, false, 0.7f);
 
-	mCharacter->GetGame()->GetStompActor()->Awake(
+	LevelManager::Instance().GetStompActor()->Awake(
 		targetPosition,
 		mDamage,
 		0.65f,

@@ -1,16 +1,17 @@
 #include "DrawComponent.h"
 #include "../../Game.h"
+#include "../../LevelManager.h"
 #include "../../Actors/Actor.h"
 
 DrawComponent::DrawComponent(class Actor *owner, int drawOrder)
     : Component(owner), mDrawOrder(drawOrder), mIsVisible(true), mColor(Vector3::One)
 {
-    mOwner->GetGame()->AddDrawable(this);
+    LevelManager::Instance().AddDrawable(this);
 }
 
 DrawComponent::~DrawComponent()
 {
-    mOwner->GetGame()->RemoveDrawable(this);
+    LevelManager::Instance().RemoveDrawable(this);
 }
 
 void DrawComponent::Draw(Renderer *renderer)

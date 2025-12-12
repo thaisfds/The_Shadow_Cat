@@ -1,5 +1,6 @@
 #include "ClawAttack.h"
 #include "../../Game.h"
+#include "../../LevelManager.h"
 #include "../../Actors/Characters/Character.h"
 #include "../Drawing/AnimatorComponent.h"
 #include "../Physics/Physics.h"
@@ -54,7 +55,7 @@ void ClawAttack::Execute()
 {
 	mVelocity = Vector2::Zero;
 
-	auto collisionActor = mCharacter->GetGame()->GetCollisionQueryActor();
+	auto collisionActor = LevelManager::Instance().GetCollisionQueryActor();
 
 	((PolygonCollider*)mAreaOfEffect)->SetForward(mTargetVector);
 	collisionActor->GetComponent<ColliderComponent>()->SetCollider(mAreaOfEffect);

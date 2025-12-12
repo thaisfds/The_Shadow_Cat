@@ -4,13 +4,15 @@
 #include "../../SkillFactory.h"
 #include <fstream>
 #include "../../Game.h"
+#include "../../LevelManager.h"
 #include "../../Random.h"
+#include "../../Actors/UpgradeTreat.h"
 
 EnemyBase::EnemyBase(class Game* game, Vector2 position, float forwardSpeed)
 	: Character(game, position, forwardSpeed)
 	, mStateMachine(nullptr)
 {
-	mGame->RegisterEnemy(this);
+	LevelManager::Instance().RegisterEnemy(this);
 	mSkillFilter.belongsTo = CollisionFilter::GroupMask({ CollisionGroup::EnemySkills });
 	mSkillFilter.collidesWith = CollisionFilter::GroupMask({ CollisionGroup::Player });
 	ResetCollisionFilter();
@@ -23,11 +25,11 @@ EnemyBase::~EnemyBase()
 
 void EnemyBase::Kill()
 {
-	mGame->UnregisterEnemy(this);
+	LevelManager::Instance().UnregisterEnemy(this);
 
 	if (Random::GetFloatRange(0.0f, 1.0f) <= mUpgradeDropChance)
 	{
-		auto upgradeTreatActor = mGame->GetUpgradeTreatActor();
+		auto upgradeTreatActor = LevelManager::Instance().GetUpgradeTreatActor();
 		upgradeTreatActor->Awake(mPosition);
 	}
 	

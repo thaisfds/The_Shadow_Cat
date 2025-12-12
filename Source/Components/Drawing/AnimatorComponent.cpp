@@ -6,6 +6,8 @@
 #include <fstream>
 #include <map>
 
+#include "../../LevelManager.h"
+
 const std::string ANIMATION_DATA_PATH = "../Assets/Data/Animation/";
 
 AnimatorComponent::AnimatorComponent(class Actor *owner, const std::string &animationName,
@@ -172,7 +174,7 @@ void AnimatorComponent::Draw(Renderer *renderer)
 			Vector3(1.0f, 1.0f, 1.0f),
 			mSpriteTexture,
 			texRect,
-			mOwner->GetGame()->GetCameraPos(),
+			LevelManager::Instance().GetCameraPos(),
 			flipH,
 			flipV,
 			mTextureFactor);

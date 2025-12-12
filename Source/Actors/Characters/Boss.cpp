@@ -10,6 +10,8 @@
 #include <cfloat>
 #include <SDL.h>
 
+#include "../../LevelManager.h"
+
 namespace {
     constexpr float SPAWN_ANIMATION_DURATION = 2.0f;
     constexpr float DEATH_ANIMATION_DURATION = 1.0f;
@@ -231,7 +233,7 @@ void Boss::Kill()
 // Helper: Get player reference if valid
 const ShadowCat* Boss::GetPlayerIfValid() const
 {
-    return mGame->GetPlayer();
+    return LevelManager::Instance().GetPlayer();
 }
 
 // Helper: Calculate squared distance to player

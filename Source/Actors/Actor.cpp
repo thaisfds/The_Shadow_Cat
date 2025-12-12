@@ -3,15 +3,17 @@
 #include "../Components/Component.h"
 #include <algorithm>
 
+#include "../LevelManager.h"
+
 Actor::Actor(Game *game)
     : mState(ActorState::Active), mPosition(Vector2::Zero), mScale(Vector2(1.0f, 1.0f)), mRotation(0.0f), mGame(game), mPersistent(false)
 {
-    mGame->AddActor(this);
+    LevelManager::Instance().AddActor(this);
 }
 
 Actor::~Actor()
 {
-    mGame->RemoveActor(this);
+    LevelManager::Instance().RemoveActor(this);
 
     for (auto component : mComponents)
     {
@@ -77,6 +79,6 @@ void Actor::SetPersistent(bool persistent)
     if (persistent == mPersistent) return;
 
     mPersistent = persistent;
-    if (mPersistent) mGame->AddPersistentActor(this);
-    else mGame->RemovePersistentActor(this);
+    if (mPersistent) LevelManager::Instance().AddPersistentActor(this);
+    else LevelManager::Instance().RemovePersistentActor(this);
 }

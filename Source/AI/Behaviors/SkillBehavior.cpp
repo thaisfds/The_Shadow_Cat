@@ -4,6 +4,8 @@
 #include "../../Random.h"
 #include <vector>
 
+#include "../../LevelManager.h"
+
 SkillBehavior::SkillBehavior(Character* owner)
 	: AIBehavior(owner, "Skill")
 {
@@ -18,7 +20,7 @@ void SkillBehavior::Update(float deltaTime)
 	// Don't use skills if already using one
 	if (mOwner->IsUsingSkill()) return;
 	
-	auto player = mOwner->GetGame()->GetPlayer();
+	auto player = LevelManager::Instance().GetPlayer();
 	if (!player) return;
 
 	auto playerPos = player->GetPosition();
@@ -53,7 +55,7 @@ bool SkillBehavior::SkillToPatrol()
 
 bool SkillBehavior::AnySkillAvailable() const
 {
-	auto player = mOwner->GetGame()->GetPlayer();
+	auto player = LevelManager::Instance().GetPlayer();
 	if (!player) return false;
 	
 	auto playerPos = player->GetPosition();

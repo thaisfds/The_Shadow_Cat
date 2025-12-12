@@ -10,6 +10,7 @@
 #include "../Physics/Physics.h"
 #include "../../Game.h"
 #include "SkillBase.h"
+#include "../../LevelManager.h"
 #include "../../SkillFactory.h"
 #include "../../Actors/Characters/ShadowCat.h"
 
@@ -62,7 +63,7 @@ void BasicAttack::StartSkill(Vector2 targetPosition)
 
 void BasicAttack::Execute()
 {
-    mCharacter->GetGame()->GetAttackTrailActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
+    LevelManager::Instance().GetAttackTrailActor()->GetComponent<AnimatedParticleSystemComponent>()->EmitParticleAt(
         0.3f,
         0.0f,
         mCharacter->GetPosition() + mTargetVector * mRange,
@@ -70,7 +71,7 @@ void BasicAttack::Execute()
         mCharacter->GetScale().x < 0.0f
     );
 
-    auto collisionActor = mCharacter->GetGame()->GetCollisionQueryActor();
+    auto collisionActor = LevelManager::Instance().GetCollisionQueryActor();
 
 	((PolygonCollider*)mAreaOfEffect)->SetForward(mTargetVector);
     collisionActor->GetComponent<ColliderComponent>()->SetCollider(mAreaOfEffect);
@@ -103,7 +104,7 @@ void BasicAttack::EndSkill()
 
 bool BasicAttack::EnemyShouldUse()
 {
-    auto player = mCharacter->GetGame()->GetPlayer();
+    auto player = LevelManager::Instance().GetPlayer();
     if (!player) return false;
 
     Vector2 toPlayer = player->GetPosition() - mCharacter->GetPosition();

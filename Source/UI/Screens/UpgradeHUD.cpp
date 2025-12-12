@@ -4,6 +4,8 @@
 #include "../../Actors/Characters/ShadowCat.h"
 #include <string>
 
+#include "../../LevelManager.h"
+
 UpgradeHUD::UpgradeHUD(class Game* game, const std::string& fontName)
     :UIScreen(game, fontName)
 {   
@@ -37,7 +39,7 @@ void UpgradeHUD::Clear() {
 
 void UpgradeHUD::InitCards() {
     Clear();
-    if (mGame->GetPlayer() == nullptr) return;
+    if (LevelManager::Instance().GetPlayer() == nullptr) return;
 
     // Opacity background
     mBackImage = AddImage("../Assets/HUD/Background/UpgradeBackground.png", Vector2::Zero, 1.0f, 0.0f, -1);
@@ -46,7 +48,7 @@ void UpgradeHUD::InitCards() {
     mInfoText->SetTextColor(Vector3::One); // White
     mInfoText->SetBackgroundColor(Vector4::Zero); // Transparent
 
-    std::vector<UpgradeInfo> upgrades = mGame->GetPlayer()->GetRandomUpgrades();
+    std::vector<UpgradeInfo> upgrades = LevelManager::Instance().GetPlayer()->GetRandomUpgrades();
     // Copy for reference
     mCurrentUpgradeInfo = upgrades;
 
@@ -104,8 +106,8 @@ void UpgradeHUD::UpdateSelectedCard(int indexChange)
 void UpgradeHUD::Update(float deltaTime)
 {   
     // Nothing to show
-    if (mGame->GetPlayer() == nullptr) return;
-    if (mGame->GetPlayer()->GetUpgradePoints() < 1) return;
+    if (LevelManager::Instance().GetPlayer() == nullptr) return;
+    if (LevelManager::Instance().GetPlayer()->GetUpgradePoints() < 1) return;
 
     // Already paused
     if (mGame->IsPaused() || mBackImage != nullptr) return;
@@ -137,7 +139,7 @@ void UpgradeHUD::HandleKeyPress(int key)
     case SDLK_SPACE:
     case SDLK_RETURN:
     case SDLK_KP_ENTER:
-        mGame->GetPlayer()->SpendUpgradePoint(mCurrentUpgradeInfo[mSelectedButtonIndex]);
+        LevelManager::Instance().GetPlayer()->SpendUpgradePoint(mCurrentUpgradeInfo[mSelectedButtonIndex]);
         mGame->ResumeGame();
 
         this->Clear();

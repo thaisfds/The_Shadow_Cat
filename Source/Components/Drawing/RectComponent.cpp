@@ -2,6 +2,7 @@
 #include "../../Renderer/Renderer.h"
 #include "../../Actors/Actor.h"
 #include "../../Game.h"
+#include "../../LevelManager.h"
 
 RectComponent::RectComponent(class Actor *owner, int width, int height, RendererMode mode, int drawOrder)
     : DrawComponent(owner, drawOrder), mMode(mode), mWidth(width), mHeight(height)
@@ -17,6 +18,6 @@ void RectComponent::Draw(class Renderer *renderer)
     if (mIsVisible)
     {
         renderer->DrawRect(mOwner->GetPosition(), Vector2(mWidth, mHeight), mOwner->GetRotation(),
-                           mColor, GetGame()->GetCameraPos(), mMode);
+                           mColor, LevelManager::Instance().GetCameraPos(), mMode);
     }
 }

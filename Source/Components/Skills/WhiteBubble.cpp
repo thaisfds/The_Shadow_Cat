@@ -1,6 +1,7 @@
 #include "WhiteBubble.h"
 #include "../../Game.h"
 #include "../../GameConstants.h"
+#include "../../LevelManager.h"
 #include "../Drawing/AnimatorComponent.h"
 #include "../../Actors/Characters/Character.h"
 #include "../Physics/ColliderComponent.h"
@@ -39,7 +40,7 @@ void WhiteBubble::Execute()
 
 	// Spawn bubble at target position (where boss is aiming)
 	// mTargetVector contains the target position after StartSkill
-	mCharacter->GetGame()->GetWhiteBubbleActor()->Awake(
+	LevelManager::Instance().GetWhiteBubbleActor()->Awake(
 		mTargetVector, // Position where bubble spawns (target position from StartSkill)
 		mDamage,
 		mCharacter->GetSkillFilter(),
@@ -66,7 +67,7 @@ void WhiteBubble::EndSkill()
 
 bool WhiteBubble::EnemyShouldUse()
 {
-	auto player = mCharacter->GetGame()->GetPlayer();
+	auto player = LevelManager::Instance().GetPlayer();
 	if (!player) return false;
 
 	Vector2 toPlayer = player->GetPosition() - mCharacter->GetPosition();

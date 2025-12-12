@@ -1,5 +1,6 @@
 #include "FleeBehavior.h"
 
+#include "../../LevelManager.h"
 #include "../../Actors/Characters/ShadowCat.h"
 #include "../../Actors/Characters/Enemies/OrangeCat.h"
 #include "../../Components/Skills/Dash.h"
@@ -24,7 +25,7 @@ void FleeBehavior::OnEnter()
 
 void FleeBehavior::Update(float deltaTime)
 {
-	const ShadowCat* player = mOwner->GetGame()->GetPlayer();
+	const ShadowCat* player = LevelManager::Instance().GetPlayer();
 	if (!player) return;
 	if (mOwner->GetMovementLock()) return;
 
