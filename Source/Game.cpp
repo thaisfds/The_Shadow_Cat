@@ -20,6 +20,7 @@
 #include "Components/Physics/RigidBodyComponent.h"
 #include "Random.h"
 #include "SkillFactory.h"
+#include "SystemInitializer.h"
 #include "UI/Screens/MainMenu.h"
 #include "UI/Screens/HUD.h"
 #include "UI/Screens/TutorialHUD.h"
@@ -70,72 +71,23 @@ Game::Game()
 
 bool Game::Initialize()
 {
-
 	Random::Init();
 
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0)
-	{
-		SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
-		return false;
-	}
+	if (!SystemInitializer::InitializeSDL()) return false;
 
-	// Init SDL Image
-	int imgFlags = IMG_INIT_PNG;
-	if (!(IMG_Init(imgFlags) & imgFlags))
-	{
-		SDL_Log("Unable to initialize SDL_image: %s", IMG_GetError());
-		return false;
-	}
-
-	// Initialize SDL_ttf
-	if (TTF_Init() != 0)
-	{
-		SDL_Log("Failed to initialize SDL_ttf");
-		return false;
-	}
-
-	// Initialize SDL_mixer
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
-	{
-		SDL_Log("Failed to initialize SDL_mixer");
-		return false;
-	}
-
-	mWindow = SDL_CreateWindow("The Shadow Cat", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
-	if (!mWindow)
-	{
-		SDL_Log("Failed to create window: %s", SDL_GetError());
-		return false;
-	}
+	mWindow = SystemInitializer::CreateGameWindow(GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT);
+	if (!mWindow) return false;
 
 	mRenderer = new Renderer(mWindow);
 	mRenderer->Initialize(GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT);
 
-	for (int i = 0; i < SDL_NumJoysticks(); ++i)
-	{
-		if (SDL_IsGameController(i))
-		{
-			mController = SDL_GameControllerOpen(i);
-			if (mController)
-			{
-				SDL_Log("Found game controller: %s", SDL_GameControllerName(mController));
-				break;
-			}
-			else
-			{
-				SDL_Log("Could not open game controller %i: %s", i, SDL_GetError());
-			}
-		}
-	}
+	mController = SystemInitializer::FindGameController();
 
-	// Hide cursor, we use our own
 	SDL_ShowCursor(SDL_DISABLE);
 
-	// Init audio system
 	mAudio = new AudioSystem();
 	mAudio->CacheAllSounds();
 
-	// First scene
 	SetScene(GameScene::MainMenu);
 
 	mTicksCount = SDL_GetTicks();

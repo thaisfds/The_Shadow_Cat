@@ -163,6 +163,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Characters/Enemies/OrangeCat.h
         Source/Actors/Characters/Enemies/SylvesterCat.cpp
         Source/Actors/Characters/Enemies/SylvesterCat.h
+        Source/SystemInitializer.cpp
+        Source/SystemInitializer.h
 )
 
 configure_local_linking(${PROJECT_NAME})
