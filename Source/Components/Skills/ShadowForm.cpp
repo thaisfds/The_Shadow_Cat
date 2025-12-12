@@ -7,8 +7,6 @@ ShadowForm::ShadowForm(Actor* owner, int updateOrder)
 	: SkillBase(owner, updateOrder)
 {
 	LoadSkillDataFromJSON("ShadowFormData");
-
-	
 }
 
 nlohmann::json ShadowForm::LoadSkillDataFromJSON(const std::string& fileName)
@@ -46,13 +44,13 @@ void ShadowForm::StartSkill(Vector2 targetPosition)
 
 	float shadowFormBeginDuration = animator->GetAnimationDuration("ShadowFormBegin");
 	AddDelayedAction(shadowFormBeginDuration, [this]() { mCharacter->SetMovementLock(false); });
-	float shadowFormEndDelay = mDuration - animator->GetAnimationDuration("ShadowFormEnd");
+	float shadowFormEndDelay = mDuration + shadowFormBeginDuration;
 	AddDelayedAction(shadowFormEndDelay, [this]()
-	{ 
+	{
 		mCharacter->SetMovementLock(true);
 		mCharacter->GetComponent<AnimatorComponent>()->PlayAnimationOnce("ShadowFormEnd", false); 
 	});
-	AddDelayedAction(mDuration, [this]() { EndSkill(); });
+	AddDelayedAction(shadowFormEndDelay + animator->GetAnimationDuration("ShadowFormEnd"), [this]() { EndSkill(); });
 }
 
 void ShadowForm::EndSkill()
