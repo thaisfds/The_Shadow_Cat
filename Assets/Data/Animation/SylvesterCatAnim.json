@@ -4,11 +4,12 @@
   "animations": 
   {
     "Idle": [0],
-    "Run": [0, 1, 2, 3],
-    "BasicAttack": { "start": 5, "end": 11},
-    "ShadowFormBegin": { "start": 17, "end": 23 },
-    "ShadowFormMid": [24, 25, 24, 23, 24, 25, 24, 26],
-    "ShadowFormEnd": { "start": 23, "end": 17 }
+    "Run": { "start": 1, "end": 4 },
+    "BasicAttack": { "start": 5, "end": 11 },
+    "Hit": { "start": 12, "end": 16 },
+    "ShadowFormBegin": { "start": 17, "end": 22 },
+    "ShadowFormMid": { "start": 23, "end": 30 },
+    "ShadowFormEnd": { "start": 31, "end": 37 }
   },
   "base": "Idle"
 }

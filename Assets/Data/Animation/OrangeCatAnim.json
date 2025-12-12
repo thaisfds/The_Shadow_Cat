@@ -4,11 +4,12 @@
   "animations": 
   {
     "Idle": [0],
-    "Run": [0, 1, 2, 3],
-    "BasicAttack": { "start": 5, "end": 11},
-    "DashBegin": { "start": 12, "end": 15 },
-    "DashMid": [16],
-    "DashEnd": { "start": 15, "end": 12 }
+    "Run": { "start": 1, "end": 4 },
+    "BasicAttack": { "start": 5, "end": 11 },
+    "Hit": { "start": 12, "end": 16 },
+    "DashBegin": { "start": 17, "end": 20 },
+    "DashMid": [21],
+    "DashEnd": { "start": 22, "end": 25 }
   },
   "base": "Idle"
 }

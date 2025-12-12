@@ -4,12 +4,11 @@
   "animations": 
   {
     "Idle": [0],
-    "Run": [1, 2, 3, 4],
-    "BasicAttack": [5, 6, 7],
-    "SpecialAttack": [8, 9],
-    "Attack": [5, 6, 7],
-    "Hit": [0, 5],
-    "Death": [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+    "Run": { "start": 1, "end": 6 },
+    "BasicAttack": [7, 8, 9],
+    "SpecialAttack": [10, 11],
+    "Attack": [7, 8, 9],
+    "Hit": [0, 7]
   },
   "base": "Idle"
 }

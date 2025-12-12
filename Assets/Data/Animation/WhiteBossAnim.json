@@ -4,13 +4,12 @@
   "animations": 
   {
     "Idle": [0],
-    "Run": [1, 2],
-    "BasicAttack": [3, 4],
-    "WhiteSlash": [3, 4],
-    "WhiteBomb": [3, 4, 3, 4],
+    "Run": { "start": 1, "end": 4 },
+    "BasicAttack": [5, 6],
+    "WhiteSlash": [5, 6],
+    "WhiteBomb": [5, 6, 5, 6],
     "BossHealing": [0],
-    "Hit": [0, 3],
-    "Death": [4, 3, 2, 1, 0]
+    "Hit": [0, 5]
   },
   "base": "Idle"
 }

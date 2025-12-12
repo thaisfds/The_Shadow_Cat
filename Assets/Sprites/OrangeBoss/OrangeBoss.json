@@ -8,6 +8,14 @@
     "duration": 200
    },
    "Walk_1.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 150
+   },
+   "Walk_2.aseprite": {
     "frame": { "x": 64, "y": 0, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
@@ -15,7 +23,15 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 200
    },
-   "Walk_2.aseprite": {
+   "Walk_3.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+    "sourceSize": { "w": 64, "h": 64 },
+    "duration": 150
+   },
+   "Walk_4.aseprite": {
     "frame": { "x": 128, "y": 0, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
@@ -23,7 +39,7 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 200
    },
-   "BasicAttack_3.aseprite": {
+   "BasicAttack_5.aseprite": {
     "frame": { "x": 192, "y": 0, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
@@ -31,7 +47,7 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 100
    },
-   "BasicAttack_4.aseprite": {
+   "BasicAttack_6.aseprite": {
     "frame": { "x": 256, "y": 0, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
@@ -39,7 +55,7 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 200
    },
-   "SpecialAttack_5.aseprite": {
+   "SpecialAttack_7.aseprite": {
     "frame": { "x": 320, "y": 0, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
@@ -47,7 +63,7 @@
     "sourceSize": { "w": 64, "h": 64 },
     "duration": 100
    },
-   "SpecialAttack_6.aseprite": {
+   "SpecialAttack_8.aseprite": {
     "frame": { "x": 384, "y": 0, "w": 64, "h": 64 },
     "rotated": false,
     "trimmed": false,
@@ -65,9 +81,9 @@
   "scale": "1",
   "frameTags": [
    { "name": "Idle", "from": 0, "to": 0, "direction": "forward", "color": "#000000ff" },
-   { "name": "Walk", "from": 1, "to": 2, "direction": "forward", "color": "#000000ff" },
-   { "name": "BasicAttack", "from": 3, "to": 4, "direction": "forward", "color": "#000000ff" },
-   { "name": "SpecialAttack", "from": 5, "to": 6, "direction": "forward", "color": "#000000ff" }
+   { "name": "Walk", "from": 1, "to": 4, "direction": "forward", "color": "#000000ff" },
+   { "name": "BasicAttack", "from": 5, "to": 6, "direction": "forward", "color": "#000000ff" },
+   { "name": "SpecialAttack", "from": 7, "to": 8, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
    { "name": "Layer 2", "opacity": 255, "blendMode": "normal" },

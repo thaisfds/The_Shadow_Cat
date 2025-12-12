@@ -4,8 +4,10 @@
   "animations": 
   {
     "Idle": [0],
-    "Run": [0, 1, 2, 3],
-    "BasicAttack": { "start": 5, "end": 11}
+    "Run": { "start": 1, "end": 4 },
+    "BasicAttack": { "start": 5, "end": 11 },
+    "Hit": { "start": 12, "end": 16 }
+
   },
   "base": "Idle"
 }
