@@ -231,6 +231,8 @@ bool AnimatorComponent::SetAnimation(const std::string &name, bool reset)
 	mCurrentFrameIndex = 0;
 	mFrameTimer = 0.0f;
 
+	mIsPaused = mCurrentAnimation->frames.size() <= 1;
+
 	return true;
 }
 
