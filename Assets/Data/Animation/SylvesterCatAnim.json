@@ -8,8 +8,8 @@
     "BasicAttack": { "start": 5, "end": 11 },
     "Hit": { "start": 12, "end": 16 },
     "ShadowFormBegin": { "start": 17, "end": 22 },
-    "ShadowFormMid": { "start": 23, "end": 30 },
-    "ShadowFormEnd": { "start": 31, "end": 37 }
+    "ShadowFormMid": { "start": 23, "end": 31 },
+    "ShadowFormEnd": { "start": 32, "end": 37 }
   },
   "base": "Idle"
 }
