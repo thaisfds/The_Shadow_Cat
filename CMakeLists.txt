@@ -170,6 +170,8 @@ add_executable(${PROJECT_NAME}
         Source/LevelManager.h
         Source/InputHandler.cpp
         Source/InputHandler.h
+        Source/SceneManager.cpp
+        Source/SceneManager.h
 )
 
 configure_local_linking(${PROJECT_NAME})

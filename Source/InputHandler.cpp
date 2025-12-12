@@ -168,7 +168,7 @@ void InputHandler::HandleKeyPress(SDL_Keycode key, Uint8 repeat)
     // Pause toggle (ESC) - only on initial press
     if (key == SDLK_ESCAPE && repeat == 0)
     {
-        if (mGame->GetCurrentScene() > GameScene::MainMenu && 
+        if (SceneManager::Instance().GetCurrentScene() > GameScene::MainMenu &&
             LevelManager::Instance().GetPlayer() && 
             LevelManager::Instance().GetPlayer()->GetUpgradePoints() == 0)
         {

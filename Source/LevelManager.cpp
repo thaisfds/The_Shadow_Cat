@@ -2,6 +2,7 @@
 #include "Game.h"
 #include "CSV.h"
 #include "GameConstants.h"
+#include "SceneManager.h"
 #include <fstream>
 #include <algorithm>
 #include <SDL.h>
@@ -165,8 +166,8 @@ void LevelManager::Update(float deltaTime)
         GameScene nextScene;
         if (CheckLevelTransition(mShadowCat->GetPosition(), nextScene))
         {
-            // Let Game handle the transition
-            mGame->SetScene(nextScene);
+            // Let SceneManager handle the transition
+            SceneManager::Instance().SetScene(nextScene);
         }
     }
 }

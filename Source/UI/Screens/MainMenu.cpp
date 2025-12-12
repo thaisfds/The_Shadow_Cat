@@ -1,6 +1,7 @@
 #include "MainMenu.h"
 #include "../../Game.h"
 #include "../../GameConstants.h"
+#include "../../SceneManager.h"
 
 MainMenu::MainMenu(class Game* game, const std::string& fontName)
     :UIScreen(game, fontName)
@@ -24,7 +25,7 @@ MainMenu::MainMenu(class Game* game, const std::string& fontName)
 
     // Using lambda as on click functions
     AddButton("    New\nAdventure", [game]() {
-        game->SetScene(GameConstants::DEFAULT_STARTING_SCENE);
+        SceneManager::Instance().SetScene(GameConstants::DEFAULT_STARTING_SCENE);
     }, Vector2(300.0f, -20.0f), SCALE);
 
     AddButton("Quit", [this, game]() {

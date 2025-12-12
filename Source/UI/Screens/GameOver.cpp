@@ -10,7 +10,7 @@ GameOver::GameOver(class Game* game, const std::string& fontName)
     game->GetAudio()->StopAllSounds();
     game->GetAudio()->PlaySound("m03_game_over.mp3", true, 0.5f);
 
-    switch (mGame->GetCurrentScene()) {
+    switch (SceneManager::Instance().GetCurrentScene()) {
     case GameScene::Level1_Boss:
         AddImage("../Assets/HUD/Background/DefeatBackground1.png", Vector2::Zero, 1.0f, 0.0f, -1);
         break;

@@ -4,25 +4,7 @@
 
 #include "AudioSystem.h"
 #include "Math.h"
-
-enum class GameScene
-{
-    MainMenu,
-    Lobby,
-    Level1,
-    Level1_Boss,
-    Level2,
-    Level2_Boss,
-    Level3,
-    Level3_Boss
-};
-
-enum class GroundType
-{
-    Grass,
-    Brick,
-    Stone
-};
+#include "SceneManager.h"
 
 class Game
 {
@@ -35,14 +17,11 @@ public:
     void Shutdown();
     void Quit() { mIsRunning = false; }
 
-    // Scene Handling
-    void SetScene(GameScene scene);
-    GroundType GetGroundType() const;
-    GameScene GetCurrentScene() const { return mCurrentScene; }
+
 
     // UI Management
     void PushUI(class UIScreen* screen) { mUIStack.emplace_back(screen); }
-    const std::vector<class UIScreen*>& GetUIStack() { return mUIStack; }
+    std::vector<class UIScreen*>& GetUIStack() { return mUIStack; }
 
     // Game State
     void PauseGame();
@@ -60,6 +39,11 @@ public:
     // UI Access
     class HUD* GetHUD() { return mHUD; }
     class TutorialHUD* GetTutorialHUD() { return mTutorialHUD; }
+    class UpgradeHUD* GetUpgradeHUD() { return mUpgradeHUD; }
+    
+    void SetHUD(class HUD* hud) { mHUD = hud; }
+    void SetTutorialHUD(class TutorialHUD* hud) { mTutorialHUD = hud; }
+    void SetUpgradeHUD(class UpgradeHUD* hud) { mUpgradeHUD = hud; }
 
     // Debug
     bool IsDebugging() const { return mIsDebugging; }
@@ -92,9 +76,6 @@ private:
     class UpgradeHUD* mUpgradeHUD;
     class TutorialHUD* mTutorialHUD;
 
-    // Audio
-    SoundHandle mBackgroundMusic;
-
     // Game state
     Uint32 mTicksCount;
     bool mIsRunning;
@@ -104,5 +85,4 @@ private:
     bool mIsGameWon;
     bool mIsDebugging;
     bool mIsGodMode;
-    GameScene mCurrentScene;
 };

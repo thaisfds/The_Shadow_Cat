@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "LevelManager.h"
 #include "InputHandler.h"
+#include "SceneManager.h"
 #include "SystemInitializer.h"
 #include "SkillFactory.h"
 #include "Random.h"
@@ -32,8 +33,7 @@ Game::Game()
       mIsGameOver(false),
       mIsGameWon(false),
       mIsDebugging(false),
-      mIsGodMode(false),
-      mCurrentScene(GameScene::MainMenu)
+      mIsGodMode(false)
 {
 }
 
@@ -64,13 +64,14 @@ bool Game::Initialize()
     mAudio = new AudioSystem();
     mAudio->CacheAllSounds();
 
-    // Initialize level manager
+    // Initialize managers
     LevelManager::Instance().Initialize(this);
+    SceneManager::Instance().Initialize(this);
 
     // Register skills
     SkillFactory::InitializeSkills();
 
-    SetScene(GameScene::MainMenu);
+    SceneManager::Instance().SetScene(GameScene::MainMenu);
 
     mTicksCount = SDL_GetTicks();
 
@@ -166,43 +167,12 @@ void Game::GenerateOutput()
     mRenderer->Clear();
 
     // Get background texture
-    std::string backgroundPath;
-    switch (mCurrentScene)
-    {
-    case GameScene::MainMenu:
-        backgroundPath = "../Assets/HUD/Background/MainMenuBackground.png";
-        break;
-    case GameScene::Lobby:
-        backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
-        break;
-    case GameScene::Level1:
-        backgroundPath = "../Assets/Levels/Level1/Level1Background.png";
-        break;
-    case GameScene::Level1_Boss:
-        backgroundPath = "../Assets/Levels/Level1_Boss/Level1_Boss_Background.png";
-        break;
-    case GameScene::Level2:
-        backgroundPath = "../Assets/Levels/Level2/Level2Background.png";
-        break;
-    case GameScene::Level2_Boss:
-        backgroundPath = "../Assets/Levels/Level2_Boss/Level2_Boss_Background.png";
-        break;
-    case GameScene::Level3:
-        backgroundPath = "../Assets/Levels/Level3/Level3Background.png";
-        break;
-    case GameScene::Level3_Boss:
-        backgroundPath = "../Assets/Levels/Level3_Boss/Level3_Boss_Background.png";
-        break;
-    default:
-        backgroundPath = "../Assets/Levels/Lobby/LobbyBackground.png";
-        break;
-    }
-
+    std::string backgroundPath = SceneManager::Instance().GetBackgroundPath();
     Texture* backgroundTexture = mRenderer->GetTexture(backgroundPath);
     if (backgroundTexture)
     {
         // Main menu
-        if (mCurrentScene == GameScene::MainMenu)
+        if (SceneManager::Instance().GetCurrentScene() == GameScene::MainMenu)
         {
             Vector2 position(GameConstants::WINDOW_WIDTH / 2.0f, GameConstants::WINDOW_HEIGHT / 2.0f);
             Vector2 size(static_cast<float>(backgroundTexture->GetWidth()), static_cast<float>(backgroundTexture->GetHeight()));
@@ -258,104 +228,6 @@ void Game::GenerateOutput()
     mRenderer->Present();
 }
 
-void Game::SetScene(GameScene nextScene)
-{
-    UnloadScene();
-    mCurrentScene = nextScene;
-
-    switch (nextScene)
-    {
-    case GameScene::MainMenu:
-        mBackgroundMusic = mAudio->PlaySound("m01_main_menu.mp3", true, 0.3f);
-        new MainMenu(this, "../Assets/Fonts/Pixellari.ttf");
-        break;
-
-    case GameScene::Lobby:
-        mBackgroundMusic = mAudio->PlaySound("m04_tutorial.mp3", true, 0.5f);
-        
-        if (!mTutorialHUD)
-            mTutorialHUD = new TutorialHUD(this, "../Assets/Fonts/Pixellari.ttf");
-
-        mHUD = new HUD(this, "../Assets/Fonts/Pixellari.ttf");
-        mUpgradeHUD = new UpgradeHUD(this, "../Assets/Fonts/Pixellari.ttf");
-
-        if (mTutorialHUD)
-            mTutorialHUD->ShowControls();
-
-        LevelManager::Instance().LoadAndBuildLevel(nextScene);
-        break;
-
-    case GameScene::Level1:
-        mBackgroundMusic = mAudio->PlaySound("m05_level1.mp3", true, 0.5f);
-        if (mTutorialHUD)
-            mTutorialHUD->HideControls();
-        LevelManager::Instance().LoadAndBuildLevel(nextScene);
-        break;
-
-    case GameScene::Level1_Boss:
-        mBackgroundMusic = mAudio->PlaySound("m08_boss1_grass.mp3", true, 0.3f);
-        if (mTutorialHUD)
-            mTutorialHUD->HideControls();
-        LevelManager::Instance().LoadAndBuildLevel(nextScene);
-        break;
-
-    case GameScene::Level2:
-        mBackgroundMusic = mAudio->PlaySound("m06_level2.mp3", true, 0.6f);
-        if (mTutorialHUD)
-            mTutorialHUD->HideControls();
-        LevelManager::Instance().LoadAndBuildLevel(nextScene);
-        break;
-
-    case GameScene::Level2_Boss:
-        mBackgroundMusic = mAudio->PlaySound("m09_boss2_bricks.mp3", true);
-        if (mTutorialHUD)
-            mTutorialHUD->HideControls();
-        LevelManager::Instance().LoadAndBuildLevel(nextScene);
-        break;
-
-    case GameScene::Level3:
-        mBackgroundMusic = mAudio->PlaySound("m07_level3.mp3", true);
-        if (mTutorialHUD)
-            mTutorialHUD->HideControls();
-        LevelManager::Instance().LoadAndBuildLevel(nextScene);
-        break;
-
-    case GameScene::Level3_Boss:
-        mBackgroundMusic = mAudio->PlaySound("m10_boss3_stone.mp3", true);
-        if (mTutorialHUD)
-            mTutorialHUD->HideControls();
-        LevelManager::Instance().LoadAndBuildLevel(nextScene);
-        break;
-    }
-}
-
-void Game::UnloadScene()
-{
-    if (mBackgroundMusic.IsValid())
-    {
-        mAudio->StopSound(mBackgroundMusic);
-        mBackgroundMusic.Reset();
-    }
-
-    LevelManager::Instance().UnloadLevel();
-
-    // Delete UI screens (except persistent HUDs)
-    for (auto ui : mUIStack)
-    {
-        if (ui == mHUD || ui == mTutorialHUD || ui == mUpgradeHUD)
-            continue;
-        delete ui;
-    }
-    mUIStack.clear();
-    
-    if (mTutorialHUD)
-        mUIStack.push_back(mTutorialHUD);
-    if (mHUD)
-        mUIStack.push_back(mHUD);
-    if (mUpgradeHUD)
-        mUIStack.push_back(mUpgradeHUD);
-}
-
 void Game::PauseGame()
 {
     mIsPaused = true;
@@ -390,30 +262,11 @@ void Game::ResetGame()
 
     SetGameOver(false);
     SetGameWon(false);
-    SetScene(GameScene::Level1);
+    SceneManager::Instance().SetScene(GameScene::Level1);
 
     LevelManager::Instance().GetPlayer()->SetHP(LevelManager::Instance().GetPlayer()->GetMaxHP());
 
     ResumeGame();
-}
-
-GroundType Game::GetGroundType() const
-{
-    switch (mCurrentScene)
-    {
-    case GameScene::Lobby:
-    case GameScene::Level1:
-    case GameScene::Level1_Boss:
-        return GroundType::Grass;
-    case GameScene::Level2:
-    case GameScene::Level2_Boss:
-        return GroundType::Brick;
-    case GameScene::Level3:
-    case GameScene::Level3_Boss:
-        return GroundType::Stone;
-    default:
-        return GroundType::Grass;
-    }
 }
 
 Vector2 Game::GetMouseWorldPosition()
@@ -446,6 +299,7 @@ Vector2 Game::GetMouseAbsolutePosition()
 
 void Game::Shutdown()
 {
+    SceneManager::Instance().Shutdown();
     InputHandler::Instance().Shutdown();
     LevelManager::Instance().Shutdown();
 

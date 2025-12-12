@@ -5,6 +5,7 @@
 #include "ShadowCat.h"
 #include "../../Game.h"
 #include "../../GameConstants.h"
+#include "../../SceneManager.h"
 #include "../../Components/Drawing/AnimatorComponent.h"
 #include "../../Components/Physics/RigidBodyComponent.h"
 #include "../../Components/Physics/ColliderComponent.h"
@@ -147,7 +148,7 @@ void ShadowCat::OnUpdate(float deltaTime)
             
             // Determine which sounds to use based on ground type
             std::string sound1, sound2;
-            switch (mGame->GetGroundType())
+            switch (SceneManager::Instance().GetGroundType())
             {
             case GroundType::Grass:
                 sound1 = "e01_step_on_grass_small1.wav";
