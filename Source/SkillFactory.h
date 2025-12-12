@@ -23,14 +23,13 @@ public:
 	SkillBase* CreateSkill(const std::string& skillName, Actor* owner)
 	{
 		auto it = mSkillCreators.find(skillName);
-		if (it != mSkillCreators.end())
-		{
-			return it->second(owner);
-		}
+		if (it != mSkillCreators.end()) return it->second(owner);
 		
 		SDL_Log("Warning: Unknown skill '%s'", skillName.c_str());
 		return nullptr;
 	}
+
+	static void InitializeSkills();
 	
 private:
 	SkillFactory() = default;

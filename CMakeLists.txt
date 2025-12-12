@@ -125,6 +125,7 @@ add_executable(${PROJECT_NAME}
         Source/DelayedActionSystem.h
         Source/GameJsonParser.cpp
         Source/GameJsonParser.h
+        Source/SkillFactory.cpp
         Source/SkillFactory.h
         Source/Components/Skills/UpgradeInfo.h
         Source/Components/Skills/Bomb.cpp

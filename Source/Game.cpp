@@ -92,7 +92,7 @@ bool Game::Initialize()
 
 	mTicksCount = SDL_GetTicks();
 
-	InitializeSkills();
+	SkillFactory::InitializeSkills();
 
 	return true;
 }
@@ -1302,18 +1302,4 @@ int Game::CountAliveBosses() const
 	if (mCurrentBoss)
 		count += !mCurrentBoss->IsDead();
 	return count;
-}
-
-void Game::InitializeSkills()
-{
-	SkillFactory::Instance().RegisterSkill("basicAttackSkill", [](Actor *owner) { return new BasicAttack(owner); });
-	SkillFactory::Instance().RegisterSkill("clawAttackSkill", [](Actor *owner){ return new ClawAttack(owner); });
-	SkillFactory::Instance().RegisterSkill("dashSkill", [](Actor *owner) { return new Dash(owner); });
-	SkillFactory::Instance().RegisterSkill("shadowFormSkill", [](Actor *owner) { return new ShadowForm(owner); });
-	SkillFactory::Instance().RegisterSkill("stompSkill", [](Actor *owner) { return new Stomp(owner); });
-	SkillFactory::Instance().RegisterSkill("furBallSkill", [](Actor *owner) { return new FurBall(owner); });
-	SkillFactory::Instance().RegisterSkill("whiteSlashSkill", [](Actor *owner) { return new WhiteSlash(owner); });
-	SkillFactory::Instance().RegisterSkill("whiteBombSkill", [](Actor *owner) { return new WhiteBomb(owner); });
-	SkillFactory::Instance().RegisterSkill("whiteBubbleSkill", [](Actor *owner) { return new WhiteBubble(owner); });
-	SkillFactory::Instance().RegisterSkill("bossHealingSkill", [](Actor *owner) { return new BossHealing(owner); });
 }
