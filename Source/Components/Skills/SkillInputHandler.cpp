@@ -38,10 +38,7 @@ void SkillInputHandler::HandleEvent(const SDL_Event& event)
     
     Vector2 targetPosition = mOwner->GetGame()->GetMouseWorldPosition();
     if (skill && skill->CanUse(targetPosition, true))
-    {
-        SDL_Log("Skill used: %s", skill->GetName().c_str());
         skill->StartSkill(targetPosition);
-    }
 }
 
 void SkillInputHandler::AssignSkillToSlot(int slot, SkillBase* skill)
