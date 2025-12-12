@@ -549,11 +549,11 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			}
 			else if (tileID == 1)
 			{
-				auto orangeCat = new OrangeCat(this, position);
+				auto whiteCat = new WhiteCat(this, position);
 			}
 			else if (tileID == 2)
 			{
-				auto whiteCat = new WhiteCat(this, position);
+				auto orangeCat = new OrangeCat(this, position);
 			}
 			else if (tileID == 3)
 			{
@@ -589,11 +589,11 @@ void Game::BuildLevel(int **levelData, int width, int height)
 			}
 			else if (tileID == 13)
 			{
-				auto boss = new SylvesterBoss(this, position);
+				auto boss = new OrangeBoss(this, position);
 			}
 			else if (tileID == 14)
 			{
-				auto boss = new OrangeBoss(this, position);
+				auto boss = new SylvesterBoss(this, position);
 			}
 			else if (tileID == 15)
 			{
