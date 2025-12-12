@@ -172,6 +172,8 @@ add_executable(${PROJECT_NAME}
         Source/InputHandler.h
         Source/SceneManager.cpp
         Source/SceneManager.h
+        Source/GameRenderer.cpp
+        Source/GameRenderer.h
 )
 
 configure_local_linking(${PROJECT_NAME})

@@ -2,6 +2,7 @@
 #include "LevelManager.h"
 #include "InputHandler.h"
 #include "SceneManager.h"
+#include "GameRenderer.h"
 #include "SystemInitializer.h"
 #include "SkillFactory.h"
 #include "Random.h"
@@ -15,9 +16,6 @@
 #include "UI/Screens/GameOver.h"
 #include "UI/Screens/WinScreen.h"
 #include <SDL.h>
-
-#include "Actors/Characters/Boss.h"
-#include "Components/Drawing/DrawComponent.h"
 
 Game::Game()
     : mRenderer(nullptr),
@@ -46,12 +44,10 @@ bool Game::Initialize()
 {
     Random::Init();
 
-    if (!SystemInitializer::InitializeSDL()) 
-        return false;
+    if (!SystemInitializer::InitializeSDL())  return false;
 
     mWindow = SystemInitializer::CreateGameWindow(GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT);
-    if (!mWindow) 
-        return false;
+    if (!mWindow) return false;
 
     mRenderer = new Renderer(mWindow);
     mRenderer->Initialize(GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT);
@@ -67,6 +63,7 @@ bool Game::Initialize()
     // Initialize managers
     LevelManager::Instance().Initialize(this);
     SceneManager::Instance().Initialize(this);
+    GameRenderer::Instance().Initialize(this);
 
     // Register skills
     SkillFactory::InitializeSkills();
@@ -92,7 +89,7 @@ void Game::RunLoop()
 
         InputHandler::Instance().ProcessInput();
         UpdateGame(deltaTime);
-        GenerateOutput();
+        GameRenderer::Instance().Render();
 
         int sleepTime = (1000 / GameConstants::FPS) - (SDL_GetTicks() - mTicksCount);
         if (sleepTime > 0)
@@ -160,72 +157,6 @@ void Game::UpdateGame(float deltaTime)
             ++iter;
         }
     }
-}
-
-void Game::GenerateOutput()
-{
-    mRenderer->Clear();
-
-    // Get background texture
-    std::string backgroundPath = SceneManager::Instance().GetBackgroundPath();
-    Texture* backgroundTexture = mRenderer->GetTexture(backgroundPath);
-    if (backgroundTexture)
-    {
-        // Main menu
-        if (SceneManager::Instance().GetCurrentScene() == GameScene::MainMenu)
-        {
-            Vector2 position(GameConstants::WINDOW_WIDTH / 2.0f, GameConstants::WINDOW_HEIGHT / 2.0f);
-            Vector2 size(static_cast<float>(backgroundTexture->GetWidth()), static_cast<float>(backgroundTexture->GetHeight()));
-            mRenderer->DrawTexture(position, size, 0.0f, Vector3(1.0f, 1.0f, 1.0f), backgroundTexture, Vector4::UnitRect, Vector2::Zero);
-        }
-        else
-        {
-            // Scaled background for levels
-            float levelPixelWidth = static_cast<float>(LevelManager::Instance().GetLevelWidth()) * static_cast<float>(GameConstants::TILE_SIZE);
-            float levelPixelHeight = static_cast<float>(LevelManager::Instance().GetLevelHeight()) * static_cast<float>(GameConstants::TILE_SIZE);
-
-            float texW = static_cast<float>(backgroundTexture->GetWidth());
-            float texH = static_cast<float>(backgroundTexture->GetHeight());
-
-            float scale = std::max(levelPixelWidth / texW, levelPixelHeight / texH);
-            float backgroundWidth = texW * scale;
-            float backgroundHeight = texH * scale;
-
-            Vector2 position(levelPixelWidth / 2.0f, levelPixelHeight / 2.0f);
-            Vector2 size(backgroundWidth, backgroundHeight);
-
-            mRenderer->DrawTexture(position, size, 0.0f, Vector3(1.0f, 1.0f, 1.0f), backgroundTexture, Vector4::UnitRect, LevelManager::Instance().GetCameraPos());
-        }
-    }
-
-    // Draw actors
-    for (auto drawable : LevelManager::Instance().GetDrawables())
-    {
-        drawable->Draw(mRenderer);
-
-        if (mIsDebugging)
-        {
-            auto actor = drawable->GetOwner();
-            auto boss = dynamic_cast<Boss*>(actor);
-            if (boss)
-            {
-                boss->OnDebugDraw(mRenderer);
-            }
-
-            for (auto comp : actor->GetComponents())
-            {
-                comp->DebugDraw(mRenderer);
-            }
-        }
-
-        for (auto comp : drawable->GetOwner()->GetComponents())
-            comp->ComponentDraw(mRenderer);
-    }
-
-    // Draw UI
-    mRenderer->DrawAllUI();
-
-    mRenderer->Present();
 }
 
 void Game::PauseGame()
@@ -299,6 +230,7 @@ Vector2 Game::GetMouseAbsolutePosition()
 
 void Game::Shutdown()
 {
+    GameRenderer::Instance().Shutdown();
     SceneManager::Instance().Shutdown();
     InputHandler::Instance().Shutdown();
     LevelManager::Instance().Shutdown();

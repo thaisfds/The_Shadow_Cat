@@ -58,10 +58,7 @@ public:
     Vector2 GetMouseAbsolutePosition();
 
 private:
-    void ProcessInput();
     void UpdateGame(float deltaTime);
-    void GenerateOutput();
-    void UnloadScene();
 
     // Systems
     class Renderer* mRenderer;
