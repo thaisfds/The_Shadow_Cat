@@ -37,7 +37,6 @@ Game::Game()
 
 Game::~Game()
 {
-    LevelManager::Instance().Shutdown();
 }
 
 bool Game::Initialize()
@@ -90,14 +89,12 @@ void Game::RunLoop()
     }
 }
 
-
-
 void Game::UpdateGame(float deltaTime)
 {
     // End condition check
     if (mIsGameOver || mIsGameWon)
     {
-        PauseGame();
+        SetPaused(true);
 
         bool screenExists = false;
         for (auto screen : mUIStack)
@@ -122,8 +119,7 @@ void Game::UpdateGame(float deltaTime)
     LevelManager::Instance().Update(deltaTime);
 
     // Update audio
-    if (mAudio)
-        mAudio->Update(deltaTime);
+    if (mAudio) mAudio->Update(deltaTime);
 
     // Update UI
     for (auto ui : mUIStack)
@@ -150,18 +146,14 @@ void Game::UpdateGame(float deltaTime)
     }
 }
 
-void Game::PauseGame()
+void Game::SetPaused(bool paused)
 {
-    mIsPaused = true;
-    for (auto actor : LevelManager::Instance().GetActors())
-        actor->SetState(ActorState::Paused);
-}
+    if (mIsPaused == paused) return;
 
-void Game::ResumeGame()
-{
-    mIsPaused = false;
-    for (auto actor : LevelManager::Instance().GetActors())
-        actor->SetState(ActorState::Active);
+    mIsPaused = paused;
+    OnPauseChanged.Invoke(mIsPaused);
+    auto newState = mIsPaused ? ActorState::Paused : ActorState::Active;
+    for (auto actor : LevelManager::Instance().GetActors()) actor->SetState(newState);
 }
 
 void Game::ResetGame()
@@ -188,7 +180,7 @@ void Game::ResetGame()
 
     LevelManager::Instance().GetPlayer()->SetHP(LevelManager::Instance().GetPlayer()->GetMaxHP());
 
-    ResumeGame();
+    SetPaused(false);
 }
 
 Vector2 Game::GetMouseWorldPosition()

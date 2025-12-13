@@ -114,12 +114,11 @@ void UpgradeHUD::Update(float deltaTime)
 
     InitCards();
 
-    // Pause Game
-    mGame->PauseGame();
+    mGame->SetPaused(true);
 }
 
 
-void UpgradeHUD::HandleKeyPress(int key)
+void UpgradeHUD::OnActiveKeyPress(int key)
 {
     if (mUpgradeCardSelectedBorders.empty())
         return;
@@ -140,7 +139,7 @@ void UpgradeHUD::HandleKeyPress(int key)
     case SDLK_RETURN:
     case SDLK_KP_ENTER:
         LevelManager::Instance().GetPlayer()->SpendUpgradePoint(mCurrentUpgradeInfo[mSelectedButtonIndex]);
-        mGame->ResumeGame();
+        mGame->SetPaused(false);
 
         this->Clear();
         break;

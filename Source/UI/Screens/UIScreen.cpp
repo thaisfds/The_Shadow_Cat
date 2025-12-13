@@ -12,10 +12,10 @@
 #include "../../Renderer/Renderer.h"
 
 UIScreen::UIScreen(Game* game, const std::string& fontName)
-	:mGame(game)
-	,mPos(0.f, 0.f)
-	,mSize(0.f, 0.f)
-	,mState(UIState::Active)
+    :mGame(game)
+    ,mPos(0.f, 0.f)
+    ,mSize(0.f, 0.f)
+    ,mState(UIState::Active)
     ,mSelectedButtonIndex(-1)
 {
     game->PushUI(this);
@@ -32,7 +32,7 @@ UIScreen::~UIScreen()
     for (auto b : mButtons) {
         delete b;
     }
-	mButtons.clear();
+    mButtons.clear();
 
     for (auto img : mImages) {
         delete img;
@@ -47,17 +47,18 @@ UIScreen::~UIScreen()
 
 void UIScreen::Update(float deltaTime)
 {
-	
+    
 }
 
-void UIScreen::HandleKeyPress(int key)
+void UIScreen::HandleKeyPress(int key, bool isActive)
 {
-
+    OnKeyPress(key);
+    if (isActive) OnActiveKeyPress(key);
 }
 
 void UIScreen::Close()
 {
-	mState = UIState::Closing;
+    mState = UIState::Closing;
 }
 
 UIText* UIScreen::AddText(const std::string& name, const Vector2& offset, float scale, float angle, const int pointSize, const int unsigned wrapLength, int drawOrder)

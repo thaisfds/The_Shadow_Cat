@@ -1,5 +1,6 @@
 #include "TutorialHUD.h"
 #include "../../Game.h"
+#include "../../SceneManager.h"
 #include <string>
 
 TutorialHUD::TutorialHUD(class Game* game, const std::string& fontName)
@@ -43,37 +44,28 @@ TutorialHUD::TutorialHUD(class Game* game, const std::string& fontName)
         txt->SetTextColor(Vector3::Zero); // Black
         txt->SetBackgroundColor(Vector4::Zero); // Transparent
     }
+
+    SceneManager::Instance().OnSceneChanged.Subscribe([this](GameScene scene) {
+        OnSceneChanged(scene);
+    });
 }
 
-void TutorialHUD::ToggleControlVisibility()
+void TutorialHUD::SetControlVisibility(bool visible)
 {
-    showControls = !showControls;
+    showControls = visible;
 
-    for (auto &img : mImages)
-        img->SetIsVisible(showControls);
-
-    for (auto &txt : mTexts)
-        txt->SetIsVisible(showControls);
+    for (auto &img : mImages) img->SetIsVisible(visible);
+    for (auto &txt : mTexts) txt->SetIsVisible(visible);
 }
 
-void TutorialHUD::ShowControls()
+void TutorialHUD::OnKeyPress(int key)
 {
-    showControls = true;
+    if (key != SDLK_h) return;
 
-    for (auto &img : mImages)
-        img->SetIsVisible(true);
-
-    for (auto &txt : mTexts)
-        txt->SetIsVisible(true);
+    SetControlVisibility(!showControls);
 }
 
-void TutorialHUD::HideControls()
+void TutorialHUD::OnSceneChanged(GameScene newScene)
 {
-    showControls = false;
-
-    for (auto &img : mImages)
-        img->SetIsVisible(false);
-
-    for (auto &txt : mTexts)
-        txt->SetIsVisible(false);
+    SetControlVisibility(newScene == GameScene::Lobby);
 }

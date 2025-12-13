@@ -62,54 +62,41 @@ void SceneManager::SetScene(GameScene nextScene)
         mGame->SetHUD(new HUD(mGame, "../Assets/Fonts/Pixellari.ttf"));
         mGame->SetUpgradeHUD(new UpgradeHUD(mGame, "../Assets/Fonts/Pixellari.ttf"));
 
-        if (mGame->GetTutorialHUD())
-            mGame->GetTutorialHUD()->ShowControls();
-
         LevelManager::Instance().LoadAndBuildLevel(nextScene);
         break;
 
     case GameScene::Level1:
         mBackgroundMusic = mGame->GetAudio()->PlaySound("m05_level1.mp3", true, 0.5f);
-        if (mGame->GetTutorialHUD())
-            mGame->GetTutorialHUD()->HideControls();
         LevelManager::Instance().LoadAndBuildLevel(nextScene);
         break;
 
     case GameScene::Level1_Boss:
         mBackgroundMusic = mGame->GetAudio()->PlaySound("m08_boss1_grass.mp3", true, 0.3f);
-        if (mGame->GetTutorialHUD())
-            mGame->GetTutorialHUD()->HideControls();
         LevelManager::Instance().LoadAndBuildLevel(nextScene);
         break;
 
     case GameScene::Level2:
         mBackgroundMusic = mGame->GetAudio()->PlaySound("m06_level2.mp3", true, 0.6f);
-        if (mGame->GetTutorialHUD())
-            mGame->GetTutorialHUD()->HideControls();
         LevelManager::Instance().LoadAndBuildLevel(nextScene);
         break;
 
     case GameScene::Level2_Boss:
         mBackgroundMusic = mGame->GetAudio()->PlaySound("m09_boss2_bricks.mp3", true);
-        if (mGame->GetTutorialHUD())
-            mGame->GetTutorialHUD()->HideControls();
         LevelManager::Instance().LoadAndBuildLevel(nextScene);
         break;
 
     case GameScene::Level3:
         mBackgroundMusic = mGame->GetAudio()->PlaySound("m07_level3.mp3", true);
-        if (mGame->GetTutorialHUD())
-            mGame->GetTutorialHUD()->HideControls();
         LevelManager::Instance().LoadAndBuildLevel(nextScene);
         break;
 
     case GameScene::Level3_Boss:
         mBackgroundMusic = mGame->GetAudio()->PlaySound("m10_boss3_stone.mp3", true);
-        if (mGame->GetTutorialHUD())
-            mGame->GetTutorialHUD()->HideControls();
         LevelManager::Instance().LoadAndBuildLevel(nextScene);
         break;
     }
+
+    OnSceneChanged.Invoke(mCurrentScene);
 }
 
 void SceneManager::UnloadScene()

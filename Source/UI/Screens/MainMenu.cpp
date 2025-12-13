@@ -56,7 +56,7 @@ MainMenu::MainMenu(class Game* game, const std::string& fontName)
     titleDrop->SetBackgroundColor(Vector4::Zero); // transparent
 }
 
-void MainMenu::HandleKeyPress(int key)
+void MainMenu::OnActiveKeyPress(int key)
 {
     if (mButtons.empty())
         return;

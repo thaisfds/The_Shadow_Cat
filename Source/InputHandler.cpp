@@ -125,10 +125,12 @@ void InputHandler::HandleControllerRemoved(SDL_JoystickID instanceID)
 
 void InputHandler::HandleKeyPress(SDL_Keycode key, Uint8 repeat)
 {
-    // UI input
-    if (!mGame->GetUIStack().empty())
+    // UI input - send to all screens, mark which is active (top of stack)
+    auto& uiStack = mGame->GetUIStack();
+    if (!uiStack.empty())
     {
-        mGame->GetUIStack().back()->HandleKeyPress(key);
+        auto topScreen = uiStack.back();
+        for (auto screen : uiStack) screen->HandleKeyPress(key, screen == topScreen);
     }
 
     // Fullscreen toggle (F11) - only on initial press
@@ -157,14 +159,6 @@ void InputHandler::HandleKeyPress(SDL_Keycode key, Uint8 repeat)
         mGame->SetDebugging(!mGame->IsDebugging());
     }
 
-    // Tutorial HUD toggle (H) - only on initial press
-    if (key == SDLK_h && repeat == 0)
-    {
-        auto tutorialHUD = mGame->GetTutorialHUD();
-        if (tutorialHUD)
-            tutorialHUD->ToggleControlVisibility();
-    }
-
     // Pause toggle (ESC) - only on initial press
     if (key == SDLK_ESCAPE && repeat == 0)
     {
@@ -172,10 +166,7 @@ void InputHandler::HandleKeyPress(SDL_Keycode key, Uint8 repeat)
             LevelManager::Instance().GetPlayer() && 
             LevelManager::Instance().GetPlayer()->GetUpgradePoints() == 0)
         {
-            if (mGame->IsPaused())
-                mGame->ResumeGame();
-            else
-                mGame->PauseGame();
+            mGame->SetPaused(!mGame->IsPaused());
         }
     }
 }

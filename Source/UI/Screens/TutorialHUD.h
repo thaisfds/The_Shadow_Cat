@@ -11,9 +11,12 @@ public:
 
     bool IsControlVisible() const { return showControls; }
 
-    void ToggleControlVisibility();
-    void ShowControls();
-    void HideControls();
+    void SetControlVisibility(bool visible);
+
+    void OnKeyPress(int key) override;
+
+    void OnSceneChanged(GameScene newScene);
+
 private:
 
     // TutorialHUD elements

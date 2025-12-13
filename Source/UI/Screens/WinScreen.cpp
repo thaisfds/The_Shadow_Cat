@@ -37,7 +37,7 @@ WinScreen::WinScreen(class Game* game, const std::string& fontName)
     }  
 }
 
-void WinScreen::HandleKeyPress(int key)
+void WinScreen::OnActiveKeyPress(int key)
 {
     if (mButtons.empty())
         return;

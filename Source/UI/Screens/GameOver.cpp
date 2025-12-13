@@ -50,7 +50,7 @@ GameOver::GameOver(class Game* game, const std::string& fontName)
     }  
 }
 
-void GameOver::HandleKeyPress(int key)
+void GameOver::OnActiveKeyPress(int key)
 {
     if (mButtons.empty())
         return;

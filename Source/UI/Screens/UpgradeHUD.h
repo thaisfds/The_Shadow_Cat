@@ -11,7 +11,7 @@ public:
     UpgradeHUD(class Game* game, const std::string& fontName);
 
     void Update(float deltaTime) override;
-    void HandleKeyPress(int key) override;
+    void OnActiveKeyPress(int key) override;
 
 private:
     const float CARD_SPACING = 200.0f;

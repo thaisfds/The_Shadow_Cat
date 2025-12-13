@@ -1,5 +1,6 @@
 #pragma once
 #include "AudioSystem.h"
+#include "Event.h"
 #include <string>
 
 class Game;
@@ -28,6 +29,8 @@ class SceneManager
 public:
     // Singleton access
     static SceneManager& Instance();
+
+    Event<GameScene> OnSceneChanged;
 
     // Delete copy constructor and assignment operator
     SceneManager(const SceneManager&) = delete;

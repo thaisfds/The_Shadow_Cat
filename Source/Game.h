@@ -5,6 +5,7 @@
 #include "AudioSystem.h"
 #include "Math.h"
 #include "SceneManager.h"
+#include "Event.h"
 
 class Game
 {
@@ -12,22 +13,21 @@ public:
     Game();
     ~Game();
 
+    Event<bool> OnPauseChanged;
+
     bool Initialize();
     void RunLoop();
     void Shutdown();
     void Quit() { mIsRunning = false; }
-
-
 
     // UI Management
     void PushUI(class UIScreen* screen) { mUIStack.emplace_back(screen); }
     std::vector<class UIScreen*>& GetUIStack() { return mUIStack; }
 
     // Game State
-    void PauseGame();
-    void ResumeGame();
-    void ResetGame();
+    void SetPaused(bool paused);
     bool IsPaused() const { return mIsPaused; }
+    void ResetGame();
     void SetGameOver(bool isOver) { mIsGameOver = isOver; }
     void SetGameWon(bool isWon) { mIsGameWon = isWon; }
 
