@@ -174,6 +174,7 @@ add_executable(${PROJECT_NAME}
         Source/SceneManager.h
         Source/GameRenderer.cpp
         Source/GameRenderer.h
+        Source/Event.h
 )
 
 configure_local_linking(${PROJECT_NAME})
