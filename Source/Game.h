@@ -48,6 +48,7 @@ public:
     // Debug
     bool IsDebugging() const { return mIsDebugging; }
     void SetDebugging(bool debug) { mIsDebugging = debug; }
+    bool IsGodMode() const { return mIsGodMode; }
 
     // Fullscreen
     bool IsFullscreen() const { return mIsFullscreen; }

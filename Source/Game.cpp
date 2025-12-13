@@ -31,7 +31,7 @@ Game::Game()
       mIsGameOver(false),
       mIsGameWon(false),
       mIsDebugging(false),
-      mIsGodMode(false)
+      mIsGodMode(true)
 {
 }
 
@@ -52,20 +52,17 @@ bool Game::Initialize()
     mRenderer = new Renderer(mWindow);
     mRenderer->Initialize(GameConstants::WINDOW_WIDTH, GameConstants::WINDOW_HEIGHT);
 
-    // Initialize input handler
-    InputHandler::Instance().Initialize(this);
-
+    
     SDL_ShowCursor(SDL_DISABLE);
-
+    
     mAudio = new AudioSystem();
     mAudio->CacheAllSounds();
-
-    // Initialize managers
+    
+    InputHandler::Instance().Initialize(this);
     LevelManager::Instance().Initialize(this);
     SceneManager::Instance().Initialize(this);
     GameRenderer::Instance().Initialize(this);
 
-    // Register skills
     SkillFactory::InitializeSkills();
 
     SceneManager::Instance().SetScene(GameScene::MainMenu);
@@ -80,10 +77,7 @@ void Game::RunLoop()
     while (mIsRunning)
     {
         float deltaTime = (SDL_GetTicks() - mTicksCount) / 1000.0f;
-        if (deltaTime > 0.05f)
-        {
-            deltaTime = 0.05f;
-        }
+        if (deltaTime > 0.05f) deltaTime = 0.05f;
 
         mTicksCount = SDL_GetTicks();
 
@@ -92,10 +86,7 @@ void Game::RunLoop()
         GameRenderer::Instance().Render();
 
         int sleepTime = (1000 / GameConstants::FPS) - (SDL_GetTicks() - mTicksCount);
-        if (sleepTime > 0)
-        {
-            SDL_Delay(sleepTime);
-        }
+        if (sleepTime > 0) SDL_Delay(sleepTime);
     }
 }
 

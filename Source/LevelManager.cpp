@@ -243,7 +243,7 @@ void LevelManager::UpdatePortalActivation()
         int aliveEnemies = CountAliveEnemies();
         int aliveBosses = CountAliveBosses();
 
-        bool shouldActivate = (aliveEnemies == 0 && aliveBosses == 0) || mGame->IsDebugging();
+        bool shouldActivate = (aliveEnemies == 0 && aliveBosses == 0) || mGame->IsDebugging() || mGame->IsGodMode();
 
         if (shouldActivate && !mLevelPortal->IsActive())
         {
